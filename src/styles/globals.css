@@ -1,0 +1,14 @@
+@layer tailwind {
+    @tailwind base;
+}
+@tailwind components;
+@tailwind utilities;
+
+/*!* Выставляем основные настройки по-умолчанию для body *!*/
+body {
+    min-height: 100vh;
+    scroll-behavior: smooth;
+    text-rendering: optimizeSpeed;
+    background: #edf6fa;
+    font-family: 'Montserrat', sans-serif;
+}

@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 .yarn/install-state.gz
+.idea/
 
 # testing
 /coverage
@@ -34,5 +35,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.env
+/src/app/api/types.ts
+/src/api/types.ts
+/src/shared/lib/crossneticsApi/Api.ts
+/public/sw.js*
+/public/workbox*
 
-.idea
+.vscode
