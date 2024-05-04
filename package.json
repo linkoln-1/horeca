@@ -9,9 +9,9 @@
     "lint": "next lint",
     "format": "prettier --write \"**/*.{ts,tsx,md,json,css}\"",
     "codegen": "npx openapi-typescript https://oyster-app-2-mhrcy.ondigitalocean.app/api-docs-json -o ./src/api/types.ts",
-    "codegen:rem": "npx openapi-typescript ${SWAGGER_URL} -o ./src/api/types.ts",
-    "libgen": "npx swagger-typescript-api -p https://oyster-app-2-mhrcy.ondigitalocean.app/api-docs -o ./src/shared/lib/horekaApi/",
-    "libgen:rem": "npx swagger-typescript-api -p ${SWAGGER_URL} -o ./src/shared/lib/crossneticsApi/",
+    "codegen:dev": "npx openapi-typescript http://localhost:8080/api-docs-json -o ./src/api/types.ts",
+    "libgen": "npx swagger-typescript-api -p https://oyster-app-2-mhrcy.ondigitalocean.app/api-docs-json -o ./src/shared/lib/horekaApi/",
+    "libgen:dev": "npx swagger-typescript-api -p http://localhost:8080/api-docs-json -o ./src/shared/lib/horekaApi/",
     "allgen:rem": "npm run codegen:rem & npm run libgen:rem"
   },
   "dependencies": {
@@ -24,7 +24,8 @@
     "next": "14.2.3",
     "next-international": "^1.2.4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-toastify": "^10.0.5"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",

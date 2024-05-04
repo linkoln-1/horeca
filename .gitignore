@@ -39,7 +39,5 @@ next-env.d.ts
 /src/app/api/types.ts
 /src/api/types.ts
 /src/shared/lib/crossneticsApi/Api.ts
-/public/sw.js*
-/public/workbox*
 
 .vscode
