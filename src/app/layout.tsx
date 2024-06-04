@@ -19,10 +19,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
     children,
-    params: { locale },
 }: Readonly<{
     children: ReactNode
-    params: { locale: string }
 }>) {
     return (
         <html lang='en'>
@@ -34,7 +32,7 @@ export default function RootLayout({
                 />
             </head>
             <body>
-                <ClientProviders locale={locale}>{children}</ClientProviders>
+                <ClientProviders>{children}</ClientProviders>
             </body>
         </html>
     )

@@ -2,47 +2,35 @@
 
 import { ReactNode } from 'react'
 
+import { AppLayout } from '@/core/layout/AppLayout/AppLayout'
 import { MantineProvider } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { QueryClientProvider } from '@tanstack/react-query'
+import { usePathname, useRouter } from 'next/navigation'
 
 import { theme } from '@/shared/constants'
-import { useCleanPathname } from '@/shared/hooks/useCleanPathname'
 import { queryClient } from '@/shared/lib/reactQuery'
-import { I18nProviderClient } from '@/shared/locales/client'
 
 import '@/styles/globals.css'
 import '@mantine/core/styles.css'
 
 type ClientProvidersProps = {
     children?: ReactNode
-    locale: string
 }
 
-export function ClientProviders({ children, locale }: ClientProvidersProps) {
-    const path = useCleanPathname()
+export function ClientProviders({ children }: ClientProvidersProps) {
+    const path = usePathname()
 
-    const isUpdatePasswordPath =
-        /^\/account\/update-password\/[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$/
+    const outSidePages = ['/', '/sign-up', '/sign-in']
 
-    const outSidePages = [
-        '/',
-        '/account/forgot-password',
-        '/sign-up',
-        '/sign-in',
-    ]
-
-    const isInsideApp =
-        !isUpdatePasswordPath.test(path) &&
-        outSidePages.filter(url => url === path).length === 0
+    const isInsideApp = outSidePages.filter(url => url === path).length === 0
 
     return (
         <QueryClientProvider client={queryClient}>
             <MantineProvider defaultColorScheme='light' theme={theme}>
                 <ModalsProvider>
-                    <I18nProviderClient locale={locale}>
-                        {children}
-                    </I18nProviderClient>
+                    {isInsideApp && <AppLayout>{children}</AppLayout>}
+                    {!isInsideApp && children}
                 </ModalsProvider>
             </MantineProvider>
         </QueryClientProvider>

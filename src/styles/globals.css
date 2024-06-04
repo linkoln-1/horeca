@@ -1,4 +1,4 @@
-
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 
 @layer tailwind {
     @tailwind base;
@@ -8,9 +8,35 @@
 
 /*!* Выставляем основные настройки по-умолчанию для body *!*/
 body {
-    min-height: 100vh;
+    /*min-height: 100vh;*/
     scroll-behavior: smooth;
     text-rendering: optimizeSpeed;
     background: #edf6fa;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Roboto', sans-serif;
+}
+
+.container {
+    @apply h-[850px] overflow-y-auto;
+}
+
+.content {
+    @apply flex flex-col justify-center w-full max-w-screen-lg mx-auto py-5 gap-5;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 9px; /* ширина скроллбара */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1; /* цвет дорожки */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #888; /* цвет скроллера */
+    border-radius: 6px; /* закругление скроллера */
+    border: 3px solid #f1f1f1; /* граница между скроллером и дорожкой */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555; /* цвет скроллера при наведении */
 }

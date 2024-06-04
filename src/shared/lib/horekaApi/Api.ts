@@ -9,91 +9,160 @@
  * ---------------------------------------------------------------
  */
 
-export interface Template {
-    /** Уникальный идентификатор шаблона */
-    templateId: string
-    /** Название шаблона */
+export interface UpdateUserDto {
     name: string
+    email: string
+    phone: string
+    profile: CreateHorecaProfileDto | CreateProviderProfileDto
 }
 
-export interface Order {
-    /** Идентификатор потребителя */
-    consumerId?: string
+export interface UserDto {
+    id: number
+    name: string
+    tin: string
+    email: string
+    phone: string
+    password: string
+    profileType: string
+    profile: HorecaProfileDto | ProviderProfileDto
 }
 
-export interface Product {
-    /** Имя продукта. */
-    name?: string
+export interface ErrorDto {
+    /** @example "AUTH_FAIL" */
+    errorMessage?:
+        | 'AUTH_FAIL'
+        | 'ITEM_NOT_FOUND'
+        | 'MAIL_IS_BUSY'
+        | 'PASSWORD_CHANGE_ERROR'
+        | 'USER_ALREADY_EXISTS'
+        | 'USER_DOES_NOT_EXISTS'
+        | 'GDPR_IS_NOT_APPROVED'
+    /** @example ["password|IS_NOT_EMPTY"] */
+    message?: string[]
+    /** @example "Bad Request" */
+    error: string
+    /** @example 400 */
+    statusCode: number
 }
 
-export interface Error {
-    /** Error message detailing what went wrong. */
-    msg?: string
+export enum Weekday {
+    Mo = 'mo',
+    Tu = 'tu',
+    We = 'we',
+    Th = 'th',
+    Fr = 'fr',
+    Sa = 'sa',
+    Su = 'su',
 }
 
-export interface ConsumerResponse {
-    consumer?: {
-        /** @format email */
-        email?: string
-        companyName?: string
-        deliveryAddress?: string
-        deliveryTime?: string
-        isVerificated?: boolean
-        inn?: string
-        _id?: string
-    }
-    token?: string
+export interface Address {
+    id?: number
+    address: string
+    weekdays: Weekday[]
+    moFrom: string
+    moTo: string
+    tuFrom: string
+    tuTo: string
+    weFrom: string
+    weTo: string
+    thFrom: string
+    thTo: string
+    frFrom: string
+    frTo: string
+    saFrom: string
+    saTo: string
+    suFrom: string
+    suTo: string
 }
 
-export interface ProviderResponse {
-    provider?: {
-        /** @format email */
-        email?: string
-        companyName?: string
-        productCategory?: string
-        minOrder?: string
-        deliveryMethod?: string
-        _id?: string
-        inn?: string
-        isVerificated?: boolean
-    }
-    token?: string
+export interface HorecaProfileDto {
+    info?: string
+    /** @minItems 1 */
+    addresses: Address[]
 }
 
-export interface BadRequestResponse {
-    message?: string
+export enum Categories {
+    AlcoholicDrinks = 'alcoholicDrinks',
+    GrocerySpicesSeasonings = 'grocerySpicesSeasonings',
+    SoftDrinks = 'softDrinks',
+    ReadyMeals = 'readyMeals',
+    Stationery = 'stationery',
+    Confectionery = 'confectionery',
+    CannedFoods = 'cannedFoods',
+    DairyProducts = 'dairyProducts',
+    IceCream = 'iceCream',
+    Meat = 'meat',
+    LowAlcoholDrinks = 'lowAlcoholDrinks',
+    SemiFinishedProducts = 'semiFinishedProducts',
+    Dishes = 'dishes',
+    CashDesk = 'cashDesk',
+    InstantFoods = 'instantFoods',
+    Fish = 'fish',
+    FruitsAndVegetables = 'fruitsAndVegetables',
+    CleaningProducts = 'cleaningProducts',
+    BakeryProducts = 'bakeryProducts',
+    TeeAndCoffee = 'teeAndCoffee',
 }
 
-export interface UnauthorizedResponse {
-    message?: string
+export enum DeliveryMethods {
+    SelfPickup = 'selfPickup',
+    DeliveryBySupplier = 'deliveryBySupplier',
+    SameDayDelivery = 'sameDayDelivery',
+    Weekends = 'weekends',
 }
 
-export interface ServerErrorResponse {
-    message?: string
+export interface ProviderProfileDto {
+    minOrderAmount: number
+    /** @minItems 1 */
+    categories: Categories[]
+    /** @minItems 1 */
+    deliveryMethods: DeliveryMethods[]
 }
 
-export interface Consumer {
-    /** @format email */
+export interface CreateHorecaProfileDto {
+    info?: string
+    /** @minItems 1 */
+    addresses: Address[]
+}
+
+export interface CreateProviderProfileDto {
+    minOrderAmount: number
+    /** @minItems 1 */
+    categories: Categories[]
+    /** @minItems 1 */
+    deliveryMethods: DeliveryMethods[]
+}
+
+export enum ProfileType {
+    Provider = 'Provider',
+    Horeca = 'Horeca',
+}
+
+export interface RegistrateUserDto {
+    name: string
+    tin: string
+    GDPRApproved: boolean
+    email: string
+    phone: string
+    password: string
+    repeatPassword: string
+    profileType: ProfileType
+    profile: CreateHorecaProfileDto | CreateProviderProfileDto
+}
+
+export interface AuthResultDto {
+    accessToken: string
+    refreshToken: string
+}
+
+export interface LoginUserDto {
     email: string
     password: string
-    phone: string
-    companyName: string
-    /** @format int64 */
-    inn: number
-    deliveryAddress: {
-        address?: string
-        info?: string
-        deliveryTime?: {
-            day?: string
-            from?: string
-            to?: string
-        }[]
-    }[]
-    /** @format int32 */
-    code?: number
-    /** @default false */
-    isVerificated?: boolean
 }
+
+export type CreateProposalHorecaDto = object
+
+export type CreateProposalProviderDto = object
 
 export type QueryParamsType = Record<string | number, any>
 export type ResponseFormat = keyof Omit<Body, 'body' | 'bodyUsed'>
@@ -147,7 +216,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-    public baseUrl: string = 'undefined'
+    public baseUrl: string = ''
     private securityData: SecurityDataType | null = null
     private securityWorker?: ApiConfig<SecurityDataType>['securityWorker']
     private abortControllers = new Map<CancelToken, AbortController>()
@@ -350,10 +419,11 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title Express API for JSONPlaceholder
- * @version 1.0.0
+ * @title HoReCa API
+ * @version 1.0
+ * @contact
  *
- * This is a REST API application made with Express. It retrieves data from JSONPlaceholder.
+ * The API for HoReCa
  */
 export class Api<
     SecurityDataType extends unknown,
@@ -362,176 +432,19 @@ export class Api<
         /**
          * No description
          *
-         * @tags Регистрация/Верификация/Авторизация общепита
-         * @name AuthConsumerChangePasswordCreate
-         * @summary Изменение пароля
-         * @request POST:/api/auth/consumer/changePassword
-         */
-        authConsumerChangePasswordCreate: (
-            data: {
-                /** @format email */
-                email: string
-                newPassword: string
-                code: number
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    provider?: {
-                        /** @format email */
-                        email?: string
-                        phone?: string
-                        companyName?: string
-                        productCategory?: string
-                        minOrder?: string
-                        deliveryMethod?: string
-                        isVerificated?: boolean
-                        inn?: string
-                        _id?: string
-                    }
-                    token?: string
-                },
-                {
-                    message?: string
-                }
-            >({
-                path: `/api/auth/consumer/changePassword`,
-                method: 'POST',
-                body: data,
-                type: ContentType.Json,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Регистрация/Верификация/Авторизация поставщика
-         * @name AuthProviderChangePasswordCreate
-         * @summary Изменение пароля
-         * @request POST:/api/auth/provider/changePassword
-         */
-        authProviderChangePasswordCreate: (
-            data: {
-                /** @format email */
-                email: string
-                newPassword: string
-                code: number
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    provider?: {
-                        /** @format email */
-                        email?: string
-                        phone?: string
-                        companyName?: string
-                        productCategory?: string
-                        minOrder?: string
-                        deliveryMethod?: string
-                        isVerificated?: boolean
-                        inn?: string
-                        _id?: string
-                    }
-                    token?: string
-                },
-                {
-                    message?: string
-                }
-            >({
-                path: `/api/auth/provider/changePassword`,
-                method: 'POST',
-                body: data,
-                type: ContentType.Json,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Шаблоны
-         * @name ConsumerDeleteTemplateDelete
-         * @summary Удаление шаблона по идентификатору
-         * @request DELETE:/api/consumer/delete_template/{templateId}
+         * @tags Users
+         * @name UsersControllerUpdate
+         * @request PUT:/api/users/{id}
          * @secure
          */
-        consumerDeleteTemplateDelete: (
-            templateId: string,
+        usersControllerUpdate: (
+            id: number,
+            data: UpdateUserDto,
             params: RequestParams = {}
         ) =>
-            this.request<
-                {
-                    /** @example "Шаблон успешно удален" */
-                    message?: string
-                },
-                | {
-                      /** @example "Шаблон не найден" */
-                      message?: string
-                  }
-                | {
-                      /** @example "Произошла ошибка при удалении шаблона" */
-                      message?: string
-                      error?: string
-                  }
-            >({
-                path: `/api/consumer/delete_template/${templateId}`,
-                method: 'DELETE',
-                secure: true,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Изменение данных в личном кабинете
-         * @name ConsumerEditExtraInfoCreate
-         * @summary Изменение дополнительной информации общепита
-         * @request POST:/api/consumer/edit_extra_info
-         * @secure
-         */
-        consumerEditExtraInfoCreate: (
-            data: {
-                consumerId: string
-                deliveryAddress?: {
-                    address?: string
-                    deliveryTime?: {
-                        day?: string
-                        from?: string
-                        to?: string
-                    }[]
-                }[]
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    consumer?: {
-                        email?: string
-                        phone?: string
-                        companyName?: string
-                        deliveryAddress?: {
-                            address?: string
-                            deliveryTime?: {
-                                day?: string
-                                from?: string
-                                to?: string
-                            }[]
-                        }[]
-                        inn?: string
-                        _id?: string
-                    }
-                    token?: string
-                },
-                {
-                    message?: string
-                }
-            >({
-                path: `/api/consumer/edit_extra_info`,
-                method: 'POST',
+            this.request<UserDto, ErrorDto>({
+                path: `/api/users/${id}`,
+                method: 'PUT',
                 body: data,
                 secure: true,
                 type: ContentType.Json,
@@ -542,167 +455,15 @@ export class Api<
         /**
          * No description
          *
-         * @tags Изменение данных в личном кабинете
-         * @name ProviderEditExtraInfoCreate
-         * @summary Изменение дополнительной информации поставщика
-         * @request POST:/api/provider/edit_extra_info
+         * @tags Users
+         * @name UsersControllerGet
+         * @request GET:/api/users/{id}
          * @secure
          */
-        providerEditExtraInfoCreate: (
-            data: {
-                /** Идентификатор поставщика */
-                providerId: string
-                /** Категории продуктов */
-                productCategory?: string[]
-                /** Минимальный размер заказа */
-                minOrder?: number
-                /** Способы доставки */
-                deliveryMethod?: string[]
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    provider?: {
-                        email?: string
-                        phone?: string
-                        companyName?: string
-                        productCategory?: string[]
-                        minOrder?: number
-                        deliveryMethod?: string[]
-                        isVerificated?: boolean
-                        _id?: string
-                        inn?: string
-                    }
-                    token?: string
-                },
-                {
-                    message?: string
-                }
-            >({
-                path: `/api/provider/edit_extra_info`,
-                method: 'POST',
-                body: data,
-                secure: true,
-                type: ContentType.Json,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Изменение данных в личном кабинете
-         * @name ConsumerEditMainInfoCreate
-         * @summary Изменение основной информации общепита
-         * @request POST:/api/consumer/edit_main_info
-         * @secure
-         */
-        consumerEditMainInfoCreate: (
-            data: {
-                phone?: string
-                companyName?: string
-                email?: string
-                password?: string
-                consumerId: string
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    consumer?: {
-                        email?: string
-                        phone?: string
-                        companyName?: string
-                        deliveryAddress?: string
-                        deliveryTime?: string
-                        inn?: string
-                        _id?: string
-                    }
-                    token?: string
-                },
-                {
-                    message?: string
-                }
-            >({
-                path: `/api/consumer/edit_main_info`,
-                method: 'POST',
-                body: data,
-                secure: true,
-                type: ContentType.Json,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Изменение данных в личном кабинете
-         * @name ProviderEditMainInfoCreate
-         * @summary Изменение основной информации поставщика
-         * @request POST:/api/provider/edit_main_info
-         * @secure
-         */
-        providerEditMainInfoCreate: (
-            data: {
-                phone?: string
-                companyName?: string
-                email?: string
-                password?: string
-                providerId: string
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    provider?: {
-                        email?: string
-                        companyName?: string
-                        productCategory?: string
-                        minOrder?: string
-                        deliveryMethod?: string
-                        _id?: string
-                        inn?: string
-                        isVerificated?: boolean
-                    }
-                    token?: string
-                },
-                {
-                    message?: string
-                }
-            >({
-                path: `/api/provider/edit_main_info`,
-                method: 'POST',
-                body: data,
-                secure: true,
-                type: ContentType.Json,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Заявки
-         * @name ConsumerAllOrdersDetail
-         * @summary Получение всех заявок по определенному общепиту
-         * @request GET:/api/consumer/allOrders/{consumerId}
-         * @secure
-         */
-        consumerAllOrdersDetail: (
-            consumerId: string,
-            data?: any,
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    orders?: Order[]
-                },
-                any
-            >({
-                path: `/api/consumer/allOrders/${consumerId}`,
+        usersControllerGet: (id: number, params: RequestParams = {}) =>
+            this.request<UserDto, ErrorDto>({
+                path: `/api/users/${id}`,
                 method: 'GET',
-                body: data,
                 secure: true,
                 format: 'json',
                 ...params,
@@ -711,43 +472,19 @@ export class Api<
         /**
          * No description
          *
-         * @tags Продукты
-         * @name ExtraAllProductsList
-         * @summary Получение списка продуктов
-         * @request GET:/api/extra/allProducts
+         * @tags Authorization
+         * @name AuthorizationControllerRegistrate
+         * @request POST:/api/auth/registration
          */
-        extraAllProductsList: (params: RequestParams = {}) =>
-            this.request<Product[], Error>({
-                path: `/api/extra/allProducts`,
-                method: 'GET',
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Шаблоны
-         * @name ConsumerAlltemplatesDetail
-         * @summary Получение всех шаблонов по определенному общепиту
-         * @request GET:/api/consumer/alltemplates/{consumerId}
-         * @secure
-         */
-        consumerAlltemplatesDetail: (
-            consumerId: string,
-            data?: any,
+        authorizationControllerRegistrate: (
+            data: RegistrateUserDto,
             params: RequestParams = {}
         ) =>
-            this.request<
-                {
-                    orders?: Template[]
-                },
-                any
-            >({
-                path: `/api/consumer/alltemplates/${consumerId}`,
-                method: 'GET',
+            this.request<AuthResultDto, ErrorDto>({
+                path: `/api/auth/registration`,
+                method: 'POST',
                 body: data,
-                secure: true,
+                type: ContentType.Json,
                 format: 'json',
                 ...params,
             }),
@@ -755,81 +492,36 @@ export class Api<
         /**
          * No description
          *
-         * @tags Авторизация
-         * @name AuthLoginCreate
-         * @summary Авторизация пользователя (поставщик или общепит)
+         * @tags Authorization
+         * @name AuthorizationControllerLogin
          * @request POST:/api/auth/login
          */
-        authLoginCreate: (
-            data: {
-                /**
-                 * Электронная почта пользователя.
-                 * @format email
-                 */
-                email: string
-                /**
-                 * Пароль пользователя.
-                 * @format password
-                 */
-                password: string
-            },
+        authorizationControllerLogin: (
+            data: LoginUserDto,
             params: RequestParams = {}
         ) =>
-            this.request<
-                ConsumerResponse | ProviderResponse,
-                BadRequestResponse | UnauthorizedResponse | ServerErrorResponse
-            >({
+            this.request<void, any>({
                 path: `/api/auth/login`,
                 method: 'POST',
                 body: data,
                 type: ContentType.Json,
-                format: 'json',
                 ...params,
             }),
 
         /**
          * No description
          *
-         * @tags Заявки
-         * @name ConsumerNeworderCreate
-         * @summary Создание новой заявки
-         * @request POST:/api/consumer/neworder
+         * @tags Proposals
+         * @name ProposalsHorecaControllerCreate
+         * @request POST:/api/proposals/horeca
          * @secure
          */
-        consumerNeworderCreate: (
-            data: {
-                /** Спопоб оптаты */
-                paymentMethod?: string
-                /** Адрес доставки */
-                deliveryAddress?: string
-                /** consumer id */
-                consumerId?: string
-                /** Крайний день доставки */
-                day?: string
-                /** Крайнее время доставки */
-                time?: string
-                /** Время до которого принимается доставка */
-                acceptTime?: string
-                /** Описание заявки */
-                description?: string
-                images?: string[]
-                categories?: {
-                    /** Название категории */
-                    categoryName?: string
-                    products?: {
-                        /** Название продукта */
-                        productName?: string
-                        /** Количество */
-                        amount?: number
-                        /** Единица измерения */
-                        measure?: string
-                    }[]
-                }[]
-            },
+        proposalsHorecaControllerCreate: (
+            data: CreateProposalHorecaDto,
             params: RequestParams = {}
         ) =>
-            this.request<void, void>({
-                path: `/api/consumer/neworder`,
+            this.request<void, any>({
+                path: `/api/proposals/horeca`,
                 method: 'POST',
                 body: data,
                 secure: true,
@@ -840,349 +532,21 @@ export class Api<
         /**
          * No description
          *
-         * @tags Шаблоны
-         * @name ConsumerNewtemplateCreate
-         * @summary Создание нового шаблона
-         * @request POST:/api/consumer/newtemplate
+         * @tags Proposals
+         * @name ProposalsProviderControllerCreate
+         * @request POST:/api/proposals/provider
          * @secure
          */
-        consumerNewtemplateCreate: (
-            data: {
-                /** Название шаблона */
-                templateName?: string
-                /** Спопоб оптаты */
-                paymentMethod?: string
-                /** Адрес доставки */
-                deliveryAddress?: string
-                /** consumer id */
-                consumerId?: string
-                /** Крайний день доставки */
-                day?: string
-                /** Крайнее время доставки */
-                time?: string
-                /** Время до которого принимается доставка */
-                acceptTime?: string
-                /** Описание заявки */
-                description?: string
-                images?: string[]
-                categories?: {
-                    /** Название категории */
-                    categoryName?: string
-                    products?: {
-                        /** Название продукта */
-                        productName?: string
-                        /** Количество */
-                        amount?: number
-                        /** Единица измерения */
-                        measure?: string
-                    }[]
-                }[]
-            },
+        proposalsProviderControllerCreate: (
+            data: CreateProposalProviderDto,
             params: RequestParams = {}
         ) =>
-            this.request<void, void>({
-                path: `/api/consumer/newtemplate`,
+            this.request<void, any>({
+                path: `/api/proposals/provider`,
                 method: 'POST',
                 body: data,
                 secure: true,
                 type: ContentType.Json,
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Регистрация/Верификация/Авторизация общепита
-         * @name AuthConsumerRegisterCreate
-         * @summary Регистрация общепита
-         * @request POST:/api/auth/consumer/register
-         */
-        authConsumerRegisterCreate: (
-            data: {
-                /**
-                 * Электронная почта общепита.
-                 * @format email
-                 */
-                email: string
-                /** Пароль для входа. */
-                password: string
-                /** Контактный телефон. */
-                phone: string
-                /** Название компании общепита. */
-                companyName: string
-                /**
-                 * ИНН компании общепита.
-                 * @format int64
-                 */
-                inn: number
-                /** Адреса и временные рамки доставки. */
-                deliveryAddress: {
-                    /** Адрес доставки. */
-                    address?: string
-                    /** Информация по приемке. */
-                    info?: string
-                    deliveryTime?: {
-                        /** День доставки. */
-                        day?: string
-                        /** Время начала доставки. */
-                        from?: string
-                        /** Время окончания доставки. */
-                        to?: string
-                    }[]
-                }[]
-                /**
-                 * Код для верификации (необязательный).
-                 * @format int32
-                 */
-                code?: number
-                /**
-                 * Статус верификации (по умолчанию false).
-                 * @default false
-                 */
-                isVerificated?: boolean
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<Consumer, void>({
-                path: `/api/auth/consumer/register`,
-                method: 'POST',
-                body: data,
-                type: ContentType.Json,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Регистрация/Верификация/Авторизация поставщика
-         * @name AuthProviderRegisterCreate
-         * @summary Регистрация поставщика
-         * @request POST:/api/auth/provider/register
-         */
-        authProviderRegisterCreate: (
-            data: {
-                /**
-                 * Электронная почта провайдера.
-                 * @format email
-                 */
-                email: string
-                /**
-                 * Пароль для входа в систему.
-                 * @format password
-                 */
-                password: string
-                /**
-                 * Контактный телефон.
-                 * @format phone
-                 */
-                phone: string
-                /** Название компании провайдера. */
-                companyName: string
-                /** Категории продуктов, которые предлагает компания. */
-                productCategory: string[]
-                /** Минимальный размер заказа. */
-                minOrder: number
-                /** Способы доставки. */
-                deliveryMethod: string[]
-                /** ИНН компании. */
-                inn: number
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    provider?: {
-                        email?: string
-                        companyName?: string
-                        productCategory?: string[]
-                        minOrder?: number
-                        deliveryMethod?: string[]
-                        /** Статус верификации провайдера. */
-                        isVerificated?: boolean
-                        _id?: string
-                        inn?: number
-                    }
-                    token?: string
-                },
-                {
-                    message?: string
-                } | void
-            >({
-                path: `/api/auth/provider/register`,
-                method: 'POST',
-                body: data,
-                type: ContentType.Json,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * @description Отправляет на электронную почту общепита новый пароль, если указанный email зарегистрирован.
-         *
-         * @tags Регистрация/Верификация/Авторизация общепита
-         * @name AuthConsumerRemindCreate
-         * @summary Генерация и отправка кода для смены пароля.
-         * @request POST:/api/auth/consumer/remind
-         */
-        authConsumerRemindCreate: (
-            data: {
-                /**
-                 * Электронная почта общепита для восстановления пароля.
-                 * @format email
-                 */
-                email: string
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    /** @example "Новый пароль сгенерирован и отправлен Вам на почту." */
-                    message?: string
-                },
-                | {
-                      /** @example "Не корректные данные." */
-                      message?: string
-                  }
-                | {
-                      /** @example "Указанный Email не зарегистрирован." */
-                      message?: string
-                  }
-                | void
-            >({
-                path: `/api/auth/consumer/remind`,
-                method: 'POST',
-                body: data,
-                type: ContentType.Json,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * @description Отправляет код для смены пароля, если указанный email зарегистрирован.
-         *
-         * @tags Регистрация/Верификация/Авторизация поставщика
-         * @name AuthProviderRemindCreate
-         * @summary Генерация и отправка кода для смены пароля.
-         * @request POST:/api/auth/provider/remind
-         */
-        authProviderRemindCreate: (
-            data: {
-                /**
-                 * Электронная почта поставщика для восстановления пароля.
-                 * @format email
-                 */
-                email: string
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    /** @example "Новый код сгенерирован и отправлен Вам на почту." */
-                    message?: string
-                },
-                | {
-                      /** @example "Не корректные данные." */
-                      message?: string
-                  }
-                | {
-                      /** @example "Указанный Email не зарегистрирован." */
-                      message?: string
-                  }
-                | void
-            >({
-                path: `/api/auth/provider/remind`,
-                method: 'POST',
-                body: data,
-                type: ContentType.Json,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Регистрация/Верификация/Авторизация общепита
-         * @name ConsumerVerificationCreate
-         * @summary Верификация общепита
-         * @request POST:/api/consumer/verification
-         */
-        consumerVerificationCreate: (
-            data: {
-                /** Код верификации, отправленный на электронную почту общепита. */
-                code: string
-                /** Идентификатор общепита, полученный при регистрации. */
-                consumerId: string
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    consumer?: {
-                        email?: string
-                        companyName?: string
-                        productCategory?: string[]
-                        deliveryAddress?: string
-                        deliveryTime?: {
-                            day?: string
-                            from?: string
-                            to?: string
-                        }[]
-                        inn?: number
-                        _id?: string
-                    }
-                    token?: string
-                },
-                {
-                    /** @example "Ошибка верификации. Код не совпадает или пользователь не найден." */
-                    message?: string
-                } | void
-            >({
-                path: `/api/consumer/verification`,
-                method: 'POST',
-                body: data,
-                type: ContentType.Json,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Регистрация/Верификация/Авторизация поставщика
-         * @name ProviderVerificationCreate
-         * @summary Верификация поставщика
-         * @request POST:/api/provider/verification
-         */
-        providerVerificationCreate: (
-            data: {
-                /** Верификационный код, отправленный на электронную почту поставщика. */
-                code: string
-                /** Уникальный идентификатор поставщика. */
-                providerId: string
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    provider?: {
-                        email?: string
-                        companyName?: string
-                        productCategory?: string
-                        minOrder?: string
-                        deliveryMethod?: string
-                        _id?: string
-                        inn?: string
-                        isVerificated?: boolean
-                    }
-                },
-                void
-            >({
-                path: `/api/provider/verification`,
-                method: 'POST',
-                body: data,
-                type: ContentType.Json,
-                format: 'json',
                 ...params,
             }),
     }

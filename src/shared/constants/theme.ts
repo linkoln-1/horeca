@@ -35,7 +35,7 @@ inputs.forEach(x => {
 })
 
 export const theme: MantineThemeOverride = {
-    fontFamily: 'Montserrat,sans-serif',
+    fontFamily: 'Roboto, sans-serif',
     fontSizes: {
         xsm: rem(14),
     },

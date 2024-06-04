@@ -1,44 +1,49 @@
 'use client'
 
-import {
-    Box,
-    Container,
-    Flex,
-    Image as MantineImage,
-    Text,
-} from '@mantine/core'
+import { useState } from 'react'
+
+import { SignUp } from '@/widgets/user/signUp'
+import { Box, Title } from '@mantine/core'
 import Link from 'next/link'
 
-export function SignUp() {
+import { Page } from '@/shared/ui/Page'
+import { RegistrationProgress } from '@/shared/ui/SignUpProgressBar'
+
+export function SignUpViews() {
+    const [currentStep, setCurrentStep] = useState(0)
+
+    const nextStep = () => setCurrentStep(current => Math.min(current + 1, 2))
     return (
-        <Box className='bg-[url("/assets/images/sign-up-bg.png")] bg-no-repeat bg-cover h-screen'>
-            <Box
-                className='w-full p-3 backdrop:blur-lg backdrop-filter'
-                style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                }}
-            >
-                <Container>
-                    <Flex align='center' justify='space-between'>
-                        <Box>
-                            <MantineImage src='/assets/icons/logo.svg' />
-                        </Box>
-                        <Box>
-                            <Flex gap='md'>
-                                <Link href=''>
-                                    <Text size='md'>О платформе</Text>
-                                </Link>
-                                <Link href=''>
-                                    <Text size='md'>Помощь</Text>
-                                </Link>
-                                <Link href=''>
-                                    <Text size='md'>Выйти</Text>
-                                </Link>
-                            </Flex>
-                        </Box>
-                    </Flex>
-                </Container>
+        <Page>
+            <Box className='flex w-screen h-screen bg-white'>
+                <Box className='w-2/5 hidden md:block'>
+                    <img
+                        className='w-full h-full object-cover'
+                        width='100%'
+                        height='100%'
+                        src={'/assets/images/bg-4.png'}
+                        alt='Horeka'
+                    />
+                </Box>
+                <Box className='w-full flex flex-col justify-center'>
+                    <Box className='w-[90%] lg:w-2/5 h-full mx-auto gap-5 container custom-scrollbar'>
+                        <Title ta='center' fw={700}>
+                            Регистрация
+                        </Title>
+
+                        <RegistrationProgress currentStep={currentStep} />
+
+                        <SignUp nextStep={nextStep} currentStep={currentStep} />
+
+                        <span className='block text-blue-600 text-center'>
+                            У вас уже есть аккаунт?{' '}
+                            <Link href='/sign-in' className='underline'>
+                                Войти
+                            </Link>
+                        </span>
+                    </Box>
+                </Box>
             </Box>
-        </Box>
+        </Page>
     )
 }
