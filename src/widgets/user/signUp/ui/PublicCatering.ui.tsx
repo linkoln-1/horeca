@@ -192,7 +192,7 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
     const steps = [PublicCateringStepOne, PublicCateringStepTwo]
 
     return (
-        <form onSubmit={form.onSubmit(values => console.log(values))}>
+        <form onSubmit={() => {}}>
             <Flex direction='column' gap='xl'>
                 {steps && steps[currentStep]()}
             </Flex>

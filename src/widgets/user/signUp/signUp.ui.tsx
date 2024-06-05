@@ -4,8 +4,9 @@ import { PublicCatering } from '@/widgets/user/signUp/ui'
 import { SupplierManufacturer } from '@/widgets/user/signUp/ui'
 import { Flex, SegmentedControl, Text } from '@mantine/core'
 
-import { Roles } from '@/shared/constants/roles'
+import { roles } from '@/shared/constants/roles'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
+import { ProfileType } from '@/shared/lib/horekaApi/Api'
 
 type SignUpProps = {
     nextStep: () => void
@@ -13,11 +14,11 @@ type SignUpProps = {
 }
 
 export function SignUp({ nextStep, currentStep }: SignUpProps) {
-    const [activeTab, setActiveTab] = useState(Roles.SupplierManufacturer)
+    const [activeTab, setActiveTab] = useState(roles[0].label)
     const isMobile = useBreakpoint('sm')
 
     const handleTabChange = (tab: string) => {
-        setActiveTab(tab as Roles)
+        setActiveTab(tab as ProfileType)
     }
 
     return (
@@ -30,11 +31,11 @@ export function SignUp({ nextStep, currentStep }: SignUpProps) {
                 onChange={handleTabChange}
                 value={activeTab}
                 color='blue'
-                data={[Roles.SupplierManufacturer, Roles.PublicCatering]}
+                data={[roles[0].label, roles[1].label]}
                 orientation={isMobile ? 'vertical' : 'horizontal'}
             />
 
-            {activeTab === Roles.SupplierManufacturer ? (
+            {activeTab === roles[0].label ? (
                 <SupplierManufacturer
                     nextStep={nextStep}
                     currentStep={currentStep}

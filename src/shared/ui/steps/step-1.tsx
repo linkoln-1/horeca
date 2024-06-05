@@ -3,7 +3,7 @@ import { UseFormReturnType } from '@mantine/form'
 import { IconAt, IconLock } from '@tabler/icons-react'
 import Link from 'next/link'
 
-import { FormValues } from '@/shared/hooks/useSupplierForm'
+import { FormValues } from '@/shared/constants'
 
 type StepOneProps = {
     form: UseFormReturnType<FormValues>
@@ -16,13 +16,13 @@ export function StepOne({ form }: StepOneProps) {
                 type='text'
                 label='Укажите название компании'
                 placeholder='Например, ООО “Рыба”'
-                {...form.getInputProps('companyName')}
+                {...form.getInputProps('name')}
             />
             <TextInput
                 type='text'
                 label='Укажите ИНН компании'
                 placeholder='ИНН'
-                {...form.getInputProps('companyTaxId')}
+                {...form.getInputProps('tin')}
             />
 
             <TextInput
@@ -47,18 +47,18 @@ export function StepOne({ form }: StepOneProps) {
                     placeholder='Повторите пароль'
                     className='w-full'
                     leftSection={<IconLock />}
-                    {...form.getInputProps('confirmPassword')}
+                    {...form.getInputProps('repeatPassword')}
                 />
             </Flex>
 
             <Checkbox
-                {...form.getInputProps('tos', { type: 'checkbox' })}
+                {...form.getInputProps('GDPRApproved', { type: 'checkbox' })}
                 label={
                     <span>
                         Поставив галочку, вы принимаете{' '}
                         <Link
                             target='_blank'
-                            href='/privacy-policy'
+                            href=''
                             className='text-blue-600 underline'
                         >
                             Пользовательское соглашение
