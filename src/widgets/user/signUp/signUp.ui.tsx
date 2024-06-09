@@ -39,7 +39,6 @@ export function SignUp({ nextStep, currentStep }: SignUpProps) {
                 <SupplierManufacturer
                     nextStep={nextStep}
                     currentStep={currentStep}
-                    activeTab={activeTab}
                 />
             ) : (
                 <PublicCatering

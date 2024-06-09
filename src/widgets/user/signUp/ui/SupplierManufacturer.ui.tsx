@@ -1,4 +1,6 @@
 import { userQueries } from '@/entities/user'
+import { SignUpStepOne } from '@/features/signUpSupplierSteps'
+import { SignUpStepTwo } from '@/features/signUpSupplierSteps'
 import { Button, Flex } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import Link from 'next/link'
@@ -6,19 +8,15 @@ import { useRouter } from 'next/navigation'
 
 import { FormValues } from '@/shared/constants'
 import { roles } from '@/shared/constants/roles'
-import { StepOne } from '@/shared/ui/steps/step-1'
-import { StepTwo } from '@/shared/ui/steps/step-2'
 
 type SupplierManufacturerProps = {
     nextStep: () => void
     currentStep: number
-    activeTab: string
 }
 
 export function SupplierManufacturer({
     nextStep,
     currentStep,
-    activeTab,
 }: SupplierManufacturerProps) {
     const form = useForm<FormValues>({
         initialValues: {
@@ -49,8 +47,6 @@ export function SupplierManufacturer({
         },
     })
 
-    console.log(form.values)
-
     const { mutateAsync: signUpUser, isPending } =
         userQueries.useRegisterUserMutation()
     const router = useRouter()
@@ -67,7 +63,8 @@ export function SupplierManufacturer({
         form.values.profile.categories.length > 0 &&
         form.values.profile.minOrderAmount > 0 &&
         form.values.profile.deliveryMethods.length > 0
-    const steps = [StepOne, StepTwo]
+
+    const steps = [SignUpStepOne, SignUpStepTwo]
 
     const CurrentStepComponent = steps[currentStep]
 
@@ -75,6 +72,7 @@ export function SupplierManufacturer({
         <form
             onSubmit={form.onSubmit(async () => {
                 if (currentStep === steps.length - 1) {
+                    await signUpUser(form.values)
                     router.push('/user/supplier')
                 } else {
                     nextStep()
@@ -94,7 +92,6 @@ export function SupplierManufacturer({
                         type='submit'
                         color='blue'
                         disabled={!isFullyFilledStepTwo}
-                        onClick={async () => await signUpUser(form.values)}
                     >
                         Завершить регистрацию
                     </Button>

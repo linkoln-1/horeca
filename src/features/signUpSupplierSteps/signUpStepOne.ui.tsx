@@ -15,7 +15,7 @@ type StepOneProps = {
     form: UseFormReturnType<FormValues>
 }
 
-export function StepOne({ form }: StepOneProps) {
+export function SignUpStepOne({ form }: StepOneProps) {
     return (
         <>
             <TextInput
