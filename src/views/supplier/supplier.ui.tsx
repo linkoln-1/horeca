@@ -31,7 +31,7 @@ export function SupplierViews() {
             name: 'История заявок',
             icon: IconCalendarClock,
             description: 'История ваших предложений и чаты с покупателями',
-            link: '/user/supplier/applications',
+            link: '/user/supplier/warning',
             button: 'Перейти к предложениям',
         },
         {
@@ -182,6 +182,8 @@ export function SupplierViews() {
                                                 color='blue'
                                                 fullWidth
                                                 my='md'
+                                                component={Link}
+                                                href={x.link}
                                             >
                                                 {x.button}
                                             </Button>
