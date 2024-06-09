@@ -6,7 +6,7 @@ import { AppLayout } from '@/core/layout/AppLayout/AppLayout'
 import { MantineProvider } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 import { theme } from '@/shared/constants'
 import { queryClient } from '@/shared/lib/reactQuery'

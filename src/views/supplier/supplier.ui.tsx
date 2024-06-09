@@ -1,16 +1,14 @@
 'use client'
 
-import { Box, Button, Divider, Flex, Grid, Paper, Text } from '@mantine/core'
+import { Box, Button, Flex, Grid, Paper, Text } from '@mantine/core'
 import {
     IconCalendarClock,
     IconLayoutBoardSplit,
     IconLayoutList,
-    IconMail,
     IconQuestionMark,
     IconSettings,
     IconShoppingCart,
     Icon,
-    IconBell,
 } from '@tabler/icons-react'
 import Link from 'next/link'
 
