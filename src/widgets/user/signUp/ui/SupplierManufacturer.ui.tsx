@@ -1,62 +1,82 @@
+import { userQueries } from '@/entities/user'
+import { SignUpStepOne } from '@/features/signUpSupplierSteps'
+import { SignUpStepTwo } from '@/features/signUpSupplierSteps'
 import { Button, Flex } from '@mantine/core'
+import { useForm } from '@mantine/form'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import { Roles } from '@/shared/constants/roles'
-import { useSupplierForm } from '@/shared/hooks/useSupplierForm'
-import { StepOne } from '@/shared/ui/steps/step-1'
-import { StepTwo } from '@/shared/ui/steps/step-2'
+import { FormValues } from '@/shared/constants'
+import { roles } from '@/shared/constants/roles'
 
 type SupplierManufacturerProps = {
     nextStep: () => void
     currentStep: number
-    activeTab: string
 }
 
 export function SupplierManufacturer({
     nextStep,
     currentStep,
-    activeTab,
 }: SupplierManufacturerProps) {
-    const form = useSupplierForm({
+    const form = useForm<FormValues>({
         initialValues: {
-            companyName: '',
-            companyTaxId: '',
+            name: '',
+            tin: '',
             email: '',
             password: '',
-            confirmPassword: '',
-            tos: false,
-            mobilePhone: '',
-            categories: [],
-            minOrderAmount: '',
-            pickup: false,
-            supplierDelivery: false,
-            sameDayDelivery: false,
+            repeatPassword: '',
+            GDPRApproved: false,
+            phone: '',
+            profileType: roles[0].role,
+            profile: {
+                deliveryMethods: [],
+                categories: [],
+                minOrderAmount: 0,
+            },
+        },
+        validate: {
+            name: value => (value ? null : 'Имя обязательно'),
+            tin: value => (value ? null : 'ИНН обязателен'),
+            email: value => (value ? null : 'Email обязателен'),
+            phone: value => (value ? null : 'Телефон обязателен'),
+            password: value => (value ? null : 'Пароль обязателен'),
+            repeatPassword: (value, values) =>
+                value === values.password ? null : 'Пароли не совпадают',
+            GDPRApproved: value =>
+                value ? null : 'Необходимо согласие на обработку данных',
         },
     })
+
+    const { mutateAsync: signUpUser, isPending } =
+        userQueries.useRegisterUserMutation()
     const router = useRouter()
 
     const isFullyFilledStepOne =
-        form.values.companyName &&
-        form.values.companyTaxId &&
+        form.values.name &&
+        form.values.tin &&
         form.values.email &&
         form.values.password &&
-        form.values.confirmPassword &&
-        form.values.tos
+        form.values.repeatPassword &&
+        form.values.GDPRApproved
 
     const isFullyFilledStepTwo =
-        form.values.mobilePhone &&
-        form.values.categories &&
-        form.values.minOrderAmount
+        form.values.profile.categories.length > 0 &&
+        form.values.profile.minOrderAmount > 0 &&
+        form.values.profile.deliveryMethods.length > 0
 
-    const steps = [StepOne, StepTwo]
+    const steps = [SignUpStepOne, SignUpStepTwo]
 
     const CurrentStepComponent = steps[currentStep]
 
     return (
         <form
-            onSubmit={form.onSubmit(() => {
-                console.log('submit')
+            onSubmit={form.onSubmit(async () => {
+                if (currentStep === steps.length - 1) {
+                    await signUpUser(form.values)
+                    router.push('/user/supplier')
+                } else {
+                    nextStep()
+                }
             })}
         >
             <Flex direction='column' gap='xl'>
@@ -72,11 +92,6 @@ export function SupplierManufacturer({
                         type='submit'
                         color='blue'
                         disabled={!isFullyFilledStepTwo}
-                        onClick={() =>
-                            activeTab === Roles.SupplierManufacturer
-                                ? router.push('/user/supplier')
-                                : null
-                        }
                     >
                         Завершить регистрацию
                     </Button>

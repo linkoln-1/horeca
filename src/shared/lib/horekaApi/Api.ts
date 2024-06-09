@@ -103,12 +103,41 @@ export enum Categories {
     BakeryProducts = 'bakeryProducts',
     TeeAndCoffee = 'teeAndCoffee',
 }
+export const CategoryLabels: Record<Categories, string> = {
+    alcoholicDrinks: 'Алкогольные напитки',
+    grocerySpicesSeasonings: 'Бакалея, специи, приправы',
+    softDrinks: 'Безалкогольные напитки, вода, соки',
+    readyMeals: 'Готовые блюда',
+    stationery: 'Канцтовары',
+    confectionery: 'Кондитерские изделия',
+    cannedFoods: 'Консервированные продукты',
+    dairyProducts: 'Молочные продукты, яйца',
+    iceCream: 'Мороженое',
+    meat: 'Мясо, субпродукты, колбасные изделия',
+    lowAlcoholDrinks: 'Пиво, слабоалкогольные напитки',
+    semiFinishedProducts: 'Полуфабрикаты',
+    dishes: 'Посуда и кухонные принадлежности',
+    cashDesk: 'Прикасса (чипсы, снеки, семечки)',
+    instantFoods: 'Продукты быстрого приготовления, лапша',
+    fish: 'Рыба и морепродукты',
+    fruitsAndVegetables: 'Свежие овощи, фрукты, зелень, грибы',
+    cleaningProducts: 'Уборка и чистящие средства',
+    bakeryProducts: 'Хлеб, хлебобулочные изделия',
+    teeAndCoffee: 'Чай, кофе, какао, заменители',
+}
 
 export enum DeliveryMethods {
     SelfPickup = 'selfPickup',
     DeliveryBySupplier = 'deliveryBySupplier',
     SameDayDelivery = 'sameDayDelivery',
     Weekends = 'weekends',
+}
+
+export const DeliveryMethodsLabels: Record<DeliveryMethods, string> = {
+    selfPickup: 'самовывоз',
+    deliveryBySupplier: 'доставка транспортом поставщика',
+    sameDayDelivery: 'доставка в день заказа',
+    weekends: 'выходные праздничные дни',
 }
 
 export interface ProviderProfileDto {
@@ -240,9 +269,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
     protected encodeQueryParam(key: string, value: any) {
         const encodedKey = encodeURIComponent(key)
-        return `${encodedKey}=${encodeURIComponent(
-            typeof value === 'number' ? value : `${value}`
-        )}`
+        return `${encodedKey}=${encodeURIComponent(typeof value === 'number' ? value : `${value}`)}`
     }
 
     protected addQueryParam(query: QueryParamsType, key: string) {
@@ -291,8 +318,8 @@ export class HttpClient<SecurityDataType = unknown> {
                     property instanceof Blob
                         ? property
                         : typeof property === 'object' && property !== null
-                        ? JSON.stringify(property)
-                        : `${property}`
+                          ? JSON.stringify(property)
+                          : `${property}`
                 )
                 return formData
             }, new FormData()),
@@ -340,19 +367,17 @@ export class HttpClient<SecurityDataType = unknown> {
         }
     }
 
-    public request = async <T = any, E = any>(
-        {
-            body,
-            secure,
-            path,
-            type,
-            query,
-            format,
-            baseUrl,
-            cancelToken,
-            ...params
-        }: FullRequestParams
-    ): Promise<HttpResponse<T, E>> => {
+    public request = async <T = any, E = any>({
+        body,
+        secure,
+        path,
+        type,
+        query,
+        format,
+        baseUrl,
+        cancelToken,
+        ...params
+    }: FullRequestParams): Promise<HttpResponse<T, E>> => {
         const secureParams =
             ((typeof secure === 'boolean'
                 ? secure
@@ -367,9 +392,7 @@ export class HttpClient<SecurityDataType = unknown> {
         const responseFormat = format || requestParams.format
 
         return this.customFetch(
-            `${baseUrl || this.baseUrl || ''}${path}${
-                queryString ? `?${queryString}` : ''
-            }`,
+            `${baseUrl || this.baseUrl || ''}${path}${queryString ? `?${queryString}` : ''}`,
             {
                 ...requestParams,
                 headers: {
@@ -388,7 +411,7 @@ export class HttpClient<SecurityDataType = unknown> {
                         : payloadFormatter(body),
             }
         ).then(async response => {
-            const r = response as HttpResponse<T, E>
+            const r = response.clone() as HttpResponse<T, E>
             r.data = null as unknown as T
             r.error = null as unknown as E
 
@@ -500,11 +523,12 @@ export class Api<
             data: LoginUserDto,
             params: RequestParams = {}
         ) =>
-            this.request<void, any>({
+            this.request<AuthResultDto, ErrorDto>({
                 path: `/api/auth/login`,
                 method: 'POST',
                 body: data,
                 type: ContentType.Json,
+                format: 'json',
                 ...params,
             }),
 
