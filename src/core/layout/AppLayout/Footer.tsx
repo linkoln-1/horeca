@@ -20,14 +20,7 @@ export function Footer() {
         </div>
     )
     return (
-        <Paper
-            w='100%'
-            bg='gray.1'
-            className={`mt-auto`}
-            pos='relative'
-            bottom={0}
-            left={0}
-        >
+        <Paper w='100%' bg='gray.1'>
             <Container my='md'>
                 <Flex justify='space-between' align='center'>
                     <MantineImage

@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 
-import { DeliveryForm } from '../../../features/delivery'
-import { SettingsForm } from '../../../features/profile'
-import { Box, Grid, SegmentedControl } from '@mantine/core'
+import { DeliveryForm } from '@/features/delivery'
+import { SettingsForm } from '@/features/profile'
+import { Box, Flex, Grid, SegmentedControl } from '@mantine/core'
+
+import { Page } from '@/shared/ui/Page'
 
 const links = [
     {
@@ -25,7 +27,7 @@ export function SettingsViews() {
     }
 
     return (
-        <Grid gutter='md'>
+        <Grid justify='space-between'>
             <Grid.Col
                 span={{
                     base: 12,
