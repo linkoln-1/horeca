@@ -20,7 +20,6 @@ export function Warning() {
 
                         <Button
                             variant='filled'
-                            radius='xl'
                             color='indigo'
                             component={Link}
                             href='/user/supplier/history'

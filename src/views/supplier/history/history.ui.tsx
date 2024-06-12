@@ -1,7 +1,7 @@
 'use client'
 
-import { Flex, Text, Paper, Box, Divider, Button } from '@mantine/core'
-import { IconChevronRight } from '@tabler/icons-react'
+import { Flex, Text, Paper, Box, Divider, Button, Menu } from '@mantine/core'
+import { IconCaretDown, IconChevronRight } from '@tabler/icons-react'
 import Link from 'next/link'
 
 type Info = {
@@ -135,152 +135,196 @@ export function History() {
     ]
 
     return (
-        <Flex gap='sm' justify='center' align='center' direction='column'>
-            {fakeHistory.map(historyItem => (
-                <Paper withBorder p='md' w='70%' key={historyItem.id}>
-                    <Text fw={700}>
-                        № {historyItem.number} от {historyItem.data}
-                    </Text>
-                    <Box>
-                        <Text
-                            c={
-                                historyItem.text.includes('В работе')
-                                    ? 'red'
-                                    : 'blue'
-                            }
-                        >
-                            {historyItem.text}
-                        </Text>
-                        <Divider my='xs' size='xs' color='gray.4' />
-                    </Box>
-                    <Box>
-                        <Text size='xl' fw={700}>
-                            {historyItem.title}
-                        </Text>
-                        <Flex>
-                            <Flex direction='column' flex={1} gap='xs'>
-                                {Object.keys(historyItem.info)
-                                    .slice(0, 4)
-                                    .map(key => (
-                                        <Text key={key} c='dimmed'>
-                                            {
-                                                historyItem.infoData[
-                                                    key as keyof Info
-                                                ]
-                                            }
-                                            :{' '}
-                                            {
-                                                historyItem.info[
-                                                    key as keyof Info
-                                                ]
-                                            }
-                                        </Text>
-                                    ))}
-                            </Flex>
-                            <Flex direction='column' flex={1}>
-                                {Object.keys(historyItem.info)
-                                    .slice(4)
-                                    .map(key => (
-                                        <Text key={key} c='dimmed'>
-                                            {
-                                                historyItem.infoData[
-                                                    key as keyof Info
-                                                ]
-                                            }
-                                            :{' '}
-                                            {
-                                                historyItem.info[
-                                                    key as keyof Info
-                                                ]
-                                            }
-                                        </Text>
-                                    ))}
-                            </Flex>
-                        </Flex>
-                        <Divider my='xs' size='xs' color='gray.4' />
-                        <Text c='dimmed' mt='sm'>
-                            Комментарий: {historyItem.commentary}
-                        </Text>
-                    </Box>
-                </Paper>
-            ))}
+        <Flex direction='column' gap='lg'>
+            <Flex gap='md' align='center'>
+                <Button variant='transparent' component={Link} href='#'>
+                    Все заявки
+                </Button>
 
-            {fakeHistory_2.map(historyItem => (
-                <Paper withBorder p='md' w='70%' key={historyItem.id}>
-                    <Text fw={700}>
-                        № {historyItem.number} от {historyItem.data}
-                    </Text>
-                    <Box>
-                        <Text
-                            c={
-                                historyItem.text.includes('В работе')
-                                    ? 'red'
-                                    : 'blue'
-                            }
-                        >
-                            {historyItem.text}
-                        </Text>
-                        <Divider my='xs' size='xs' color='gray.4' />
-                    </Box>
-                    <Box>
-                        <Text size='xl' fw={700}>
-                            {historyItem.title}
-                        </Text>
-                        <Flex>
-                            <Flex direction='column' flex={1} gap='xs'>
-                                {Object.keys(historyItem.info)
-                                    .slice(0, 4)
-                                    .map(key => (
-                                        <Text key={key} c='dimmed'>
-                                            {
-                                                historyItem.infoData[
-                                                    key as keyof Info
-                                                ]
-                                            }
-                                            :{' '}
-                                            {
-                                                historyItem.info[
-                                                    key as keyof Info
-                                                ]
-                                            }
-                                        </Text>
-                                    ))}
-                            </Flex>
-                            <Flex direction='column' flex={1}>
-                                {Object.keys(historyItem.info)
-                                    .slice(4)
-                                    .map(key => (
-                                        <Text key={key} c='dimmed'>
-                                            {
-                                                historyItem.infoData[
-                                                    key as keyof Info
-                                                ]
-                                            }
-                                            :{' '}
-                                            {
-                                                historyItem.info[
-                                                    key as keyof Info
-                                                ]
-                                            }
-                                        </Text>
-                                    ))}
-                            </Flex>
-                        </Flex>
-                        <Divider my='xs' size='xs' color='gray.4' />
-
+                <Menu offset={11} withArrow>
+                    <Menu.Target>
                         <Button
-                            component={Link}
-                            href='#'
-                            rightSection={<IconChevronRight />}
-                            c='blue'
                             variant='transparent'
-                            mt='sm'
+                            c='gray.7'
+                            rightSection={<IconCaretDown stroke={1} />}
                         >
-                            Смотреть все
+                            Текущие заявки
                         </Button>
-                    </Box>
-                </Paper>
-            ))}
+                    </Menu.Target>
+
+                    <Menu.Dropdown>
+                        <Menu.Item>В работе (чат доступен)</Menu.Item>
+                        <Menu.Item>
+                            Ожидает подтверждения (чат недоступен)
+                        </Menu.Item>
+                    </Menu.Dropdown>
+                </Menu>
+
+                <Menu offset={11} withArrow>
+                    <Menu.Target>
+                        <Button
+                            variant='transparent'
+                            c='gray.7'
+                            rightSection={<IconCaretDown stroke={1} />}
+                        >
+                            Завершенные заявки
+                        </Button>
+                    </Menu.Target>
+
+                    <Menu.Dropdown>
+                        <Menu.Item>Успешные</Menu.Item>
+                        <Menu.Item>Неуспешные</Menu.Item>
+                    </Menu.Dropdown>
+                </Menu>
+            </Flex>
+
+            <Flex gap='sm' direction='column'>
+                {fakeHistory.map(historyItem => (
+                    <Paper withBorder p='md' key={historyItem.id}>
+                        <Text fw={700}>
+                            № {historyItem.number} от {historyItem.data}
+                        </Text>
+                        <Box>
+                            <Text
+                                c={
+                                    historyItem.text.includes('В работе')
+                                        ? 'red'
+                                        : 'blue'
+                                }
+                            >
+                                {historyItem.text}
+                            </Text>
+                            <Divider my='xs' size='xs' color='gray.4' />
+                        </Box>
+                        <Box>
+                            <Text size='xl' fw={700}>
+                                {historyItem.title}
+                            </Text>
+                            <Flex>
+                                <Flex direction='column' flex={1} gap='xs'>
+                                    {Object.keys(historyItem.info)
+                                        .slice(0, 4)
+                                        .map(key => (
+                                            <Text key={key} c='dimmed'>
+                                                {
+                                                    historyItem.infoData[
+                                                        key as keyof Info
+                                                    ]
+                                                }
+                                                :{' '}
+                                                {
+                                                    historyItem.info[
+                                                        key as keyof Info
+                                                    ]
+                                                }
+                                            </Text>
+                                        ))}
+                                </Flex>
+                                <Flex direction='column' flex={1}>
+                                    {Object.keys(historyItem.info)
+                                        .slice(4)
+                                        .map(key => (
+                                            <Text key={key} c='dimmed'>
+                                                {
+                                                    historyItem.infoData[
+                                                        key as keyof Info
+                                                    ]
+                                                }
+                                                :{' '}
+                                                {
+                                                    historyItem.info[
+                                                        key as keyof Info
+                                                    ]
+                                                }
+                                            </Text>
+                                        ))}
+                                </Flex>
+                            </Flex>
+                            <Divider my='xs' size='xs' color='gray.4' />
+                            <Text c='dimmed' mt='sm'>
+                                Комментарий: {historyItem.commentary}
+                            </Text>
+                        </Box>
+                    </Paper>
+                ))}
+
+                {fakeHistory_2.map(historyItem => (
+                    <Paper withBorder p='md' key={historyItem.id}>
+                        <Text fw={700}>
+                            № {historyItem.number} от {historyItem.data}
+                        </Text>
+                        <Box>
+                            <Text
+                                c={
+                                    historyItem.text.includes('В работе')
+                                        ? 'red'
+                                        : 'blue'
+                                }
+                            >
+                                {historyItem.text}
+                            </Text>
+                            <Divider my='xs' size='xs' color='gray.4' />
+                        </Box>
+                        <Box>
+                            <Text size='xl' fw={700}>
+                                {historyItem.title}
+                            </Text>
+                            <Flex>
+                                <Flex direction='column' flex={1} gap='xs'>
+                                    {Object.keys(historyItem.info)
+                                        .slice(0, 4)
+                                        .map(key => (
+                                            <Text key={key} c='dimmed'>
+                                                {
+                                                    historyItem.infoData[
+                                                        key as keyof Info
+                                                    ]
+                                                }
+                                                :{' '}
+                                                {
+                                                    historyItem.info[
+                                                        key as keyof Info
+                                                    ]
+                                                }
+                                            </Text>
+                                        ))}
+                                </Flex>
+                                <Flex direction='column' flex={1}>
+                                    {Object.keys(historyItem.info)
+                                        .slice(4)
+                                        .map(key => (
+                                            <Text key={key} c='dimmed'>
+                                                {
+                                                    historyItem.infoData[
+                                                        key as keyof Info
+                                                    ]
+                                                }
+                                                :{' '}
+                                                {
+                                                    historyItem.info[
+                                                        key as keyof Info
+                                                    ]
+                                                }
+                                            </Text>
+                                        ))}
+                                </Flex>
+                            </Flex>
+                            <Divider my='xs' size='xs' color='gray.4' />
+
+                            <Button
+                                component={Link}
+                                href='#'
+                                rightSection={<IconChevronRight />}
+                                c='blue'
+                                variant='transparent'
+                                mt='sm'
+                            >
+                                Смотреть все
+                            </Button>
+                        </Box>
+                    </Paper>
+                ))}
+            </Flex>
         </Flex>
     )
 }
