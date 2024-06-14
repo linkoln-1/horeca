@@ -16,7 +16,7 @@ body {
 }
 
 .container {
-    @apply h-[850px] overflow-y-auto;
+    @apply h-[950px] overflow-y-auto;
 }
 
 .content {
