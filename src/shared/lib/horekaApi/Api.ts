@@ -9,6 +9,27 @@
  * ---------------------------------------------------------------
  */
 
+export type StreamableFile = object
+
+export interface ErrorDto {
+    /** @example "AUTH_FAIL" */
+    errorMessage?:
+        | 'AUTH_FAIL'
+        | 'ITEM_NOT_FOUND'
+        | 'MAIL_IS_BUSY'
+        | 'PASSWORD_CHANGE_ERROR'
+        | 'USER_ALREADY_EXISTS'
+        | 'USER_DOES_NOT_EXISTS'
+        | 'GDPR_IS_NOT_APPROVED'
+        | 'UPLOAD_NOT_FOUND'
+    /** @example ["password|IS_NOT_EMPTY"] */
+    message?: string[]
+    /** @example "Bad Request" */
+    error: string
+    /** @example 400 */
+    statusCode: number
+}
+
 export interface UpdateUserDto {
     name: string
     email: string
@@ -25,24 +46,6 @@ export interface UserDto {
     password: string
     profileType: string
     profile: HorecaProfileDto | ProviderProfileDto
-}
-
-export interface ErrorDto {
-    /** @example "AUTH_FAIL" */
-    errorMessage?:
-        | 'AUTH_FAIL'
-        | 'ITEM_NOT_FOUND'
-        | 'MAIL_IS_BUSY'
-        | 'PASSWORD_CHANGE_ERROR'
-        | 'USER_ALREADY_EXISTS'
-        | 'USER_DOES_NOT_EXISTS'
-        | 'GDPR_IS_NOT_APPROVED'
-    /** @example ["password|IS_NOT_EMPTY"] */
-    message?: string[]
-    /** @example "Bad Request" */
-    error: string
-    /** @example 400 */
-    statusCode: number
 }
 
 export enum Weekday {
@@ -103,6 +106,7 @@ export enum Categories {
     BakeryProducts = 'bakeryProducts',
     TeeAndCoffee = 'teeAndCoffee',
 }
+
 export const CategoryLabels: Record<Categories, string> = {
     alcoholicDrinks: 'Алкогольные напитки',
     grocerySpicesSeasonings: 'Бакалея, специи, приправы',
@@ -192,6 +196,46 @@ export interface LoginUserDto {
 export type CreateProposalHorecaDto = object
 
 export type CreateProposalProviderDto = object
+
+export interface CreateProductProviderDto {
+    category: string
+    name: string
+    description: string
+    producer: string
+    cost: number
+    count: number
+    packagingType: string
+    imageIds: number[]
+}
+
+export interface ProductResponse {
+    id: number
+    profileId: number
+    category: string
+    name: string
+    description: string
+    producer: string
+    cost: number
+    count: number
+    packagingType: string
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+    productImage: string[]
+    isEditable: boolean
+}
+
+export interface UpdateProductProviderDto {
+    category?: string
+    name?: string
+    description?: string
+    producer?: string
+    cost?: number
+    count?: number
+    packagingType?: string
+    imageIds: number[]
+}
 
 export type QueryParamsType = Record<string | number, any>
 export type ResponseFormat = keyof Omit<Body, 'body' | 'bodyUsed'>
@@ -455,6 +499,63 @@ export class Api<
         /**
          * No description
          *
+         * @tags Uploads
+         * @name UploadsControllerUpload
+         * @request POST:/api/uploads
+         * @secure
+         */
+        uploadsControllerUpload: (
+            data: {
+                /** @format binary */
+                file?: File
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<void, any>({
+                path: `/api/uploads`,
+                method: 'POST',
+                body: data,
+                secure: true,
+                type: ContentType.FormData,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Uploads
+         * @name UploadsControllerRead
+         * @request GET:/api/uploads/{id}
+         * @secure
+         */
+        uploadsControllerRead: (id: number, params: RequestParams = {}) =>
+            this.request<StreamableFile, ErrorDto>({
+                path: `/api/uploads/${id}`,
+                method: 'GET',
+                secure: true,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Uploads
+         * @name UploadsControllerDelete
+         * @request DELETE:/api/uploads/{id}
+         * @secure
+         */
+        uploadsControllerDelete: (id: number, params: RequestParams = {}) =>
+            this.request<void, any>({
+                path: `/api/uploads/${id}`,
+                method: 'DELETE',
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
          * @tags Users
          * @name UsersControllerUpdate
          * @request PUT:/api/users/{id}
@@ -571,6 +672,104 @@ export class Api<
                 body: data,
                 secure: true,
                 type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Products
+         * @name ProductsProviderControllerCreate
+         * @request POST:/api/products
+         * @secure
+         */
+        productsProviderControllerCreate: (
+            data: CreateProductProviderDto,
+            params: RequestParams = {}
+        ) =>
+            this.request<void, any>({
+                path: `/api/products`,
+                method: 'POST',
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Products
+         * @name ProductsProviderControllerFindAll
+         * @request GET:/api/products
+         * @secure
+         */
+        productsProviderControllerFindAll: (params: RequestParams = {}) =>
+            this.request<ProductResponse[], ErrorDto>({
+                path: `/api/products`,
+                method: 'GET',
+                secure: true,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Products
+         * @name ProductsProviderControllerGet
+         * @request GET:/api/products/{id}
+         * @secure
+         */
+        productsProviderControllerGet: (
+            id: number,
+            params: RequestParams = {}
+        ) =>
+            this.request<void, any>({
+                path: `/api/products/${id}`,
+                method: 'GET',
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Products
+         * @name ProductsProviderControllerUpdate
+         * @request PUT:/api/products/{id}
+         * @secure
+         */
+        productsProviderControllerUpdate: (
+            id: number,
+            data: UpdateProductProviderDto,
+            params: RequestParams = {}
+        ) =>
+            this.request<void, any>({
+                path: `/api/products/${id}`,
+                method: 'PUT',
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Products
+         * @name ProductsProviderControllerDelete
+         * @request DELETE:/api/products/{id}
+         * @secure
+         */
+        productsProviderControllerDelete: (
+            id: number,
+            params: RequestParams = {}
+        ) =>
+            this.request<void, any>({
+                path: `/api/products/${id}`,
+                method: 'DELETE',
+                secure: true,
                 ...params,
             }),
     }

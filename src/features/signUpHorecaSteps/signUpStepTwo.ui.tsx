@@ -1,6 +1,14 @@
-import { Checkbox, Group, Textarea, TextInput } from '@mantine/core'
+import {
+    Box,
+    Button,
+    Checkbox,
+    Group,
+    Textarea,
+    TextInput,
+} from '@mantine/core'
 import { TimeInput } from '@mantine/dates'
 import { UseFormReturnType } from '@mantine/form'
+import { IconPlus } from '@tabler/icons-react'
 
 import { HorecaFormValues } from '@/shared/constants'
 import { Address, Weekday } from '@/shared/lib/horekaApi/Api'
@@ -25,6 +33,31 @@ const weekdays: {
 ]
 
 export function HorecaStepTwo({ form }: StepProps) {
+    // Функция для добавления нового адреса
+    const addNewAddress = () => {
+        const newAddress = {
+            address: '',
+            weekdays: [],
+            moFrom: '',
+            moTo: '',
+            tuFrom: '',
+            tuTo: '',
+            weFrom: '',
+            weTo: '',
+            thFrom: '',
+            thTo: '',
+            frFrom: '',
+            frTo: '',
+            saFrom: '',
+            saTo: '',
+            suFrom: '',
+            suTo: '',
+        }
+        form.insertListItem('profile.addresses', newAddress)
+    }
+
+    console.log(form.values)
+
     return (
         <>
             <TextInput
@@ -34,68 +67,70 @@ export function HorecaStepTwo({ form }: StepProps) {
                 {...form.getInputProps('phone')}
             />
 
-            {/*Нужно доработать, эта хрень работает неправильно я его душу матал*/}
-            {form.values.profile.addresses.map((address, index) => (
-                <TextInput
-                    key={index}
-                    required
-                    label={`Адрес доставки ${index + 1}`}
-                    placeholder='Например, Г. Сочи, ул. Ленина, д.15, корп.7.'
-                    {...form.getInputProps(`${address.address}`)}
-                />
+            {form.values.profile.addresses.map((address, addressIndex) => (
+                <div key={addressIndex}>
+                    <TextInput
+                        required
+                        label={`Адрес доставки ${addressIndex + 1}`}
+                        placeholder='Адрес доставки'
+                        {...form.getInputProps(
+                            `profile.addresses.${addressIndex}.address`
+                        )}
+                    />
+
+                    {weekdays.map(day => (
+                        <Group key={day.value} grow align='center' my='lg'>
+                            <Checkbox
+                                label={day.label}
+                                checked={address.weekdays.includes(day.value)}
+                                onChange={event => {
+                                    const checked = event.currentTarget.checked
+                                    if (!address.weekdays) address.weekdays = [] // Инициализация, если необходимо
+                                    form.setFieldValue(
+                                        `profile.addresses.${addressIndex}.weekdays`,
+                                        checked
+                                            ? [...address.weekdays, day.value]
+                                            : address.weekdays.filter(
+                                                  w => w !== day.value
+                                              )
+                                    )
+
+                                    if (!checked) {
+                                        form.setFieldValue(
+                                            `profile.addresses.${addressIndex}.${day.from}`,
+                                            ''
+                                        )
+                                        form.setFieldValue(
+                                            `profile.addresses.${addressIndex}.${day.to}`,
+                                            ''
+                                        )
+                                    }
+                                }}
+                            />
+                            <TimeInput
+                                size='xs'
+                                label='C'
+                                {...form.getInputProps(
+                                    `profile.addresses.${addressIndex}.${day.from}`
+                                )}
+                            />
+                            <TimeInput
+                                size='xs'
+                                label='До'
+                                {...form.getInputProps(
+                                    `profile.addresses.${addressIndex}.${day.to}`
+                                )}
+                            />
+                        </Group>
+                    ))}
+                </div>
             ))}
 
-            {/*Эта хрень тоже работает неправильно.*/}
-            {weekdays.map((day, index) => (
-                <Group key={day.value} grow align='center'>
-                    <Checkbox
-                        label={day.label}
-                        checked={form.values.profile.addresses.some(d =>
-                            d.weekdays.includes(day.value)
-                        )}
-                        onChange={event => {
-                            const checked = event.currentTarget.checked
-                            const newAddresses =
-                                form.values.profile.addresses.map(d => {
-                                    if (d.weekdays.includes(day.value)) {
-                                        if (!checked) {
-                                            d.weekdays = d.weekdays.filter(
-                                                wd => wd !== day.value
-                                            )
-                                            ;(d[
-                                                day.from as keyof Address
-                                            ] as string) = ''
-                                            ;(d[
-                                                day.to as keyof Address
-                                            ] as string) = ''
-                                        }
-                                    } else if (checked) {
-                                        d.weekdays.push(day.value)
-                                    }
-                                    return d
-                                })
-                            form.setFieldValue(
-                                'profile.addresses',
-                                newAddresses
-                            )
-                        }}
-                    />
-                    <TimeInput
-                        size='xs'
-                        label='C'
-                        {...form.getInputProps(
-                            `profile.addresses[${index}].${day.from}`
-                        )}
-                    />
-                    <TimeInput
-                        size='xs'
-                        label='До'
-                        {...form.getInputProps(
-                            `profile.addresses[${index}].${day.to}`
-                        )}
-                    />
-                </Group>
-            ))}
+            <Box className='flex justify-center'>
+                <Button onClick={addNewAddress} leftSection={<IconPlus />}>
+                    Добавить еще адрес
+                </Button>
+            </Box>
 
             <Textarea
                 label='Информация о приёмке, которую должен знать поставщик'

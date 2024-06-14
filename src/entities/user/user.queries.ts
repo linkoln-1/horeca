@@ -12,7 +12,6 @@ import { api } from '@/shared/lib/horekaApi'
  */
 export function useRegisterUserMutation() {
     const queryClient = useQueryClient()
-    const router = useRouter()
 
     return useMutation({
         mutationFn: api.authorizationControllerRegistrate,
@@ -34,7 +33,6 @@ export function useRegisterUserMutation() {
  */
 export function useLoginUserMutation() {
     const queryClient = useQueryClient()
-    const router = useRouter()
 
     return useMutation({
         mutationFn: api.authorizationControllerLogin,
@@ -43,8 +41,6 @@ export function useLoginUserMutation() {
                 accessToken: data.accessToken || null,
                 refreshToken: data.refreshToken || null,
             })
-
-            router.push('/user')
 
             await queryClient.invalidateQueries({ queryKey: ['user', 'me'] })
         },
