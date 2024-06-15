@@ -2,7 +2,9 @@
 
 import { ReactNode } from 'react'
 
+import { UserStoreProvider } from './userStoreContext'
 import { AppLayout } from '@/core/layout/AppLayout/AppLayout'
+import { AuthProvider } from '@/core/providers/authProvider'
 import { MantineProvider } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
 import { QueryClientProvider } from '@tanstack/react-query'
@@ -28,10 +30,14 @@ export function ClientProviders({ children }: ClientProvidersProps) {
     return (
         <QueryClientProvider client={queryClient}>
             <MantineProvider defaultColorScheme='light' theme={theme}>
-                <ModalsProvider>
-                    {isInsideApp && <AppLayout>{children}</AppLayout>}
-                    {!isInsideApp && children}
-                </ModalsProvider>
+                <UserStoreProvider>
+                    <AuthProvider>
+                        <ModalsProvider>
+                            {isInsideApp && <AppLayout>{children}</AppLayout>}
+                            {!isInsideApp && children}
+                        </ModalsProvider>
+                    </AuthProvider>
+                </UserStoreProvider>
             </MantineProvider>
         </QueryClientProvider>
     )
