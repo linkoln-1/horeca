@@ -73,7 +73,6 @@ export function SupplierManufacturer({
             onSubmit={form.onSubmit(async () => {
                 if (currentStep === steps.length - 1) {
                     await signUpUser(form.values)
-                    router.push('/user/supplier')
                 } else {
                     nextStep()
                 }

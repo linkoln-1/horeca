@@ -14,7 +14,7 @@ import Link from 'next/link'
 
 import { CustomAvatarUpload } from '@/shared/ui/CustomAvatarUpload'
 
-export function SupplierViews() {
+export function ProfileView() {
     const userData = [
         {
             id: 1,
@@ -29,7 +29,7 @@ export function SupplierViews() {
             name: 'История заявок',
             icon: IconCalendarClock,
             description: 'История ваших предложений и чаты с покупателями',
-            link: '/user/supplier/warning',
+            link: '/user/warning',
             button: 'Перейти к предложениям',
         },
         {
@@ -37,7 +37,7 @@ export function SupplierViews() {
             name: 'Входящие заявки',
             icon: IconLayoutList,
             description: 'Вы можете откликаться на любые заявки!',
-            link: '/user/supplier/products/applications',
+            link: '/user/products/applications',
             button: 'Перейти к заявкам',
         },
         {
@@ -45,21 +45,21 @@ export function SupplierViews() {
             name: 'Мой каталог',
             icon: IconLayoutBoardSplit,
             description: 'Предложите ваши товары всему общепиту на площадке!',
-            link: '/user/supplier/catalog',
+            link: '/user/catalog',
         },
         {
             id: 4,
             name: 'Реклама',
             icon: IconShoppingCart,
             description: 'Здесь можно купить рекламу на площадке',
-            link: '/user/supplier/advertisement',
+            link: '/user/advertisement',
         },
         {
             id: 5,
             name: 'Служба заботы',
             icon: IconQuestionMark,
             description: 'У вас пока нет ни одного запроса к нам',
-            link: '/user/supplier/service',
+            link: '/user/service',
         },
         {
             id: 6,
@@ -67,7 +67,7 @@ export function SupplierViews() {
             icon: IconSettings,
             description:
                 'Вы можете изменить условия доставки и категории товара, по которым принимаете заявки',
-            link: '/user/supplier/settings',
+            link: '/user/settings',
         },
     ]
     return (
