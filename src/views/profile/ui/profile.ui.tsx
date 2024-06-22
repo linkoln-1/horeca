@@ -47,7 +47,7 @@ export function ProfileView() {
             name: 'Реклама',
             icon: IconShoppingCart,
             description: 'Здесь можно купить рекламу на площадке',
-            link: '/user/advertisement',
+            link: '/user/advertising/advertisement',
         },
         {
             id: 5,

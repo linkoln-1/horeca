@@ -1,4 +1,4 @@
-import { SettingsViews } from '../../../views/profile/ui/settings'
+import { SettingsViews } from '../../../views/settings'
 
 export default function SettingsPage() {
     return <SettingsViews />
