@@ -1,35 +1,22 @@
-'use client'
+import { Button, Checkbox, Flex, Text, TextInput } from '@mantine/core'
 
-import { useState } from 'react'
-
-import {
-    Button,
-    Checkbox,
-    Flex,
-    Image,
-    Modal,
-    Text,
-    TextInput,
-} from '@mantine/core'
-
-type PromotionProps = {
-    opened: boolean
-    close: () => void
-    rate: any
+type rateType = {
+    isAgreementAccepted: boolean
+    handleAgreementSubmit: () => void
+    name: string
 }
 
-export function Promotion({ opened, close, rate }: PromotionProps) {
-    const [isAgreementAccepted, setAgreementAccepted] = useState(false)
-    const handleAgreementSubmit = () => {
-        setAgreementAccepted(true)
-    }
-
+export function RateModal({
+    isAgreementAccepted,
+    handleAgreementSubmit,
+    name,
+}: rateType) {
     return (
-        <Modal opened={opened} onClose={close} centered>
+        <>
             {!isAgreementAccepted ? (
                 <Flex direction='column' gap='md'>
                     <Text ta='center' size='xl' fw={700}>
-                        Вы выбрали тариф "{rate?.name}"
+                        Вы выбрали тариф &ldquo;{name}&ldquo;
                     </Text>
                     <Text>
                         Чтобы заказать рекламу, Вам нужно будет заполнить
@@ -86,6 +73,6 @@ export function Promotion({ opened, close, rate }: PromotionProps) {
                     </Button>
                 </>
             )}
-        </Modal>
+        </>
     )
 }

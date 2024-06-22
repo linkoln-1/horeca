@@ -16,6 +16,7 @@ export function SettingsForm() {
     })
 
     const { mutateAsync: updateUser } = userQueries.useUpdateUserMutation()
+
     return (
         <Page>
             <Title>Общая информация</Title>

@@ -1,4 +1,4 @@
-import { Advertisement } from '@/views/profile/ui/advertising/advertisement'
+import { Advertisement } from '@/views/advertising/advertisement'
 
 export default function PageAdvertisement() {
     return <Advertisement />
