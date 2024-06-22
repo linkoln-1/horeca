@@ -1,20 +1,10 @@
-import {
-    Checkbox,
-    Flex,
-    MultiSelect,
-    NumberInput,
-    Text,
-    TextInput,
-} from '@mantine/core'
+import { Checkbox, Flex, MultiSelect, NumberInput, Text } from '@mantine/core'
 import { UseFormReturnType } from '@mantine/form'
 
 import { FormValues } from '@/shared/constants'
-import {
-    Categories,
-    CategoryLabels,
-    DeliveryMethods,
-    DeliveryMethodsLabels,
-} from '@/shared/lib/horekaApi/Api'
+import { CategoryLabels } from '@/shared/constants'
+import { DeliveryMethodsLabels } from '@/shared/constants'
+import { Categories, DeliveryMethods } from '@/shared/lib/horekaApi/Api'
 
 type StepTwoProps = {
     form: UseFormReturnType<FormValues>

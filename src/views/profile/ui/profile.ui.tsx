@@ -14,14 +14,8 @@ import Link from 'next/link'
 
 import { CustomAvatarUpload } from '@/shared/ui/CustomAvatarUpload'
 
-export function SupplierViews() {
-    const userData = [
-        {
-            id: 1,
-            name: 'ООО “РОМАШКА”',
-            email: 'ivanov.ivan@ryba.com',
-        },
-    ]
+export function ProfileView() {
+    const user = useUserStore(state => state.user)
 
     const menuList = [
         {
@@ -29,7 +23,7 @@ export function SupplierViews() {
             name: 'История заявок',
             icon: IconCalendarClock,
             description: 'История ваших предложений и чаты с покупателями',
-            link: '/user/supplier/warning',
+            link: '/user/warning',
             button: 'Перейти к предложениям',
         },
         {
@@ -37,7 +31,7 @@ export function SupplierViews() {
             name: 'Входящие заявки',
             icon: IconLayoutList,
             description: 'Вы можете откликаться на любые заявки!',
-            link: '/user/supplier/products/applications',
+            link: '/user/products/applications',
             button: 'Перейти к заявкам',
         },
         {
@@ -45,7 +39,7 @@ export function SupplierViews() {
             name: 'Мой каталог',
             icon: IconLayoutBoardSplit,
             description: 'Предложите ваши товары всему общепиту на площадке!',
-            link: '/user/supplier/catalog',
+            link: '/user/catalog',
         },
         {
             id: 4,
@@ -59,7 +53,7 @@ export function SupplierViews() {
             name: 'Служба заботы',
             icon: IconQuestionMark,
             description: 'У вас пока нет ни одного запроса к нам',
-            link: '/user/supplier/service',
+            link: '/user/service',
         },
         {
             id: 6,
@@ -67,12 +61,12 @@ export function SupplierViews() {
             icon: IconSettings,
             description:
                 'Вы можете изменить условия доставки и категории товара, по которым принимаете заявки',
-            link: '/user/supplier/settings',
+            link: '/user/settings',
         },
     ]
     return (
         <Flex direction='column' gap='md'>
-            <Grid align='center'>
+            <Grid>
                 <Grid.Col
                     span={{
                         base: 12,
@@ -93,19 +87,21 @@ export function SupplierViews() {
                                 </Box>
                                 <Box>
                                     <Flex direction='column' gap='lg'>
-                                        {userData.map(item => (
+                                        {[user].map(item => (
                                             <Flex
-                                                key={item.id}
+                                                key={item && item.id}
                                                 direction='column'
                                                 gap='md'
                                                 justify='center'
                                                 align='center'
                                             >
                                                 <Text size='xl' fw={700}>
-                                                    {item.name}
+                                                    {item && item.name}
                                                 </Text>
 
-                                                <Text>email: {item.email}</Text>
+                                                <Text>
+                                                    email: {item && item.email}
+                                                </Text>
                                             </Flex>
                                         ))}
                                     </Flex>

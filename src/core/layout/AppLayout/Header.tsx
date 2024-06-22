@@ -1,3 +1,4 @@
+import { useUserStore } from '@/core/providers/userStoreContext'
 import {
     Button,
     Container,
@@ -11,11 +12,12 @@ import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 
 export function Header() {
     const isMobile = useBreakpoint('sm')
+    const user = useUserStore(state => state.user)
     return (
         <Paper w='100%' bg='gray.1' p='sm'>
             <Container>
                 <Flex justify='space-between' align='center'>
-                    <Link href='/user/supplier'>
+                    <Link href={`/user/${user?.id}`}>
                         <MantineImage
                             src='/assets/icons/logo.svg'
                             alt='Horeka logo'

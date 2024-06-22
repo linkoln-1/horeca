@@ -22,7 +22,7 @@ export function Warning() {
                             variant='filled'
                             color='indigo'
                             component={Link}
-                            href='/user/supplier/history'
+                            href='/user/history'
                             size='lg'
                             fullWidth
                         >

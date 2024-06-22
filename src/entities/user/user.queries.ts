@@ -35,16 +35,28 @@ export function useLoginUserMutation() {
     })
 }
 
-export function useGetMeQuery(enabled: boolean = true, id: number) {
+export function useGetMeQuery(enabled: boolean = true) {
     return useCustomQuery({
-        queryKey: ['user', id],
+        queryKey: ['user', 'me'],
         queryFn: async () => {
-            const result = await api.usersControllerGet(id)
+            const result = await api.usersControllerGet()
 
             userStore.getState().updateUser(result.data)
 
             return result
         },
         enabled,
+    })
+}
+
+export function useUpdateUserMutation() {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: api.usersControllerUpdate,
+        onSuccess: async ({ data }) => {
+            userStore.getState().updateUser(data)
+            await queryClient.invalidateQueries({ queryKey: ['user', 'me'] })
+        },
     })
 }

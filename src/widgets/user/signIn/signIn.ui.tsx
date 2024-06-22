@@ -29,9 +29,9 @@ export function SignIn() {
 
     return (
         <form
-            onSubmit={form.onSubmit(async values =>
+            onSubmit={form.onSubmit(async values => {
                 signInUser(values).then(form.reset)
-            )}
+            })}
             className='relative'
         >
             <LoadingOverlay

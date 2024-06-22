@@ -107,41 +107,11 @@ export enum Categories {
     TeeAndCoffee = 'teeAndCoffee',
 }
 
-export const CategoryLabels: Record<Categories, string> = {
-    alcoholicDrinks: 'Алкогольные напитки',
-    grocerySpicesSeasonings: 'Бакалея, специи, приправы',
-    softDrinks: 'Безалкогольные напитки, вода, соки',
-    readyMeals: 'Готовые блюда',
-    stationery: 'Канцтовары',
-    confectionery: 'Кондитерские изделия',
-    cannedFoods: 'Консервированные продукты',
-    dairyProducts: 'Молочные продукты, яйца',
-    iceCream: 'Мороженое',
-    meat: 'Мясо, субпродукты, колбасные изделия',
-    lowAlcoholDrinks: 'Пиво, слабоалкогольные напитки',
-    semiFinishedProducts: 'Полуфабрикаты',
-    dishes: 'Посуда и кухонные принадлежности',
-    cashDesk: 'Прикасса (чипсы, снеки, семечки)',
-    instantFoods: 'Продукты быстрого приготовления, лапша',
-    fish: 'Рыба и морепродукты',
-    fruitsAndVegetables: 'Свежие овощи, фрукты, зелень, грибы',
-    cleaningProducts: 'Уборка и чистящие средства',
-    bakeryProducts: 'Хлеб, хлебобулочные изделия',
-    teeAndCoffee: 'Чай, кофе, какао, заменители',
-}
-
 export enum DeliveryMethods {
     SelfPickup = 'selfPickup',
     DeliveryBySupplier = 'deliveryBySupplier',
     SameDayDelivery = 'sameDayDelivery',
     Weekends = 'weekends',
-}
-
-export const DeliveryMethodsLabels: Record<DeliveryMethods, string> = {
-    selfPickup: 'самовывоз',
-    deliveryBySupplier: 'доставка транспортом поставщика',
-    sameDayDelivery: 'доставка в день заказа',
-    weekends: 'выходные праздничные дни',
 }
 
 export interface ProviderProfileDto {
@@ -558,16 +528,15 @@ export class Api<
          *
          * @tags Users
          * @name UsersControllerUpdate
-         * @request PUT:/api/users/{id}
+         * @request PUT:/api/users/me
          * @secure
          */
         usersControllerUpdate: (
-            id: number,
             data: UpdateUserDto,
             params: RequestParams = {}
         ) =>
             this.request<UserDto, ErrorDto>({
-                path: `/api/users/${id}`,
+                path: `/api/users/me`,
                 method: 'PUT',
                 body: data,
                 secure: true,
@@ -581,12 +550,12 @@ export class Api<
          *
          * @tags Users
          * @name UsersControllerGet
-         * @request GET:/api/users/{id}
+         * @request GET:/api/users/me
          * @secure
          */
-        usersControllerGet: (id: number, params: RequestParams = {}) =>
+        usersControllerGet: (params: RequestParams = {}) =>
             this.request<UserDto, ErrorDto>({
-                path: `/api/users/${id}`,
+                path: `/api/users/me`,
                 method: 'GET',
                 secure: true,
                 format: 'json',

@@ -13,46 +13,49 @@ type AuthProviderProps = {
 
 export function AuthProvider({ children }: AuthProviderProps) {
     const [isEnabled, setIsEnabled] = useState(false)
-    const [isRefreshFirstTimeLoading, setIsRefreshFirstTimeLoading] =
-        useState(true)
+    const [isUserLoading, setIsUserLoading] = useState(true)
 
-    const { user, accessToken, updateUser } = useUserStore(state => state)
-    const userId = user?.id
+    const { user, updateUser, accessToken } = useUserStore(state => state)
 
     const path = usePathname()
     const router = useRouter()
+    const { data } = userQueries.useGetMeQuery(isEnabled)
 
-    //  Эту логику нужно доработать, потому что она не работает так, как ожидается
-    // Возможно, стоит использовать другой подход
-    // сейчас юзер может зайти на страницу буквально на секунду, и его перекинет на страницу логина такого быть не должно
+    useEffect(() => {
+        const handleAuthentication = async () => {
+            if (user) {
+                setIsEnabled(true)
+                setIsUserLoading(false)
 
-    // const {
-    //     data,
-    //     isLoading: isUserLoading,
-    //     refetch: refetchUser,
-    // } = userQueries.useGetMeQuery(isEnabled, userId)
+                if (outSidePages.includes(path)) {
+                    router.push('/user')
+                }
+            } else {
+                if (!outSidePages.includes(path)) {
+                    router.push('/sign-in')
+                }
+                setIsEnabled(true)
+                setIsUserLoading(false)
+            }
+        }
+        handleAuthentication()
+    }, [user, path, accessToken])
+
+    useEffect(() => {
+        if (data) {
+            updateUser(data)
+        }
+    }, [data])
 
     useEffect(() => {
         if (!accessToken && !outSidePages.includes(path)) {
             router.push('/sign-in')
         }
-        // } else if (!userId) {
-        //     router.push('/sign-in')
-        // } else {
-        //     setIsEnabled(true)
-        //     // if (userId) {
-        //     //     refetchUser();
-        //     // }
-        // }
-    }, [accessToken, userId, path])
+    }, [accessToken, path])
 
-    // useEffect(() => updateUser(data), [data])
-
-    // const isAnyLoading = !isEnabled || isRefreshFirstTimeLoading
-    //
-    // if (!accessToken) {
-    //     return <FullPageLoader className='w-screen h-screen' />
-    // }
+    if (isUserLoading) {
+        return <FullPageLoader className='w-screen h-screen' />
+    }
 
     return <>{children}</>
 }

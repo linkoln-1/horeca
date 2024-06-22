@@ -1,4 +1,4 @@
-import { History } from '@/views/supplier/history'
+import { History } from '../../../views/profile/ui/history'
 
 export default function HistoryPage() {
     return <History />
