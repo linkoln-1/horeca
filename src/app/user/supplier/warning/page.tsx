@@ -1,4 +1,4 @@
-import { Warning } from "@/views/supplier/warning";
+import { Warning } from '@/views/supplier/warning'
 
 export default function WarningHistoryPage() {
     return <Warning />

@@ -52,7 +52,7 @@ export function SupplierViews() {
             name: 'Реклама',
             icon: IconShoppingCart,
             description: 'Здесь можно купить рекламу на площадке',
-            link: '/user/supplier/advertisement',
+            link: '/user/supplier/advertising/advertisement',
         },
         {
             id: 5,

@@ -1,1 +1,1 @@
-export * from "./warning.ui"
+export * from './warning.ui'
