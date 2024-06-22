@@ -1,3 +1,4 @@
+import { userQueries } from '@/entities/user'
 import { Button, PasswordInput, TextInput, Title } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconLock } from '@tabler/icons-react'
@@ -13,6 +14,8 @@ export function SettingsForm() {
             password: '',
         },
     })
+
+    const { mutateAsync: updateUser } = userQueries.useUpdateUserMutation()
     return (
         <Page>
             <Title>Общая информация</Title>

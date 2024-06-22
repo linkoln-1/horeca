@@ -1,5 +1,6 @@
 'use client'
 
+import { useUserStore } from '@/core/providers/userStoreContext'
 import { Box, Button, Flex, Grid, Paper, Text } from '@mantine/core'
 import {
     IconCalendarClock,
@@ -15,13 +16,7 @@ import Link from 'next/link'
 import { CustomAvatarUpload } from '@/shared/ui/CustomAvatarUpload'
 
 export function ProfileView() {
-    const userData = [
-        {
-            id: 1,
-            name: 'ООО “РОМАШКА”',
-            email: 'ivanov.ivan@ryba.com',
-        },
-    ]
+    const user = useUserStore(state => state.user)
 
     const menuList = [
         {
@@ -72,7 +67,7 @@ export function ProfileView() {
     ]
     return (
         <Flex direction='column' gap='md'>
-            <Grid align='center'>
+            <Grid>
                 <Grid.Col
                     span={{
                         base: 12,
@@ -93,19 +88,21 @@ export function ProfileView() {
                                 </Box>
                                 <Box>
                                     <Flex direction='column' gap='lg'>
-                                        {userData.map(item => (
+                                        {[user].map(item => (
                                             <Flex
-                                                key={item.id}
+                                                key={item && item.id}
                                                 direction='column'
                                                 gap='md'
                                                 justify='center'
                                                 align='center'
                                             >
                                                 <Text size='xl' fw={700}>
-                                                    {item.name}
+                                                    {item && item.name}
                                                 </Text>
 
-                                                <Text>email: {item.email}</Text>
+                                                <Text>
+                                                    email: {item && item.email}
+                                                </Text>
                                             </Flex>
                                         ))}
                                     </Flex>

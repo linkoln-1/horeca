@@ -48,3 +48,15 @@ export function useGetMeQuery(enabled: boolean = true) {
         enabled,
     })
 }
+
+export function useUpdateUserMutation() {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: api.usersControllerUpdate,
+        onSuccess: async ({ data }) => {
+            userStore.getState().updateUser(data)
+            await queryClient.invalidateQueries({ queryKey: ['user', 'me'] })
+        },
+    })
+}
