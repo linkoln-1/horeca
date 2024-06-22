@@ -1,5 +1,6 @@
 'use client'
 
+import { useUserStore } from '@/core/providers/userStoreContext'
 import { Box, Button, Flex, Grid, Paper, Text } from '@mantine/core'
 import {
     IconCalendarClock,
@@ -46,7 +47,7 @@ export function ProfileView() {
             name: 'Реклама',
             icon: IconShoppingCart,
             description: 'Здесь можно купить рекламу на площадке',
-            link: '/user/supplier/advertising/advertisement',
+            link: '/user/advertising/advertisement',
         },
         {
             id: 5,

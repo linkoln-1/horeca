@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 
-import { Navigation } from '../navigation'
 import { Promotion } from './promotion'
 import {
     Box,
@@ -15,6 +14,7 @@ import {
     Button,
 } from '@mantine/core'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 type detailsType = {
     workTime: string
@@ -72,6 +72,8 @@ export function Rates() {
     )
     const [isModalOpen, setModalOpen] = useState(false)
 
+    const router = usePathname()
+
     const handleCardClick = (rate: ratesContentType) => {
         setSelectedRate(rate)
         setModalOpen(true)
@@ -84,7 +86,32 @@ export function Rates() {
 
     return (
         <Box>
-            <Navigation />
+            <Box>
+                <Button
+                    variant='transparent'
+                    component={Link}
+                    color={
+                        router === '/user/advertising/rates' ? 'blue' : 'black'
+                    }
+                    href='/user/advertising/rates'
+                    fw={400}
+                >
+                    Тарифы
+                </Button>
+                <Button
+                    variant='transparent'
+                    component={Link}
+                    href='/user/advertising/advertisement'
+                    color={
+                        router === '/user/advertising/advertisement'
+                            ? 'blue'
+                            : 'black'
+                    }
+                    fw={400}
+                >
+                    История заявок
+                </Button>
+            </Box>
             <Grid>
                 {ratesContent.map(item => {
                     return (

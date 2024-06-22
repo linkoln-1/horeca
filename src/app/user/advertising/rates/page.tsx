@@ -1,4 +1,4 @@
-import { Rates } from '@/views/supplier/advertising/rates'
+import { Rates } from '@/views/profile/ui/advertising/rates'
 
 export default function PageRates() {
     return <Rates />

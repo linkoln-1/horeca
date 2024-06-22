@@ -28,7 +28,7 @@
         "**/*.ts",
         "**/*.tsx",
         ".next/types/**/*.ts",
-        "src/app/user/supplier/advertising/rates"
+      "src/app/user/advertising/rates"
     ],
     "exclude": ["node_modules"]
 }

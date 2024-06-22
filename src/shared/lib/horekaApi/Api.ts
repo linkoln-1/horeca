@@ -44,7 +44,6 @@ export interface UserDto {
     email: string
     phone: string
     password: string
-    profileType: string
     profile: HorecaProfileDto | ProviderProfileDto
 }
 
@@ -79,6 +78,7 @@ export interface Address {
 }
 
 export interface HorecaProfileDto {
+    profileType: 'Provider' | 'Horeca'
     info?: string
     /** @minItems 1 */
     addresses: Address[]
@@ -115,6 +115,7 @@ export enum DeliveryMethods {
 }
 
 export interface ProviderProfileDto {
+    profileType: 'Provider' | 'Horeca'
     minOrderAmount: number
     /** @minItems 1 */
     categories: Categories[]

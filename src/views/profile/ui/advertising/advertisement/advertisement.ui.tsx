@@ -1,6 +1,8 @@
-import { Navigation } from '../navigation'
+'use client'
+
 import { Box, Button, Divider, Flex, Paper, Text } from '@mantine/core'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 type Info = {
     name: string
@@ -20,6 +22,7 @@ type FakeHistory = {
 }
 
 export function Advertisement() {
+    const router = usePathname()
     const fakeHistory: FakeHistory[] = [
         {
             id: 1,
@@ -76,8 +79,34 @@ export function Advertisement() {
     ]
 
     return (
-        <Flex direction='column'>
-            <Navigation />
+        <Flex direction='column' gap='md'>
+            <Box>
+                <Button
+                    variant='transparent'
+                    component={Link}
+                    color={
+                        router === '/user/advertising/rates' ? 'blue' : 'black'
+                    }
+                    href='/user/advertising/rates'
+                    fw={400}
+                >
+                    Тарифы
+                </Button>
+                <Button
+                    variant='transparent'
+                    component={Link}
+                    href='/user/advertising/advertisement'
+                    color={
+                        router === '/user/advertising/advertisement'
+                            ? 'blue'
+                            : 'black'
+                    }
+                    fw={400}
+                >
+                    История заявок
+                </Button>
+            </Box>
+
             <Flex gap='md' direction='column'>
                 {fakeHistory.map(item => (
                     <Box key={item.id}>
