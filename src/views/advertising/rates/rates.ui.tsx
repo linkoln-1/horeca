@@ -16,7 +16,7 @@ export function Rates() {
     const [isModalOpen, setModalOpen] = useState(false)
     const [isAgreementAccepted, setAgreementAccepted] = useState(false)
 
-    const path = usePathname()
+    const router = usePathname()
 
     const handleCardClick = (rate: ratesContentType) => {
         setSelectedRate(rate.name)
@@ -31,15 +31,6 @@ export function Rates() {
         setModalOpen(false)
         setSelectedRate('')
     }
-
-    useEffect(() => {
-        return () => {
-            if (isModalOpen) {
-                setModalOpen(false)
-                setAgreementAccepted(false)
-            }
-        }
-    }, [isModalOpen])
 
     useEffect(() => {
         if (isModalOpen) {
@@ -64,7 +55,9 @@ export function Rates() {
                 <Button
                     variant='transparent'
                     component={Link}
-                    c={path === '/user/advertising/rates' ? 'blue' : 'black'}
+                    color={
+                        router === '/user/advertising/rates' ? 'blue' : 'black'
+                    }
                     href='/user/advertising/rates'
                     fw={400}
                 >
@@ -74,8 +67,8 @@ export function Rates() {
                     variant='transparent'
                     component={Link}
                     href='/user/advertising/advertisement'
-                    c={
-                        path === '/user/advertising/advertisement'
+                    color={
+                        router === '/user/advertising/advertisement'
                             ? 'blue'
                             : 'black'
                     }
@@ -87,7 +80,10 @@ export function Rates() {
             <Grid>
                 {ratesContent.map(item => (
                     <GridCol span={4} key={item.id}>
-                        <RateCard rate={item} onClick={handleCardClick} />
+                        <RateCard
+                            rate={item}
+                            onClick={() => handleCardClick(item)}
+                        />
                     </GridCol>
                 ))}
             </Grid>

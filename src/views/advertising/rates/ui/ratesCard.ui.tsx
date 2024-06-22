@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Box, Paper, Text, Divider, Flex } from '@mantine/core'
+import { IconProps } from '@tabler/icons-react'
 
 import { ratesContentType } from '@/shared/constants'
 
@@ -10,6 +11,7 @@ type RateCardProps = {
 }
 
 export function RateCard({ rate, onClick }: RateCardProps) {
+    const Icon = rate.icon as React.FC<IconProps>
     return (
         <Paper
             radius='lg'
@@ -22,6 +24,9 @@ export function RateCard({ rate, onClick }: RateCardProps) {
                 onClick(rate)
             }}
         >
+            <Flex justify='center'>
+                <Icon size={120} stroke={1} />
+            </Flex>
             <Text fw={700} size='30px'>
                 {rate.name}
             </Text>

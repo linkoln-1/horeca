@@ -1,3 +1,11 @@
+import { FC } from 'react'
+
+import {
+    IconBellRinging2,
+    IconDiscount,
+    IconHandTwoFingers,
+} from '@tabler/icons-react'
+
 export type detailsType = {
     workTime: string
     accomodationTime: string
@@ -10,6 +18,7 @@ export type ratesContentType = {
     price: string
     time: string
     details: detailsType
+    icon: FC
 }
 
 export const ratesContent: ratesContentType[] = [
@@ -23,6 +32,7 @@ export const ratesContent: ratesContentType[] = [
             workTime: 'до 5 рабочих дней',
             accomodationTime: 'на 1 неделю',
         },
+        icon: IconHandTwoFingers,
     },
     {
         id: 2,
@@ -34,6 +44,7 @@ export const ratesContent: ratesContentType[] = [
             workTime: 'в течении 3 часов',
             accomodationTime: 'макс. 2 недели',
         },
+        icon: IconBellRinging2,
     },
     {
         id: 3,
@@ -45,5 +56,6 @@ export const ratesContent: ratesContentType[] = [
             workTime: 'до 2 рабочих дней',
             accomodationTime: 'до 5 дней',
         },
+        icon: IconDiscount,
     },
 ]
