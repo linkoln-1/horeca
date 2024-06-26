@@ -8,7 +8,6 @@
         "start": "next start",
         "lint": "next lint",
         "format": "prettier --write \"**/*.{ts,tsx,md,json,css}\"",
-        "codegen": "npx openapi-typescript http://95.163.222.187/api-json -o ./src/api/types.ts",
         "libgen": "npx swagger-typescript-api -p http://95.163.222.187/api-json -o ./src/shared/lib/horekaApi/",
         "libgen:dev": "npx swagger-typescript-api -p http://localhost:8080/api-docs-json -o ./src/shared/lib/horekaApi/",
         "allgen:rem": "npm run codegen:rem & npm run libgen:rem"
