@@ -1,16 +1,11 @@
-import {
-    Button,
-    TextInput,
-    Checkbox,
-    Textarea,
-    Group,
-    Flex,
-    PasswordInput,
-} from '@mantine/core'
-import { TimeInput } from '@mantine/dates'
+import { userQueries } from '@/entities/user'
+import { HorecaStepOne, HorecaStepTwo } from '@/features/signUpHorecaSteps'
+import { Button, Flex } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { IconAt, IconLock } from '@tabler/icons-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+
+import { HorecaFormValues, roles } from '@/shared/constants'
 
 type PublicCateringProps = {
     nextStep: () => void
@@ -18,183 +13,98 @@ type PublicCateringProps = {
     activeTab: string
 }
 
-type DeliveryTime = {
-    day: string
-    from: Date
-    to: Date
+function validateEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
 }
-type FormValues = {
-    companyName: string
-    companyTaxId: string
-    email: string
-    password: string
-    confirmPassword: string
-    tos: boolean
-    mobileNumber: string
-    deliveryAddress: string
-    deliveryTimes: DeliveryTime[]
-    additionalInfo: string
+
+function validatePhone(phone: string): boolean {
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/ // Simple international phone format check
+    return phoneRegex.test(phone)
 }
 
 export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
-    const form = useForm<FormValues>({
+    const form = useForm<HorecaFormValues>({
         initialValues: {
-            companyName: '',
-            companyTaxId: '',
+            name: '',
+            tin: '',
             email: '',
             password: '',
-            confirmPassword: '',
-            tos: false,
-            mobileNumber: '',
-            deliveryAddress: '',
-            deliveryTimes: [
-                { day: 'Понедельник', from: new Date(), to: new Date() },
-                { day: 'Вторник', from: new Date(), to: new Date() },
-                { day: 'Среда', from: new Date(), to: new Date() },
-                { day: 'Четверг', from: new Date(), to: new Date() },
-                { day: 'Пятница', from: new Date(), to: new Date() },
-                { day: 'Суббота', from: new Date(), to: new Date() },
-                { day: 'Воскресенье', from: new Date(), to: new Date() },
-            ],
-            additionalInfo: '',
+            repeatPassword: '',
+            GDPRApproved: false,
+            phone: '',
+            profileType: roles[1].role,
+            profile: {
+                info: '',
+                addresses: [
+                    {
+                        address: '',
+                        weekdays: [],
+                        moFrom: '',
+                        moTo: '',
+                        tuFrom: '',
+                        tuTo: '',
+                        weFrom: '',
+                        weTo: '',
+                        thFrom: '',
+                        thTo: '',
+                        frFrom: '',
+                        frTo: '',
+                        saFrom: '',
+                        saTo: '',
+                        suFrom: '',
+                        suTo: '',
+                    },
+                ],
+            },
         },
         validate: {
-            companyName: value =>
-                value ? null : 'Название компании обязательно',
-            companyTaxId: value => (value ? null : 'ИНН компании обязателен'),
-            email: value => (value ? null : 'Email обязателен'),
-            password: value => (value ? null : 'Пароль обязателен'),
-            confirmPassword: (value, values) =>
-                value === values.password ? null : 'Пароли не совпадают',
-            tos: value =>
-                value ? null : 'Пользовательское соглашение обязательно',
-            mobileNumber: value =>
-                value ? null : 'Контактный номер обязателен',
-            deliveryAddress: value =>
-                value ? null : 'Адрес доставки обязателен',
-            deliveryTimes: value =>
-                value.length > 0 ? null : 'Укажите время доставки',
+            name: value =>
+                value.trim().length === 0 ? 'Имя обязательно' : null,
+            tin: value =>
+                value.trim().length === 0 ? 'ИНН обязательно' : null,
+            email: value => (!validateEmail(value) ? 'Email Обязателен' : null),
+            password: value =>
+                value.length < 8
+                    ? 'Пароль должен содержать не менее 8 символов'
+                    : null,
+            repeatPassword: (value, values) =>
+                value !== values.password ? 'Пароли не совпадают' : null,
+            phone: value => (!validatePhone(value) ? 'номер обязателен' : null),
         },
     })
 
+    const { mutateAsync: signUpUser, isPending } =
+        userQueries.useRegisterUserMutation()
+    const router = useRouter()
+
     const isFullyFilledStepOne =
-        form.values.companyName &&
-        form.values.companyTaxId &&
+        form.values.name &&
+        form.values.tin &&
         form.values.email &&
         form.values.password &&
-        form.values.confirmPassword &&
-        form.values.tos
+        form.values.repeatPassword &&
+        form.values.GDPRApproved
 
     const isFullyFilledStepTwo =
-        form.values.mobileNumber &&
-        form.values.deliveryAddress &&
-        form.values.deliveryTimes.length
+        form.values.phone && form.values.profile.addresses.length > 0
 
-    const PublicCateringStepOne = () => (
-        <>
-            <TextInput
-                type='text'
-                label='Укажите название компании'
-                placeholder='Например, ООО “Рыба”'
-                {...form.getInputProps('companyName')}
-            />
-            <TextInput
-                type='text'
-                label='Укажите ИНН компании'
-                placeholder='ИНН'
-                {...form.getInputProps('companyTaxId')}
-            />
-
-            <TextInput
-                type='email'
-                label='Введите свою электронную почту'
-                placeholder='электронная почта'
-                leftSection={<IconAt size={16} />}
-                {...form.getInputProps('email')}
-            />
-
-            <Flex gap='md' align='center'>
-                <PasswordInput
-                    label='Придумайте пароль'
-                    placeholder='Введите пароль'
-                    className='w-full'
-                    leftSection={<IconLock />}
-                    {...form.getInputProps('password')}
-                />
-
-                <PasswordInput
-                    label='Повторите пароль'
-                    placeholder='Повторите пароль'
-                    className='w-full'
-                    leftSection={<IconLock />}
-                    {...form.getInputProps('confirmPassword')}
-                />
-            </Flex>
-
-            <Checkbox
-                {...form.getInputProps('tos', { type: 'checkbox' })}
-                label={
-                    <span>
-                        Поставив галочку, вы принимаете{' '}
-                        <Link
-                            target='_blank'
-                            href='/privacy-policy'
-                            className='text-blue-600 underline'
-                        >
-                            Пользовательское соглашение
-                        </Link>
-                    </span>
-                }
-            />
-        </>
-    )
-
-    const PublicCateringStepTwo = () => (
-        <>
-            <TextInput
-                required
-                label='Контактный номер для связи с поставщиком'
-                placeholder='Номер мобильного телефона'
-                {...form.getInputProps('mobileNumber')}
-            />
-
-            <TextInput
-                required
-                label='Адрес доставки'
-                placeholder='Например, Г. Сочи, ул. Ленина, д.15, корп.7.'
-                {...form.getInputProps('deliveryAddress')}
-            />
-
-            {form.values.deliveryTimes.map((_, index) => (
-                <Group key={index} grow align='center'>
-                    <Checkbox label={form.values.deliveryTimes[index].day} />
-                    <TimeInput
-                        size='xs'
-                        label='C'
-                        {...form.getInputProps(`deliveryTimes[${index}].from`)}
-                    />
-                    <TimeInput
-                        size='xs'
-                        label='До'
-                        {...form.getInputProps(`deliveryTimes[${index}].to`)}
-                    />
-                </Group>
-            ))}
-
-            <Textarea
-                label='Информация о приёмке, которую должен знать поставщик'
-                placeholder='Добавьте комментарий до 250 символов...'
-                {...form.getInputProps('additionalInfo')}
-            />
-        </>
-    )
-
-    const steps = [PublicCateringStepOne, PublicCateringStepTwo]
+    const steps = [HorecaStepOne, HorecaStepTwo]
+    const CurrentStepComponent = steps[currentStep]
 
     return (
-        <form onSubmit={form.onSubmit(values => console.log(values))}>
+        <form
+            onSubmit={form.onSubmit(async () => {
+                if (currentStep === steps.length - 1) {
+                    await signUpUser(form.values)
+                    // router.push('/user/horeca')
+                } else {
+                    nextStep()
+                }
+            })}
+        >
             <Flex direction='column' gap='xl'>
-                {steps && steps[currentStep]()}
+                <CurrentStepComponent form={form} />
             </Flex>
 
             <Flex direction='column' justify='center' mt='xl' gap='lg'>

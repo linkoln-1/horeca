@@ -1,13 +1,11 @@
 import { userStore } from '@/entities/user/user.model'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
 
 import { api } from '@/shared/lib/horekaApi'
 import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
 
 export function useRegisterUserMutation() {
     const queryClient = useQueryClient()
-    const router = useRouter()
 
     return useMutation({
         mutationFn: api.authorizationControllerRegistrate,
@@ -16,9 +14,6 @@ export function useRegisterUserMutation() {
                 accessToken: data.accessToken || null,
                 refreshToken: data.refreshToken || null,
             })
-
-            router.push('/user')
-
             await queryClient.invalidateQueries({ queryKey: ['user', 'me'] })
         },
     })
@@ -26,7 +21,6 @@ export function useRegisterUserMutation() {
 
 export function useLoginUserMutation() {
     const queryClient = useQueryClient()
-    const router = useRouter()
 
     return useMutation({
         mutationFn: api.authorizationControllerLogin,
@@ -36,8 +30,32 @@ export function useLoginUserMutation() {
                 refreshToken: data.refreshToken || null,
             })
 
-            router.push('/user')
+            await queryClient.invalidateQueries({ queryKey: ['user', 'me'] })
+        },
+    })
+}
 
+export function useGetMeQuery(enabled: boolean = true) {
+    return useCustomQuery({
+        queryKey: ['user', 'me'],
+        queryFn: async () => {
+            const result = await api.usersControllerGet()
+
+            userStore.getState().updateUser(result.data)
+
+            return result
+        },
+        enabled,
+    })
+}
+
+export function useUpdateUserMutation() {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: api.usersControllerUpdate,
+        onSuccess: async ({ data }) => {
+            userStore.getState().updateUser(data)
             await queryClient.invalidateQueries({ queryKey: ['user', 'me'] })
         },
     })
