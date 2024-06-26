@@ -8,12 +8,12 @@ import '@/styles/globals.css'
 import '@mantine/core/styles.css'
 
 export const metadata: Metadata = {
-    description: 'Horeka corporation application',
+    description: 'Horeca corporation application',
     icons: '/favicon.ico',
-    applicationName: 'Horeka',
+    applicationName: 'Horeca',
     title: {
-        default: 'Horeka',
-        template: 'Horeka',
+        default: 'Horeca',
+        template: 'Horeca',
     },
 }
 
