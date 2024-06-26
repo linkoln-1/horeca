@@ -159,14 +159,13 @@ export async function customFetch<P extends Path, M extends PathMethod<P>>(
         const error = (await response.json()) as object
 
         if (BackendError.isBackendError(error)) {
-            if (error.msg) {
-                toast.error(error.msg)
+            if (error.errorMessage) {
+                toast.error(error.errorMessage)
             }
             throw new BackendError(
                 error.error,
                 error.statusCode,
-                error.msg,
-                error.message
+                error.errorMessage
             )
         } else if (error instanceof Error) {
             toast.error('Unknown API error')
