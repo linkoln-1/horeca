@@ -22,6 +22,7 @@ export interface ErrorDto {
         | 'USER_DOES_NOT_EXISTS'
         | 'GDPR_IS_NOT_APPROVED'
         | 'UPLOAD_NOT_FOUND'
+        | 'ACTIVATION_LINK_ERROR'
     /** @example ["password|IS_NOT_EMPTY"] */
     message?: string[]
     /** @example "Bad Request" */
@@ -31,10 +32,12 @@ export interface ErrorDto {
 }
 
 export interface UpdateUserDto {
-    name: string
-    email: string
-    phone: string
-    profile: CreateHorecaProfileDto | CreateProviderProfileDto
+    name?: string
+    email?: string
+    phone?: string
+    password?: string
+    repeatPassword: string
+    profile?: CreateHorecaProfileDto | CreateProviderProfileDto
 }
 
 export interface UserDto {
@@ -123,23 +126,25 @@ export interface ProviderProfileDto {
     deliveryMethods: DeliveryMethods[]
 }
 
+export enum ProfileType {
+    Provider = 'Provider',
+    Horeca = 'Horeca',
+}
+
 export interface CreateHorecaProfileDto {
+    profileType: ProfileType
     info?: string
     /** @minItems 1 */
     addresses: Address[]
 }
 
 export interface CreateProviderProfileDto {
+    profileType: ProfileType
     minOrderAmount: number
     /** @minItems 1 */
     categories: Categories[]
     /** @minItems 1 */
     deliveryMethods: DeliveryMethods[]
-}
-
-export enum ProfileType {
-    Provider = 'Provider',
-    Horeca = 'Horeca',
 }
 
 export interface RegistrateUserDto {
@@ -150,7 +155,6 @@ export interface RegistrateUserDto {
     phone: string
     password: string
     repeatPassword: string
-    profileType: ProfileType
     profile: CreateHorecaProfileDto | CreateProviderProfileDto
 }
 
@@ -162,6 +166,10 @@ export interface AuthResultDto {
 export interface LoginUserDto {
     email: string
     password: string
+}
+
+export interface SuccessDto {
+    status: string
 }
 
 export type CreateProposalHorecaDto = object
@@ -599,6 +607,24 @@ export class Api<
                 method: 'POST',
                 body: data,
                 type: ContentType.Json,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Authorization
+         * @name AuthorizationControllerActivateAccount
+         * @request GET:/api/auth/activate/{uuid}
+         */
+        authorizationControllerActivateAccount: (
+            uuid: string,
+            params: RequestParams = {}
+        ) =>
+            this.request<SuccessDto, ErrorDto>({
+                path: `/api/auth/activate/${uuid}`,
+                method: 'GET',
                 format: 'json',
                 ...params,
             }),
