@@ -16,8 +16,8 @@ export type FormValues = {
     phone: string
     password: string
     repeatPassword: string
-    profileType: ProfileType
     profile: CreateProviderProfileDto & {
+        profileType: ProfileType
         minOrderAmount: number
         categories: Categories[]
         deliveryMethods: DeliveryMethods[]
@@ -35,8 +35,8 @@ export type HorecaFormValues = {
     phone: string
     password: string
     repeatPassword: string
-    profileType: ProfileType
     profile: CreateHorecaProfileDto & {
+        profileType: ProfileType
         info?: string
         addresses: ({
             address: string

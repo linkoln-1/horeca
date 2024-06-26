@@ -13,7 +13,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <Box>
             <Header />
 
-            <Container size='xl' px='md' className='flex-grow min-h-[75vh]'>
+            <Container size='xl' className='flex-grow min-h-[75vh]'>
                 <Box pt='md'>{children}</Box>
             </Container>
 
