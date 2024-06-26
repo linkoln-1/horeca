@@ -19,7 +19,7 @@ function validateEmail(email: string): boolean {
 }
 
 function validatePhone(phone: string): boolean {
-    const phoneRegex = /^\+?[1-9]\d{1,14}$/ // Simple international phone format check
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/
     return phoneRegex.test(phone)
 }
 
@@ -97,7 +97,6 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
             onSubmit={form.onSubmit(async () => {
                 if (currentStep === steps.length - 1) {
                     await signUpUser(form.values)
-                    // router.push('/user/horeca')
                 } else {
                     nextStep()
                 }

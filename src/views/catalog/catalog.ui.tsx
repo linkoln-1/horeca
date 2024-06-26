@@ -1,7 +1,17 @@
 'use client'
 
+import { useUserStore } from '@/core/providers/userStoreContext'
 import { ProductsModal } from '@/features/products'
-import { Box, Button, Flex, Menu, Paper, Text, Grid } from '@mantine/core'
+import {
+    Box,
+    Button,
+    Flex,
+    Menu,
+    Paper,
+    Text,
+    Grid,
+    Select,
+} from '@mantine/core'
 import { modals } from '@mantine/modals'
 import { IconCaretDown } from '@tabler/icons-react'
 
@@ -14,6 +24,7 @@ const categoryOptions = Object.values(Categories).map(category => ({
 }))
 
 export function Catalog() {
+    const user = useUserStore(state => state.user)
     const tabData = [
         'Наименование',
         'Производитель',
@@ -79,24 +90,7 @@ export function Catalog() {
     return (
         <Flex direction='column' gap='md'>
             <Flex justify='space-between' align='center'>
-                <Menu offset={11} withArrow>
-                    <Menu.Target>
-                        <Button
-                            variant='transparent'
-                            c='gray.7'
-                            rightSection={<IconCaretDown stroke={1} />}
-                            p={0}
-                        >
-                            Категории
-                        </Button>
-                    </Menu.Target>
-
-                    <Menu.Dropdown>
-                        {categoryOptions.map((option, index) => (
-                            <Menu.Item key={index}>{option.label}</Menu.Item>
-                        ))}
-                    </Menu.Dropdown>
-                </Menu>
+                <Select />
 
                 <Box>
                     <Button
