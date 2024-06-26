@@ -33,8 +33,8 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
             repeatPassword: '',
             GDPRApproved: false,
             phone: '',
-            profileType: roles[1].role,
             profile: {
+                profileType: roles[1].role,
                 info: '',
                 addresses: [
                     {

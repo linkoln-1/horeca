@@ -27,8 +27,8 @@ export function SupplierManufacturer({
             repeatPassword: '',
             GDPRApproved: false,
             phone: '',
-            profileType: roles[0].role,
             profile: {
+                profileType: roles[0].role,
                 deliveryMethods: [],
                 categories: [],
                 minOrderAmount: 0,
