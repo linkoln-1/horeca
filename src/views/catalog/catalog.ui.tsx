@@ -16,7 +16,11 @@ import { modals } from '@mantine/modals'
 import { IconCaretDown } from '@tabler/icons-react'
 
 import { CategoryLabels } from '@/shared/constants'
-import { Categories } from '@/shared/lib/horekaApi/Api'
+import {
+    Categories,
+    ProfileType,
+    ProviderProfileDto,
+} from '@/shared/lib/horekaApi/Api'
 
 const categoryOptions = Object.values(Categories).map(category => ({
     value: category,
@@ -25,6 +29,7 @@ const categoryOptions = Object.values(Categories).map(category => ({
 
 export function Catalog() {
     const user = useUserStore(state => state.user)
+
     const tabData = [
         'Наименование',
         'Производитель',
@@ -90,7 +95,14 @@ export function Catalog() {
     return (
         <Flex direction='column' gap='md'>
             <Flex justify='space-between' align='center'>
-                <Select />
+                <Select
+                    data={(user?.profile as ProviderProfileDto).categories.map(
+                        x => ({
+                            value: x,
+                            label: CategoryLabels[x as Categories],
+                        })
+                    )}
+                />
 
                 <Box>
                     <Button
