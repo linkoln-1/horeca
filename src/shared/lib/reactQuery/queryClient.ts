@@ -1,9 +1,9 @@
 import { toast } from 'react-toastify'
 
-import { BackendError } from '@/utils/backendError'
 import { QueryClient } from '@tanstack/react-query'
 
 import { errors } from '@/shared/constants/errors'
+import { BackendError } from '@/shared/utils/backendError'
 
 export const queryClient = new QueryClient({
     defaultOptions: {

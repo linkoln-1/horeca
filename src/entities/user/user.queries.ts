@@ -1,3 +1,5 @@
+import { toast } from 'react-toastify'
+
 import { userStore } from '@/entities/user/user.model'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
@@ -54,9 +56,12 @@ export function useUpdateUserMutation() {
 
     return useMutation({
         mutationFn: api.usersControllerUpdate,
-        onSuccess: async ({ data }) => {
-            userStore.getState().updateUser(data)
+        onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ['user', 'me'] })
+            toast.success('Your account successfully updated.')
+        },
+        onError: error => {
+            toast.error(`Error updating user: ${error.message}`)
         },
     })
 }

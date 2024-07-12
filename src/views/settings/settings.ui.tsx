@@ -4,9 +4,7 @@ import { useState } from 'react'
 
 import { DeliveryForm } from '@/features/delivery'
 import { SettingsForm } from '@/features/profile'
-import { Box, Flex, Grid, SegmentedControl } from '@mantine/core'
-
-import { Page } from '@/shared/ui/Page'
+import { Grid, SegmentedControl } from '@mantine/core'
 
 const links = [
     {

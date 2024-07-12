@@ -1,38 +1,79 @@
+import { useEffect } from 'react'
+
 import { userQueries } from '@/entities/user'
-import { Button, PasswordInput, TextInput, Title } from '@mantine/core'
+import {
+    Button,
+    LoadingOverlay,
+    PasswordInput,
+    TextInput,
+    Title,
+} from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconLock } from '@tabler/icons-react'
 
+import { UpdateUserDto } from '@/shared/lib/horekaApi/Api'
 import { Page } from '@/shared/ui/Page'
 
 export function SettingsForm() {
-    const form = useForm({
+    const form = useForm<UpdateUserDto>({
         initialValues: {
-            companyName: '',
-            mobilePhone: '',
+            name: '',
+            phone: '',
             email: '',
             password: '',
+            repeatPassword: '',
+        },
+
+        validate: {
+            repeatPassword: (value, values) =>
+                value === values.password ? null : 'Пароли не совпадают',
         },
     })
 
-    const { mutateAsync: updateUser } = userQueries.useUpdateUserMutation()
+    const { mutate: updateUser, isPending } =
+        userQueries.useUpdateUserMutation()
+    const { data } = userQueries.useGetMeQuery()
+
+    useEffect(() => {
+        if (data) {
+            form.setValues({
+                name: data.name,
+                phone: data.phone,
+                email: data.email,
+            })
+        }
+    }, [data])
 
     return (
         <Page>
             <Title>Общая информация</Title>
 
-            <form className='flex flex-col gap-7'>
+            <LoadingOverlay
+                zIndex={1000}
+                overlayProps={{ blur: 2 }}
+                visible={isPending}
+            />
+
+            <form
+                className='flex flex-col gap-7'
+                onSubmit={form.onSubmit(async values => {
+                    if (form.validate().hasErrors) {
+                        return
+                    }
+                    updateUser(values)
+                })}
+            >
                 <TextInput
                     type='text'
                     label='Фактическое наименование компании:'
                     placeholder='ООО “Рыба моя”'
-                    {...form.getInputProps('companyName')}
+                    {...form.getInputProps('name')}
                 />
                 <TextInput
                     type='text'
                     label='Контактный номер для связи с покупателем:'
                     placeholder='+7 (965) 999-99-99'
-                    {...form.getInputProps('mobilePhone')}
+                    {...form.getInputProps('phone')}
                 />
                 <TextInput
                     type='text'
@@ -49,7 +90,21 @@ export function SettingsForm() {
                     {...form.getInputProps('password')}
                 />
 
-                <Button type='submit' color='blue' size='large'>
+                <PasswordInput
+                    label='Повторите пароль:'
+                    placeholder='XXX_xx123'
+                    className='w-full'
+                    leftSection={<IconLock />}
+                    {...form.getInputProps('repeatPassword')}
+                    withAsterisk
+                />
+
+                <Button
+                    type='submit'
+                    color='blue'
+                    size='large'
+                    loading={isPending}
+                >
                     Сохранить изменения
                 </Button>
             </form>

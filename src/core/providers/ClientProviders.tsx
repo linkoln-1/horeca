@@ -1,6 +1,8 @@
 'use client'
 
 import { ReactNode } from 'react'
+import { Bounce, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 import { UserStoreProvider } from './userStoreContext'
 import { AppLayout } from '@/core/layout/AppLayout/AppLayout'
@@ -33,6 +35,20 @@ export function ClientProviders({ children }: ClientProvidersProps) {
                 <UserStoreProvider>
                     <AuthProvider>
                         <ModalsProvider>
+                            <ToastContainer
+                                position='top-center'
+                                autoClose={5000}
+                                hideProgressBar={false}
+                                newestOnTop={false}
+                                closeOnClick
+                                rtl={false}
+                                pauseOnFocusLoss
+                                draggable
+                                pauseOnHover
+                                theme='light'
+                                transition={Bounce}
+                            />
+
                             {isInsideApp && <AppLayout>{children}</AppLayout>}
                             {!isInsideApp && children}
                         </ModalsProvider>

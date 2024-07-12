@@ -2,30 +2,11 @@
 
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { ProductsModal } from '@/features/products'
-import {
-    Box,
-    Button,
-    Flex,
-    Menu,
-    Paper,
-    Text,
-    Grid,
-    Select,
-} from '@mantine/core'
+import { Box, Button, Flex, Paper, Text, Grid, Select } from '@mantine/core'
 import { modals } from '@mantine/modals'
-import { IconCaretDown } from '@tabler/icons-react'
 
 import { CategoryLabels } from '@/shared/constants'
-import {
-    Categories,
-    ProfileType,
-    ProviderProfileDto,
-} from '@/shared/lib/horekaApi/Api'
-
-const categoryOptions = Object.values(Categories).map(category => ({
-    value: category,
-    label: CategoryLabels[category as Categories],
-}))
+import { Categories, ProviderProfileDto } from '@/shared/lib/horekaApi/Api'
 
 export function Catalog() {
     const user = useUserStore(state => state.user)
@@ -102,6 +83,7 @@ export function Catalog() {
                             label: CategoryLabels[x as Categories],
                         })
                     )}
+                    placeholder='Выберите категорию'
                 />
 
                 <Box>
