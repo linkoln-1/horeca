@@ -246,6 +246,22 @@ export interface CreateProductProviderDto {
     imageIds: number[]
 }
 
+export interface Image {
+    id: number
+    name: string
+    mimetype: string
+    path: string
+    size: number
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+}
+
+export interface ProductImage {
+    image: Image
+}
+
 export interface ProductResponse {
     id: number
     profileId: number
@@ -260,7 +276,7 @@ export interface ProductResponse {
     createdAt: string
     /** @format date-time */
     updatedAt: string
-    productImage: string[]
+    productImage: ProductImage[]
     isEditable: boolean
 }
 
