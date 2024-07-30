@@ -1,17 +1,9 @@
 import { userStore } from '@/entities/user'
 
-export const uploadFiles = async <T>(
-    files: File[],
-    url: string,
-    type: string
-): Promise<T> => {
+export const uploadFile = async <T>(file: File, url: string): Promise<T> => {
     const formData = new FormData()
 
-    for (const file of files) {
-        formData.append('files', file)
-    }
-
-    formData.append('type', type)
+    formData.append('file', file)
 
     const session = userStore.getState()
 

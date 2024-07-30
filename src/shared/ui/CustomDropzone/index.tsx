@@ -50,7 +50,8 @@ export function CustomDropzone({ placeholder, ...props }: CustomDropzoneProps) {
                 </Dropzone.Idle>
 
                 <Text size='md' ta='center'>
-                    {placeholder || 'Drag files here or click to select files'}
+                    {placeholder ||
+                        'Перетащите файл сюда или нажмите чтобы выбрать файл с вашего компьютера'}
                 </Text>
             </Flex>
         </Dropzone>

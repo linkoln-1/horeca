@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect } from 'react'
 
 import { userQueries } from '@/entities/user'
@@ -14,7 +16,7 @@ import { IconLock } from '@tabler/icons-react'
 import { UpdateUserDto } from '@/shared/lib/horekaApi/Api'
 import { Page } from '@/shared/ui/Page'
 
-export function SettingsForm() {
+export function EditViews() {
     const form = useForm<UpdateUserDto>({
         initialValues: {
             name: '',

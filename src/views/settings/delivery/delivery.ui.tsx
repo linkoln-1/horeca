@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect } from 'react'
 
 import { userQueries } from '@/entities/user'
@@ -38,7 +40,7 @@ function transformCategories(
     }))
 }
 
-export function DeliveryForm() {
+export function DeliveryViews() {
     const form = useForm<DeliveryFormType>({
         initialValues: {
             categories: [],
@@ -47,7 +49,7 @@ export function DeliveryForm() {
         },
         validate: {
             categories: value =>
-                value.length > 0 ? null : 'Выберите хотя бы одну категорию',
+                value.length > 0 ? null : 'категория не может быть пустой',
         },
     })
 

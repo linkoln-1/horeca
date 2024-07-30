@@ -1,83 +1,42 @@
 'use client'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
+import { productsQueries } from '@/entities/products'
 import { ProductsModal } from '@/features/products'
-import { Box, Button, Flex, Paper, Text, Grid, Select } from '@mantine/core'
+import {
+    Box,
+    Button,
+    Flex,
+    Paper,
+    Text,
+    Grid,
+    Select,
+    Loader,
+    Image as MantineImage,
+} from '@mantine/core'
 import { modals } from '@mantine/modals'
 
 import { CategoryLabels } from '@/shared/constants'
-import { Categories, ProviderProfileDto } from '@/shared/lib/horekaApi/Api'
+import { packageTypeLabel } from '@/shared/constants/packageType'
+import { getImageUrl } from '@/shared/helpers'
+import {
+    Categories,
+    ProductPackagingType,
+    ProviderProfileDto,
+} from '@/shared/lib/horekaApi/Api'
 
 export function Catalog() {
     const user = useUserStore(state => state.user)
 
-    const tabData = [
-        'Наименование',
-        'Производитель',
-        'Характеристики',
-        'Фасовка',
-        'Цена (за ед.)',
-        'Кол-во',
-        'Фотографии',
-    ]
-    const productData = [
-        {
-            name: 'Виски (Jack Daniels)',
-            manufacturer: 'Diageo',
-            characteristics:
-                'Легендарный виски Jack Daniel’s состоит из 80% кукурузы, 12% ячменя и 8% ржи.',
-            packaging: 'Бутылка',
-            price: '5,500',
-            quantity: '40,000',
-            photos: 'photo1.jpg',
-        },
-        {
-            name: 'Виски (Jack Daniels)',
-            manufacturer: 'Diageo',
-            characteristics:
-                'Легендарный виски Jack Daniel’s состоит из 80% кукурузы, 12% ячменя и 8% ржи.',
-            packaging: 'Бутылка',
-            price: '5,500',
-            quantity: '40,000',
-            photos: 'photo1.jpg',
-        },
-        {
-            name: 'Виски (Jack Daniels)',
-            manufacturer: 'Diageo',
-            characteristics:
-                'Легендарный виски Jack Daniel’s состоит из 80% кукурузы, 12% ячменя и 8% ржи.',
-            packaging: 'Бутылка',
-            price: '5,500',
-            quantity: '40,000',
-            photos: 'photo1.jpg',
-        },
-        {
-            name: 'Виски (Jack Daniels)',
-            manufacturer: 'Diageo',
-            characteristics:
-                'Легендарный виски Jack Daniel’s состоит из 80% кукурузы, 12% ячменя и 8% ржи.',
-            packaging: 'Бутылка',
-            price: '5,500',
-            quantity: '40,000',
-            photos: 'photo1.jpg',
-        },
-        {
-            name: 'Виски (Jack Daniels)',
-            manufacturer: 'Diageo',
-            characteristics:
-                'Легендарный виски Jack Daniel’s состоит из 80% кукурузы, 12% ячменя и 8% ржи.',
-            packaging: 'Бутылка',
-            price: '5,500',
-            quantity: '40,000',
-            photos: 'photo1.jpg',
-        },
-    ]
+    const { data, isPending } = productsQueries.useProductsInfiniteQuery()
+
+    if (!data) return <Loader />
 
     return (
         <Flex direction='column' gap='md'>
             <Flex justify='space-between' align='center'>
                 <Select
-                    data={(user?.profile as ProviderProfileDto).categories.map(
+                    data={(user?.profile as ProviderProfileDto)?.categories.map(
                         x => ({
                             value: x,
                             label: CategoryLabels[x as Categories],
@@ -101,7 +60,15 @@ export function Catalog() {
             <Flex direction='column' gap='md'>
                 <Paper p='md' withBorder bg='indigo.4'>
                     <Grid justify='space-between'>
-                        {tabData.map((tab, index) => (
+                        {[
+                            'Наименование',
+                            'Производитель',
+                            'Характеристики',
+                            'Фасовка',
+                            'Цена (за ед.)',
+                            'Кол-во',
+                            'Фотографии',
+                        ].map((tab, index) => (
                             <Grid.Col
                                 span={{
                                     base: 12,
@@ -119,7 +86,7 @@ export function Catalog() {
                     </Grid>
                 </Paper>
 
-                {productData.map((product, index) => (
+                {data.map((product, index) => (
                     <Paper p='md' withBorder key={index} bg='gray.0'>
                         <Grid justify='space-between'>
                             <Grid.Col span={{ base: 12, md: 1 }}>
@@ -129,36 +96,45 @@ export function Catalog() {
                             </Grid.Col>
                             <Grid.Col span={{ base: 12, md: 1 }}>
                                 <Flex justify='center'>
+                                    <Text size='md'>{product.producer}</Text>
+                                </Flex>
+                            </Grid.Col>
+                            <Grid.Col span={{ base: 12, md: 1 }}>
+                                <Flex justify='center' w='fit-content'>
+                                    <Text size='md'>{product.description}</Text>
+                                </Flex>
+                            </Grid.Col>
+                            <Grid.Col span={{ base: 12, md: 1 }}>
+                                <Flex justify='center'>
                                     <Text size='md'>
-                                        {product.manufacturer}
+                                        {
+                                            packageTypeLabel[
+                                                product.packagingType as ProductPackagingType
+                                            ]
+                                        }
                                     </Text>
                                 </Flex>
                             </Grid.Col>
                             <Grid.Col span={{ base: 12, md: 1 }}>
                                 <Flex justify='center'>
-                                    <Text size='md' truncate='end'>
-                                        {product.characteristics}
-                                    </Text>
+                                    <Text size='md'>{product.cost}</Text>
                                 </Flex>
                             </Grid.Col>
                             <Grid.Col span={{ base: 12, md: 1 }}>
                                 <Flex justify='center'>
-                                    <Text size='md'>{product.packaging}</Text>
+                                    <Text size='md'>{product.count}</Text>
                                 </Flex>
                             </Grid.Col>
                             <Grid.Col span={{ base: 12, md: 1 }}>
                                 <Flex justify='center'>
-                                    <Text size='md'>{product.price}</Text>
-                                </Flex>
-                            </Grid.Col>
-                            <Grid.Col span={{ base: 12, md: 1 }}>
-                                <Flex justify='center'>
-                                    <Text size='md'>{product.quantity}</Text>
-                                </Flex>
-                            </Grid.Col>
-                            <Grid.Col span={{ base: 12, md: 1 }}>
-                                <Flex justify='center'>
-                                    <Text size='md'>{product.photos}</Text>
+                                    {product.productImage.map((x, index) => (
+                                        <MantineImage
+                                            key={index}
+                                            src={getImageUrl(
+                                                `/${x.image.path}`
+                                            )}
+                                        />
+                                    ))}
                                 </Flex>
                             </Grid.Col>
                         </Grid>

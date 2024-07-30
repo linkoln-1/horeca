@@ -172,19 +172,95 @@ export interface SuccessDto {
     status: string
 }
 
-export type CreateProposalHorecaDto = object
+export interface CreateProposalItemDto {
+    name: string
+    amount: number
+    unit: string
+    category: Categories
+}
 
-export type CreateProposalProviderDto = object
+export interface CreateProposalDto {
+    /** @minItems 1 */
+    items: CreateProposalItemDto[]
+    imageIds: number[]
+    address: string
+    /** @format date-time */
+    deliveryTime: string
+    /** @format date-time */
+    acceptUntill: string
+    paymentType: 'Prepayment' | 'Deferment' | 'PaymentUponDelivery'
+    name: string
+    phone: string
+    comment?: string
+}
+
+export interface ProposalDto {
+    id: number
+    profileId: number
+    address: string
+    /** @format date-time */
+    deliveryTime: string
+    /** @format date-time */
+    acceptUntill: string
+    paymentType: string
+    name: string
+    phone: string
+    items: string[]
+    images: string[]
+    comment: string
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+}
+
+export interface CreateProposalTemplateDto {
+    name: string
+    content: CreateProposalDto
+}
+
+export interface ProposalTemplateDto {
+    id: number
+    name: string
+    content: object
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+}
+
+export enum ProductPackagingType {
+    Bottle = 'Bottle',
+    Box = 'Box',
+    Pallet = 'Pallet',
+}
 
 export interface CreateProductProviderDto {
-    category: string
+    category: Categories
     name: string
     description: string
     producer: string
     cost: number
     count: number
-    packagingType: string
+    packagingType: ProductPackagingType
     imageIds: number[]
+}
+
+export interface Image {
+    id: number
+    productId: number
+    imageId: number
+    createdAt: string
+    updatedAt: string
+    image: {
+        id: number
+        name: string
+        mimetype: string
+        path: string
+        size: number
+        createdAt: string
+        updatedAt: string
+    }
 }
 
 export interface ProductResponse {
@@ -201,18 +277,18 @@ export interface ProductResponse {
     createdAt: string
     /** @format date-time */
     updatedAt: string
-    productImage: string[]
+    productImage: Image[]
     isEditable: boolean
 }
 
 export interface UpdateProductProviderDto {
-    category?: string
+    category?: Categories
     name?: string
     description?: string
     producer?: string
     cost?: number
     count?: number
-    packagingType?: string
+    packagingType?: ProductPackagingType
     imageIds: number[]
 }
 
@@ -537,6 +613,7 @@ export class Api<
          *
          * @tags Users
          * @name UsersControllerUpdate
+         * @summary Update users profile
          * @request PUT:/api/users/me
          * @secure
          */
@@ -559,6 +636,7 @@ export class Api<
          *
          * @tags Users
          * @name UsersControllerGet
+         * @summary Get users profile
          * @request GET:/api/users/me
          * @secure
          */
@@ -576,6 +654,7 @@ export class Api<
          *
          * @tags Authorization
          * @name AuthorizationControllerRegistrate
+         * @summary Registrate user
          * @request POST:/api/auth/registration
          */
         authorizationControllerRegistrate: (
@@ -596,6 +675,7 @@ export class Api<
          *
          * @tags Authorization
          * @name AuthorizationControllerLogin
+         * @summary Authenticate user
          * @request POST:/api/auth/login
          */
         authorizationControllerLogin: (
@@ -616,6 +696,7 @@ export class Api<
          *
          * @tags Authorization
          * @name AuthorizationControllerActivateAccount
+         * @summary Activate profile by link in the confirmation email
          * @request GET:/api/auth/activate/{uuid}
          */
         authorizationControllerActivateAccount: (
@@ -634,19 +715,21 @@ export class Api<
          *
          * @tags Proposals
          * @name ProposalsHorecaControllerCreate
+         * @summary Create products(categories) set proposal required for HoReCa
          * @request POST:/api/proposals/horeca
          * @secure
          */
         proposalsHorecaControllerCreate: (
-            data: CreateProposalHorecaDto,
+            data: CreateProposalDto,
             params: RequestParams = {}
         ) =>
-            this.request<void, any>({
+            this.request<ProposalDto, ErrorDto>({
                 path: `/api/proposals/horeca`,
                 method: 'POST',
                 body: data,
                 secure: true,
                 type: ContentType.Json,
+                format: 'json',
                 ...params,
             }),
 
@@ -654,20 +737,63 @@ export class Api<
          * No description
          *
          * @tags Proposals
-         * @name ProposalsProviderControllerCreate
-         * @request POST:/api/proposals/provider
+         * @name ProposalsHorecaControllerCreateTemplate
+         * @summary Create template of products(categories) set proposal required for HoReCa to use later
+         * @request POST:/api/proposals/horeca/template
          * @secure
          */
-        proposalsProviderControllerCreate: (
-            data: CreateProposalProviderDto,
+        proposalsHorecaControllerCreateTemplate: (
+            data: CreateProposalTemplateDto,
             params: RequestParams = {}
         ) =>
-            this.request<void, any>({
-                path: `/api/proposals/provider`,
+            this.request<ProposalTemplateDto, ErrorDto>({
+                path: `/api/proposals/horeca/template`,
                 method: 'POST',
                 body: data,
                 secure: true,
                 type: ContentType.Json,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Proposals
+         * @name ProposalsHorecaControllerGetTemplate
+         * @summary Get template of products(categories) set proposal required for HoReCa
+         * @request GET:/api/proposals/horeca/template/{id}
+         * @secure
+         */
+        proposalsHorecaControllerGetTemplate: (
+            id: number,
+            params: RequestParams = {}
+        ) =>
+            this.request<ProposalTemplateDto, ErrorDto>({
+                path: `/api/proposals/horeca/template/${id}`,
+                method: 'GET',
+                secure: true,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Proposals
+         * @name ProposalsProviderControllerFindAppropriateProposals
+         * @summary List of HoReCa proposals that matches with provider's offers
+         * @request GET:/api/proposals/provider
+         * @secure
+         */
+        proposalsProviderControllerFindAppropriateProposals: (
+            params: RequestParams = {}
+        ) =>
+            this.request<ProposalDto[], ErrorDto>({
+                path: `/api/proposals/provider`,
+                method: 'GET',
+                secure: true,
+                format: 'json',
                 ...params,
             }),
 
@@ -676,19 +802,21 @@ export class Api<
          *
          * @tags Products
          * @name ProductsProviderControllerCreate
-         * @request POST:/api/products
+         * @summary Create product from provider's offer
+         * @request POST:/api/products/provider
          * @secure
          */
         productsProviderControllerCreate: (
             data: CreateProductProviderDto,
             params: RequestParams = {}
         ) =>
-            this.request<void, any>({
-                path: `/api/products`,
+            this.request<ProductResponse, ErrorDto>({
+                path: `/api/products/provider`,
                 method: 'POST',
                 body: data,
                 secure: true,
                 type: ContentType.Json,
+                format: 'json',
                 ...params,
             }),
 
@@ -697,12 +825,13 @@ export class Api<
          *
          * @tags Products
          * @name ProductsProviderControllerFindAll
-         * @request GET:/api/products
+         * @summary Gat all products from provider's offer
+         * @request GET:/api/products/provider
          * @secure
          */
         productsProviderControllerFindAll: (params: RequestParams = {}) =>
             this.request<ProductResponse[], ErrorDto>({
-                path: `/api/products`,
+                path: `/api/products/provider`,
                 method: 'GET',
                 secure: true,
                 format: 'json',
@@ -714,17 +843,19 @@ export class Api<
          *
          * @tags Products
          * @name ProductsProviderControllerGet
-         * @request GET:/api/products/{id}
+         * @summary Get the specific product
+         * @request GET:/api/products/provider/{id}
          * @secure
          */
         productsProviderControllerGet: (
             id: number,
             params: RequestParams = {}
         ) =>
-            this.request<void, any>({
-                path: `/api/products/${id}`,
+            this.request<ProductResponse, ErrorDto>({
+                path: `/api/products/provider/${id}`,
                 method: 'GET',
                 secure: true,
+                format: 'json',
                 ...params,
             }),
 
@@ -733,7 +864,8 @@ export class Api<
          *
          * @tags Products
          * @name ProductsProviderControllerUpdate
-         * @request PUT:/api/products/{id}
+         * @summary Update the specific product
+         * @request PUT:/api/products/provider/{id}
          * @secure
          */
         productsProviderControllerUpdate: (
@@ -741,12 +873,13 @@ export class Api<
             data: UpdateProductProviderDto,
             params: RequestParams = {}
         ) =>
-            this.request<void, any>({
-                path: `/api/products/${id}`,
+            this.request<ProductResponse, ErrorDto>({
+                path: `/api/products/provider/${id}`,
                 method: 'PUT',
                 body: data,
                 secure: true,
                 type: ContentType.Json,
+                format: 'json',
                 ...params,
             }),
 
@@ -755,7 +888,8 @@ export class Api<
          *
          * @tags Products
          * @name ProductsProviderControllerDelete
-         * @request DELETE:/api/products/{id}
+         * @summary Delete the specific product
+         * @request DELETE:/api/products/provider/{id}
          * @secure
          */
         productsProviderControllerDelete: (
@@ -763,7 +897,7 @@ export class Api<
             params: RequestParams = {}
         ) =>
             this.request<void, any>({
-                path: `/api/products/${id}`,
+                path: `/api/products/provider/${id}`,
                 method: 'DELETE',
                 secure: true,
                 ...params,

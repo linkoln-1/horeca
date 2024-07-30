@@ -1,1 +1,1 @@
-export * from './settings.ui'
+export * from './settingsLayout.ui'

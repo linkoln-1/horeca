@@ -15,10 +15,8 @@ export function useProductMutation() {
 }
 
 export function useProductsInfiniteQuery() {
-    const queryClient = useQueryClient()
-
     return useCustomQuery({
         queryKey: ['product'],
-        queryFn: async () => api.productsProviderControllerFindAll(),
+        queryFn: () => api.productsProviderControllerFindAll(),
     })
 }
