@@ -36,7 +36,7 @@ export interface UpdateUserDto {
     email?: string
     phone?: string
     password?: string
-    repeatPassword?: string
+    repeatPassword: string
     profile?: CreateHorecaProfileDto | CreateProviderProfileDto
 }
 
@@ -246,23 +246,6 @@ export interface CreateProductProviderDto {
     imageIds: number[]
 }
 
-export interface Image {
-    id: number
-    productId: number
-    imageId: number
-    createdAt: string
-    updatedAt: string
-    image: {
-        id: number
-        name: string
-        mimetype: string
-        path: string
-        size: number
-        createdAt: string
-        updatedAt: string
-    }
-}
-
 export interface ProductResponse {
     id: number
     profileId: number
@@ -277,7 +260,7 @@ export interface ProductResponse {
     createdAt: string
     /** @format date-time */
     updatedAt: string
-    productImage: Image[]
+    productImage: string[]
     isEditable: boolean
 }
 
