@@ -61,7 +61,7 @@ export function useUpdateUserMutation() {
             toast.success('Your account successfully updated.')
         },
         onError: error => {
-            toast.error(`Error updating user: ${error.message}`)
+            toast.error(`Error updating user: ${error.name}`)
         },
     })
 }

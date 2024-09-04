@@ -33,7 +33,6 @@ const weekdays: {
 ]
 
 export function HorecaStepTwo({ form }: StepProps) {
-    // Функция для добавления нового адреса
     const addNewAddress = () => {
         const newAddress = {
             address: '',
@@ -55,8 +54,6 @@ export function HorecaStepTwo({ form }: StepProps) {
         }
         form.insertListItem('profile.addresses', newAddress)
     }
-
-    console.log(form.values)
 
     return (
         <>
@@ -85,7 +82,7 @@ export function HorecaStepTwo({ form }: StepProps) {
                                 checked={address.weekdays.includes(day.value)}
                                 onChange={event => {
                                     const checked = event.currentTarget.checked
-                                    if (!address.weekdays) address.weekdays = [] // Инициализация, если необходимо
+                                    if (!address.weekdays) address.weekdays = []
                                     form.setFieldValue(
                                         `profile.addresses.${addressIndex}.weekdays`,
                                         checked

@@ -2,26 +2,34 @@
 
 import { ReactNode } from 'react'
 
+import { useUserStore } from '@/core/providers/userStoreContext'
 import { Grid, SegmentedControl, SegmentedControlItem } from '@mantine/core'
 import { usePathname, useRouter } from 'next/navigation'
 
+import { roles } from '@/shared/constants'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
-
-const tabs: SegmentedControlItem[] = [
-    {
-        label: 'Информация о поставщике',
-        value: '/user/settings/edit',
-    },
-    {
-        label: 'Об условиях доставки и категориях товаров',
-        value: '/user/settings/delivery',
-    },
-]
 
 export function SettingsLayout({ children }: { children: ReactNode }) {
     const router = useRouter()
     const path = usePathname()
+    const user = useUserStore(state => state.user)
     const isMobile = useBreakpoint('sm')
+
+    const tabs: SegmentedControlItem[] = [
+        {
+            label: 'Информация о поставщике',
+            value: `/user/${user && user.profile.profileType.toLowerCase()}/settings/edit`,
+        },
+        {
+            label: 'Об условиях доставки и категориях товаров',
+            value: `/user/${user && user.profile.profileType.toLowerCase()}/settings/delivery`,
+        },
+    ]
+
+    if (user?.profile.profileType === roles[1].role) {
+        tabs[1].label = 'Об условиях приемки товара'
+        tabs[1].value = `/user/${user && user.profile.profileType.toLowerCase()}/settings/product-acceptance-terms`
+    }
 
     return (
         <Grid justify='space-between'>

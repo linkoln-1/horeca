@@ -1,5 +1,5 @@
 import { ProfileView } from '@/views/profile/ui'
 
-export default function ProfilePage() {
+export default function ProviderProfile() {
     return <ProfileView />
 }

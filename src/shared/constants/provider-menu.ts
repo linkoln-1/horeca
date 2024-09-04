@@ -1,19 +1,19 @@
 import {
     IconCalendarClock,
+    IconHelpSquareRounded,
     IconLayoutBoardSplit,
     IconLayoutList,
-    IconQuestionMark,
     IconSettings,
     IconShoppingCart,
 } from '@tabler/icons-react'
 
-export const menuList = [
+export const providerMenu = [
     {
         id: 1,
         name: 'История заявок',
         icon: IconCalendarClock,
         description: 'История ваших предложений и чаты с покупателями',
-        link: '/user/warning',
+        link: '/warning',
         button: 'Перейти к предложениям',
     },
     {
@@ -21,7 +21,7 @@ export const menuList = [
         name: 'Входящие заявки',
         icon: IconLayoutList,
         description: 'Вы можете откликаться на любые заявки!',
-        link: '/user/products/applications',
+        link: '/products/applications',
         button: 'Перейти к заявкам',
     },
     {
@@ -29,21 +29,21 @@ export const menuList = [
         name: 'Мой каталог',
         icon: IconLayoutBoardSplit,
         description: 'Предложите ваши товары всему общепиту на площадке!',
-        link: '/user/catalog',
+        link: '/catalog',
     },
     {
         id: 4,
         name: 'Реклама',
         icon: IconShoppingCart,
         description: 'Здесь можно купить рекламу на площадке',
-        link: '/user/advertising/advertisement',
+        link: '/advertising/advertisement',
     },
     {
         id: 5,
         name: 'Служба заботы',
-        icon: IconQuestionMark,
+        icon: IconHelpSquareRounded,
         description: 'У вас пока нет ни одного запроса к нам',
-        link: '/user/service',
+        link: '/service',
     },
     {
         id: 6,
@@ -51,6 +51,6 @@ export const menuList = [
         icon: IconSettings,
         description:
             'Вы можете изменить условия доставки и категории товара, по которым принимаете заявки',
-        link: '/user/settings/edit',
+        link: '/settings/edit',
     },
 ]

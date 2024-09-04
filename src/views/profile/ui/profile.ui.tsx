@@ -1,19 +1,11 @@
 'use client'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
+import { HorecaMenuList } from '@/views/profile/ui/horecaMenu'
+import { ProviderMenuList } from '@/views/profile/ui/providerMenu'
 import { Box, Button, Flex, Grid, Paper, Text } from '@mantine/core'
-import {
-    IconCalendarClock,
-    IconLayoutBoardSplit,
-    IconLayoutList,
-    IconQuestionMark,
-    IconSettings,
-    IconShoppingCart,
-    Icon,
-} from '@tabler/icons-react'
-import Link from 'next/link'
 
-import { menuList } from '@/shared/constants'
+import { roles } from '@/shared/constants'
 import { CustomAvatarUpload } from '@/shared/ui/CustomAvatarUpload'
 
 export function ProfileView() {
@@ -89,58 +81,11 @@ export function ProfileView() {
                     }}
                 >
                     <Grid>
-                        {menuList.map(x => {
-                            const Icon = x.icon as Icon
-                            return (
-                                <Grid.Col
-                                    key={x.id}
-                                    span={{
-                                        base: 12,
-                                        sm: 6,
-                                    }}
-                                >
-                                    <Paper p='md' shadow='xs' bg='gray.1'>
-                                        <Link href={x.link}>
-                                            <Flex gap='md' h={120}>
-                                                <Icon
-                                                    stroke={2}
-                                                    color='blue'
-                                                    size={60}
-                                                />
-                                                <Flex
-                                                    direction='column'
-                                                    gap='sm'
-                                                >
-                                                    <Text size='lg' fw={600}>
-                                                        {x.name}
-                                                    </Text>
-                                                    <Text
-                                                        size='xs'
-                                                        fw={600}
-                                                        c='gray'
-                                                    >
-                                                        {x.description}
-                                                    </Text>
-                                                </Flex>
-                                            </Flex>
-                                        </Link>
-                                        {x.button && (
-                                            <Button
-                                                variant='filled'
-                                                size='md'
-                                                color='blue'
-                                                fullWidth
-                                                my='md'
-                                                component={Link}
-                                                href={x.link}
-                                            >
-                                                {x.button}
-                                            </Button>
-                                        )}
-                                    </Paper>
-                                </Grid.Col>
-                            )
-                        })}
+                        {user?.profile.profileType === roles[0].role ? (
+                            <ProviderMenuList />
+                        ) : (
+                            <HorecaMenuList />
+                        )}
                     </Grid>
                 </Grid.Col>
             </Grid>

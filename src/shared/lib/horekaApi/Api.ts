@@ -23,6 +23,7 @@ export interface ErrorDto {
         | 'GDPR_IS_NOT_APPROVED'
         | 'UPLOAD_NOT_FOUND'
         | 'ACTIVATION_LINK_ERROR'
+        | 'INVALID_QUERY_STRING'
     /** @example ["password|IS_NOT_EMPTY"] */
     message?: string[]
     /** @example "Bad Request" */
@@ -229,6 +230,45 @@ export interface ProposalTemplateDto {
     updatedAt: string
 }
 
+export interface PaginatedDto {
+    /** Data items */
+    data: any[]
+    /** Total number of items */
+    total: number
+}
+
+export enum PaymentType {
+    Prepayment = 'Prepayment',
+    Deferment = 'Deferment',
+    PaymentUponDelivery = 'PaymentUponDelivery',
+}
+
+export interface CreateApplicationDto {
+    proposalId: number
+    imageIds: number[]
+    comment?: string
+    available: boolean
+    manufacturer: string
+    paymentType: PaymentType
+    cost: number
+}
+
+export interface ApplicationDto {
+    id: number
+    profileId: number
+    proposalId: number
+    images: string[]
+    comment: string
+    available: boolean
+    manufacturer: string
+    paymentType: PaymentType
+    cost: number
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+}
+
 export enum ProductPackagingType {
     Bottle = 'Bottle',
     Box = 'Box',
@@ -248,19 +288,18 @@ export interface CreateProductProviderDto {
 
 export interface Image {
     id: number
-    productId: number
-    imageId: number
+    name: string
+    mimetype: string
+    path: string
+    size: number
+    /** @format date-time */
     createdAt: string
+    /** @format date-time */
     updatedAt: string
-    image: {
-        id: number
-        name: string
-        mimetype: string
-        path: string
-        size: number
-        createdAt: string
-        updatedAt: string
-    }
+}
+
+export interface ProductImage {
+    image: Image
 }
 
 export interface ProductResponse {
@@ -277,8 +316,12 @@ export interface ProductResponse {
     createdAt: string
     /** @format date-time */
     updatedAt: string
-    productImage: Image[]
+    productImage: ProductImage[]
     isEditable: boolean
+}
+
+export interface ProductSearchDto {
+    category?: Categories
 }
 
 export interface UpdateProductProviderDto {
@@ -409,9 +452,9 @@ export class HttpClient<SecurityDataType = unknown> {
             input !== null && typeof input !== 'string'
                 ? JSON.stringify(input)
                 : input,
-        [ContentType.FormData]: (input: FormData) =>
-            (Array.from(input.keys()) || []).reduce((formData, key) => {
-                const property = input.get(key)
+        [ContentType.FormData]: (input: any) =>
+            Object.keys(input || {}).reduce((formData, key) => {
+                const property = input[key]
                 formData.append(
                     key,
                     property instanceof Blob
@@ -787,12 +830,48 @@ export class Api<
          * @secure
          */
         proposalsProviderControllerFindAppropriateProposals: (
+            query?: {
+                offset?: number
+                limit?: number
+                search?: string
+                /** fieldName(numeric)|ASC/DESC */
+                sort?: string
+            },
             params: RequestParams = {}
         ) =>
-            this.request<ProposalDto[], ErrorDto>({
+            this.request<
+                {
+                    data: ProposalDto[]
+                    total: number
+                },
+                ErrorDto
+            >({
                 path: `/api/proposals/provider`,
                 method: 'GET',
+                query: query,
                 secure: true,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Applications
+         * @name ApplicationsProviderControllerCreate
+         * @request POST:/api/proposals/provider
+         * @secure
+         */
+        applicationsProviderControllerCreate: (
+            data: CreateApplicationDto,
+            params: RequestParams = {}
+        ) =>
+            this.request<ApplicationDto, ErrorDto>({
+                path: `/api/proposals/provider`,
+                method: 'POST',
+                body: data,
+                secure: true,
+                type: ContentType.Json,
                 format: 'json',
                 ...params,
             }),
@@ -829,10 +908,26 @@ export class Api<
          * @request GET:/api/products/provider
          * @secure
          */
-        productsProviderControllerFindAll: (params: RequestParams = {}) =>
-            this.request<ProductResponse[], ErrorDto>({
+        productsProviderControllerFindAll: (
+            query?: {
+                offset?: number
+                limit?: number
+                search?: ProductSearchDto
+                /** fieldName(numeric)|ASC/DESC */
+                sort?: string
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    data: ProductResponse[]
+                    total: number
+                },
+                ErrorDto
+            >({
                 path: `/api/products/provider`,
                 method: 'GET',
+                query: query,
                 secure: true,
                 format: 'json',
                 ...params,

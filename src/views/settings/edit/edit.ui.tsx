@@ -46,6 +46,14 @@ export function EditViews() {
         }
     }, [data])
 
+    const handleSubmit = async (values: UpdateUserDto) => {
+        if (form.validate().hasErrors) {
+            return
+        }
+
+        updateUser(values)
+    }
+
     return (
         <Page>
             <Title>Общая информация</Title>
@@ -58,12 +66,7 @@ export function EditViews() {
 
             <form
                 className='flex flex-col gap-7'
-                onSubmit={form.onSubmit(async values => {
-                    if (form.validate().hasErrors) {
-                        return
-                    }
-                    updateUser(values)
-                })}
+                onSubmit={form.onSubmit(handleSubmit)}
             >
                 <TextInput
                     type='text'

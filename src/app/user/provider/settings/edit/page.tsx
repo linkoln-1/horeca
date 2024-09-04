@@ -1,5 +1,5 @@
 import { EditViews } from '@/views/settings/edit'
 
-export default function EditPage() {
+export default function ProviderEditPage() {
     return <EditViews />
 }
