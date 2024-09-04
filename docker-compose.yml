@@ -1,0 +1,9 @@
+services:
+  nextapp:
+    container_name: horeca-ui
+    image: nextapp
+    build: .
+    environment:
+      - NEXT_PUBLIC_APP_BASE_API=http://95.163.222.187
+    ports:
+      - "3000:3000"
