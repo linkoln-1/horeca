@@ -15,7 +15,7 @@ export function ProfileRootView() {
         if (user && user.profile.profileType === roles[0].role) {
             router.push(`/user/provider`)
         } else {
-            user && router.push(`/user/horeca`)
+            router.push(`/user/horeca`)
         }
     }, [user])
 
