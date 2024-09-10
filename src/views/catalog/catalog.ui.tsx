@@ -86,7 +86,7 @@ export function Catalog() {
                     </Grid>
                 </Paper>
 
-                {data.map((product, index) => (
+                {data.data.map((product, index) => (
                     <Paper p='md' withBorder key={index} bg='gray.0'>
                         <Grid justify='space-between'>
                             <Grid.Col span={{ base: 12, md: 1 }}>
