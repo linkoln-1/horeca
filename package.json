@@ -9,9 +9,8 @@
         "start": "next start",
         "lint": "next lint",
         "format": "prettier --write \"**/*.{ts,tsx,md,json,css}\"",
-        "libgen": "npx swagger-typescript-api@13.0.16 -p http://95.163.222.187:3001/api-json -o ./src/shared/lib/horekaApi/",
-        "libgen:dev": "npx swagger-typescript-api@13.0.16 -p http://localhost:8080/api-docs-json -o ./src/shared/lib/horekaApi/",
-        "allgen:rem": "npm run codegen:rem & npm run libgen:rem"
+        "libgen": "pnpm exec swagger-typescript-api -p http://95.163.222.187:3001/api-json -o ./src/shared/lib/horekaApi/",
+        "libgen:dev": "pnpm exec swagger-typescript-api -p http://localhost:8080/api-json -o ./src/shared/lib/horekaApi/"
     },
     "dependencies": {
         "@mantine/core": "^7.9.1",
@@ -26,6 +25,7 @@
         "react": "^18",
         "react-dom": "^18",
         "react-toastify": "^10.0.5",
+        "swagger-typescript-api": "^13.0.22",
         "zustand": "^4.5.2"
     },
     "devDependencies": {

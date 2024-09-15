@@ -1,13 +1,14 @@
-FROM node:20-alpine
+FROM node:22
 
 ARG BUILD
 
 WORKDIR /app
 COPY . .
 
-RUN npm install
+RUN npm install -g pnpm
+RUN pnpm install 
 
-RUN npm run libgen
-RUN npm run build
+RUN pnpm libgen
+RUN pnpm build
 
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]
