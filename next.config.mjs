@@ -6,7 +6,6 @@ const nextConfig = {
         config.module.unknownContextCritical = false
         return config
     },
-
     reactStrictMode: false,
     experimental: {
         optimizePackageImports: ['@mantine/core', '@mantine/hooks'],

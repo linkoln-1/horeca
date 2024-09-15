@@ -7,7 +7,7 @@ export function useProductMutation() {
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: api.productsProviderControllerCreate,
+        mutationFn: api.productsControllerCreate,
         onSettled: async () => {
             await queryClient.invalidateQueries({ queryKey: ['product'] })
         },
@@ -17,6 +17,6 @@ export function useProductMutation() {
 export function useProductsInfiniteQuery() {
     return useCustomQuery({
         queryKey: ['product'],
-        queryFn: () => api.productsProviderControllerFindAll(),
+        queryFn: () => api.productsControllerFindAll(),
     })
 }

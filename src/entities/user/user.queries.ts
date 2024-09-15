@@ -11,11 +11,7 @@ export function useRegisterUserMutation() {
 
     return useMutation({
         mutationFn: api.authorizationControllerRegistrate,
-        onSuccess: async ({ data }) => {
-            userStore.getState().updateTokens({
-                accessToken: data.accessToken || null,
-                refreshToken: data.refreshToken || null,
-            })
+        onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ['user', 'me'] })
         },
     })

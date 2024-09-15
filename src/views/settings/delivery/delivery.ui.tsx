@@ -25,7 +25,14 @@ import { Page } from '@/shared/ui/Page'
 
 type DeliveryFormType = Omit<
     ProviderProfileDto,
-    'profileType' | 'categories'
+    | 'profileType'
+    | 'categories'
+    | 'id'
+    | 'info'
+    | 'addresses'
+    | 'userId'
+    | 'createdAt'
+    | 'updatedAt'
 > & {
     categories: { value: string; label: string }[]
 }

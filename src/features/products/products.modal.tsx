@@ -21,7 +21,7 @@ import { CategoryLabels } from '@/shared/constants'
 import { packageTypeLabel } from '@/shared/constants/packageType'
 import {
     Categories,
-    CreateProductProviderDto,
+    ProductCreateDto,
     ProductPackagingType,
     ProviderProfileDto,
 } from '@/shared/lib/horekaApi/Api'
@@ -40,7 +40,7 @@ export function ProductsModal() {
         value: x,
         label: packageTypeLabel[x as ProductPackagingType],
     }))
-    const form = useForm<CreateProductProviderDto>({
+    const form = useForm<ProductCreateDto>({
         initialValues: {
             category: categories as unknown as Categories,
             name: '',

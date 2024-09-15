@@ -320,7 +320,14 @@ export interface ProviderRequestDto {
     images: UploadDto[]
 }
 
+export enum ProductPackagingType {
+    Bottle = 'Bottle',
+    Box = 'Box',
+    Pallet = 'Pallet',
+}
+
 export interface ProductCreateDto {
+    packagingType: ProductPackagingType
     category:
         | 'alcoholicDrinks'
         | 'grocerySpicesSeasonings'
@@ -347,12 +354,11 @@ export interface ProductCreateDto {
     producer: string
     cost: number
     count: number
-    packagingType: object
     imageIds: number[]
 }
 
 export interface ProductDto {
-    packagingType: 'Bottle' | 'Box' | 'Pallet'
+    packagingType: ProductPackagingType
     isEditable: boolean
     id: number
     userId: number
@@ -414,6 +420,7 @@ export interface ProductSearchDto {
 }
 
 export interface ProductUpdateDto {
+    packagingType: ProductPackagingType
     category:
         | 'alcoholicDrinks'
         | 'grocerySpicesSeasonings'
@@ -440,7 +447,6 @@ export interface ProductUpdateDto {
     producer: string
     cost: number
     count: number
-    packagingType: object
     imageIds: number[]
 }
 
@@ -1018,6 +1024,40 @@ export class Api<
                 body: data,
                 secure: true,
                 type: ContentType.Json,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Products
+         * @name ProductsControllerFindAll
+         * @summary Gat all products from provider's offer
+         * @request GET:/api/products/provider
+         * @secure
+         */
+        productsControllerFindAll: (
+            query?: {
+                offset?: number
+                limit?: number
+                search?: ProductSearchDto
+                /** fieldName(numeric)|ASC/DESC */
+                sort?: string
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    data: ProductDto[]
+                    total: number
+                },
+                ErrorDto
+            >({
+                path: `/api/products/provider`,
+                method: 'GET',
+                query: query,
+                secure: true,
                 format: 'json',
                 ...params,
             }),

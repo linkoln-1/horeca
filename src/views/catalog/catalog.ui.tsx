@@ -127,12 +127,10 @@ export function Catalog() {
                             </Grid.Col>
                             <Grid.Col span={{ base: 12, md: 1 }}>
                                 <Flex justify='center'>
-                                    {product.productImage.map((x, index) => (
+                                    {product.images.map((x, index) => (
                                         <MantineImage
                                             key={index}
-                                            src={getImageUrl(
-                                                `/${x.image.path}`
-                                            )}
+                                            src={getImageUrl(`/${x.path}`)}
                                         />
                                     ))}
                                 </Flex>
