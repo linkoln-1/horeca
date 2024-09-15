@@ -12,21 +12,15 @@ type AuthProviderProps = {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-    const [isEnabled, setIsEnabled] = useState(false)
-    const [isUserLoading, setIsUserLoading] = useState(true)
-
     const { user, updateUser, accessToken } = useUserStore(state => state)
 
     const path = usePathname()
     const router = useRouter()
-    const { data } = userQueries.useGetMeQuery(isEnabled)
+    const { data, isLoading  } = userQueries.useGetMeQuery()
 
     useEffect(() => {
         const handleAuthentication = async () => {
             if (user) {
-                setIsEnabled(true)
-                setIsUserLoading(false)
-
                 if (outSidePages.includes(path)) {
                     router.push('/user')
                 }
@@ -34,8 +28,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 if (!outSidePages.includes(path)) {
                     router.push('/sign-in')
                 }
-                setIsEnabled(true)
-                setIsUserLoading(false)
             }
         }
         handleAuthentication()
@@ -53,7 +45,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
     }, [accessToken, path])
 
-    if (isUserLoading) {
+    if (isLoading) {
         return <FullPageLoader className='w-screen h-screen' />
     }
 
