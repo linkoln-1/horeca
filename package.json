@@ -1,16 +1,15 @@
 {
-    "proxy": "http://localhost:3001",
     "name": "horeka",
     "version": "0.1.0",
     "private": true,
     "scripts": {
-	"docker": "docker compose up --build -d",
+        "docker": "docker compose up --build -d",
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
         "format": "prettier --write \"**/*.{ts,tsx,md,json,css}\"",
-        "libgen": "npx swagger-typescript-api@13.0.16 -p http://95.163.222.187/api-json -o ./src/shared/lib/horekaApi/",
+        "libgen": "npx swagger-typescript-api@13.0.16 -p http://95.163.222.187:3001/api-json -o ./src/shared/lib/horekaApi/",
         "libgen:dev": "npx swagger-typescript-api@13.0.16 -p http://localhost:8080/api-docs-json -o ./src/shared/lib/horekaApi/",
         "allgen:rem": "npm run codegen:rem & npm run libgen:rem"
     },

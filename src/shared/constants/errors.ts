@@ -10,5 +10,5 @@ export const errors: Record<NonNullable<ErrorDto['errorMessage']>, string> = {
     ITEM_NOT_FOUND: 'Item is not found',
     UPLOAD_NOT_FOUND: 'Upload is not found',
     ACTIVATION_LINK_ERROR: 'Activation link error',
-    INVALID_QUERY_STRING: ''
+    INVALID_QUERY_STRING: '',
 }

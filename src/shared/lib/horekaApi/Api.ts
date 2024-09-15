@@ -9,6 +9,18 @@
  * ---------------------------------------------------------------
  */
 
+export interface UploadDto {
+    id: number
+    name: string
+    mimetype: string
+    size: number
+    path: string
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+}
+
 export type StreamableFile = object
 
 export interface ErrorDto {
@@ -49,6 +61,13 @@ export interface UserDto {
     phone: string
     password: string
     profile: HorecaProfileDto | ProviderProfileDto
+    role: object
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+    activationLink: string
+    isActivated: boolean
 }
 
 export enum Weekday {
@@ -65,20 +84,20 @@ export interface Address {
     id?: number
     address: string
     weekdays: Weekday[]
-    moFrom: string
-    moTo: string
-    tuFrom: string
-    tuTo: string
-    weFrom: string
-    weTo: string
-    thFrom: string
-    thTo: string
-    frFrom: string
-    frTo: string
-    saFrom: string
-    saTo: string
-    suFrom: string
-    suTo: string
+    moFrom?: string
+    moTo?: string
+    tuFrom?: string
+    tuTo?: string
+    weFrom?: string
+    weTo?: string
+    thFrom?: string
+    thTo?: string
+    frFrom?: string
+    frTo?: string
+    saFrom?: string
+    saTo?: string
+    suFrom?: string
+    suTo?: string
 }
 
 export interface HorecaProfileDto {
@@ -86,6 +105,15 @@ export interface HorecaProfileDto {
     info?: string
     /** @minItems 1 */
     addresses: Address[]
+    id: number
+    userId: number
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+    categories: string[]
+    deliveryMethods: string[]
+    minOrderAmount: number
 }
 
 export enum Categories {
@@ -125,6 +153,14 @@ export interface ProviderProfileDto {
     categories: Categories[]
     /** @minItems 1 */
     deliveryMethods: DeliveryMethods[]
+    id: number
+    userId: number
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+    info: string | null
+    addresses: string[]
 }
 
 export enum ProfileType {
@@ -159,30 +195,30 @@ export interface RegistrateUserDto {
     profile: CreateHorecaProfileDto | CreateProviderProfileDto
 }
 
-export interface AuthResultDto {
-    accessToken: string
-    refreshToken: string
-}
-
 export interface LoginUserDto {
     email: string
     password: string
+}
+
+export interface AuthResultDto {
+    accessToken: string
+    refreshToken: string
 }
 
 export interface SuccessDto {
     status: string
 }
 
-export interface CreateProposalItemDto {
+export interface HorecaRequestItemCreateDto {
     name: string
     amount: number
     unit: string
     category: Categories
 }
 
-export interface CreateProposalDto {
+export interface HorecaRequestCreateDto {
     /** @minItems 1 */
-    items: CreateProposalItemDto[]
+    items: HorecaRequestItemCreateDto[]
     imageIds: number[]
     address: string
     /** @format date-time */
@@ -193,34 +229,48 @@ export interface CreateProposalDto {
     name: string
     phone: string
     comment?: string
+    userId: number
 }
 
-export interface ProposalDto {
+export interface HorecaRequestItemDto {
     id: number
-    profileId: number
-    address: string
-    /** @format date-time */
-    deliveryTime: string
-    /** @format date-time */
-    acceptUntill: string
-    paymentType: string
+    horecaRequestId: number
     name: string
-    phone: string
-    items: string[]
-    images: string[]
-    comment: string
+    amount: number
+    unit: string
+    category: string
     /** @format date-time */
     createdAt: string
     /** @format date-time */
     updatedAt: string
 }
 
-export interface CreateProposalTemplateDto {
+export interface HorecaRequestDto {
+    id: number
+    userId: number
+    address: string
+    /** @format date-time */
+    deliveryTime: string
+    /** @format date-time */
+    acceptUntill: string
+    paymentType: object
     name: string
-    content: CreateProposalDto
+    phone: string
+    items: HorecaRequestItemDto[]
+    comment: string
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+    images: UploadDto[]
 }
 
-export interface ProposalTemplateDto {
+export interface HorecaRequestTemplateCreateDto {
+    name: string
+    content: HorecaRequestCreateDto
+}
+
+export interface HorecaRequestTemplateDto {
     id: number
     name: string
     content: object
@@ -243,8 +293,8 @@ export enum PaymentType {
     PaymentUponDelivery = 'PaymentUponDelivery',
 }
 
-export interface CreateApplicationDto {
-    proposalId: number
+export interface ProviderRequestCreateDto {
+    horecaRequestId: number
     imageIds: number[]
     comment?: string
     available: boolean
@@ -253,86 +303,170 @@ export interface CreateApplicationDto {
     cost: number
 }
 
-export interface ApplicationDto {
+export interface ProviderRequestDto {
     id: number
-    profileId: number
-    proposalId: number
-    images: string[]
+    userId: number
+    horecaRequestId: number
     comment: string
     available: boolean
     manufacturer: string
-    paymentType: PaymentType
+    paymentType: object
     cost: number
+    approvedByHoreca: boolean
     /** @format date-time */
     createdAt: string
     /** @format date-time */
     updatedAt: string
+    images: UploadDto[]
 }
 
-export enum ProductPackagingType {
-    Bottle = 'Bottle',
-    Box = 'Box',
-    Pallet = 'Pallet',
-}
-
-export interface CreateProductProviderDto {
-    category: Categories
+export interface ProductCreateDto {
+    category:
+        | 'alcoholicDrinks'
+        | 'grocerySpicesSeasonings'
+        | 'softDrinks'
+        | 'readyMeals'
+        | 'stationery'
+        | 'confectionery'
+        | 'cannedFoods'
+        | 'dairyProducts'
+        | 'iceCream'
+        | 'meat'
+        | 'lowAlcoholDrinks'
+        | 'semiFinishedProducts'
+        | 'dishes'
+        | 'cashDesk'
+        | 'instantFoods'
+        | 'fish'
+        | 'fruitsAndVegetables'
+        | 'cleaningProducts'
+        | 'bakeryProducts'
+        | 'teeAndCoffee'
     name: string
     description: string
     producer: string
     cost: number
     count: number
-    packagingType: ProductPackagingType
+    packagingType: object
     imageIds: number[]
 }
 
-export interface Image {
+export interface ProductDto {
+    packagingType: 'Bottle' | 'Box' | 'Pallet'
+    isEditable: boolean
     id: number
-    name: string
-    mimetype: string
-    path: string
-    size: number
-    /** @format date-time */
-    createdAt: string
-    /** @format date-time */
-    updatedAt: string
-}
-
-export interface ProductImage {
-    image: Image
-}
-
-export interface ProductResponse {
-    id: number
-    profileId: number
-    category: string
+    userId: number
+    category:
+        | 'alcoholicDrinks'
+        | 'grocerySpicesSeasonings'
+        | 'softDrinks'
+        | 'readyMeals'
+        | 'stationery'
+        | 'confectionery'
+        | 'cannedFoods'
+        | 'dairyProducts'
+        | 'iceCream'
+        | 'meat'
+        | 'lowAlcoholDrinks'
+        | 'semiFinishedProducts'
+        | 'dishes'
+        | 'cashDesk'
+        | 'instantFoods'
+        | 'fish'
+        | 'fruitsAndVegetables'
+        | 'cleaningProducts'
+        | 'bakeryProducts'
+        | 'teeAndCoffee'
     name: string
     description: string
     producer: string
     cost: number
     count: number
-    packagingType: string
     /** @format date-time */
     createdAt: string
     /** @format date-time */
     updatedAt: string
-    productImage: ProductImage[]
-    isEditable: boolean
+    images: UploadDto[]
 }
 
 export interface ProductSearchDto {
-    category?: Categories
+    category?:
+        | 'alcoholicDrinks'
+        | 'grocerySpicesSeasonings'
+        | 'softDrinks'
+        | 'readyMeals'
+        | 'stationery'
+        | 'confectionery'
+        | 'cannedFoods'
+        | 'dairyProducts'
+        | 'iceCream'
+        | 'meat'
+        | 'lowAlcoholDrinks'
+        | 'semiFinishedProducts'
+        | 'dishes'
+        | 'cashDesk'
+        | 'instantFoods'
+        | 'fish'
+        | 'fruitsAndVegetables'
+        | 'cleaningProducts'
+        | 'bakeryProducts'
+        | 'teeAndCoffee'
 }
 
-export interface UpdateProductProviderDto {
-    category?: Categories
-    name?: string
-    description?: string
-    producer?: string
-    cost?: number
-    count?: number
-    packagingType?: ProductPackagingType
+export interface ProductUpdateDto {
+    category:
+        | 'alcoholicDrinks'
+        | 'grocerySpicesSeasonings'
+        | 'softDrinks'
+        | 'readyMeals'
+        | 'stationery'
+        | 'confectionery'
+        | 'cannedFoods'
+        | 'dairyProducts'
+        | 'iceCream'
+        | 'meat'
+        | 'lowAlcoholDrinks'
+        | 'semiFinishedProducts'
+        | 'dishes'
+        | 'cashDesk'
+        | 'instantFoods'
+        | 'fish'
+        | 'fruitsAndVegetables'
+        | 'cleaningProducts'
+        | 'bakeryProducts'
+        | 'teeAndCoffee'
+    name: string
+    description: string
+    producer: string
+    cost: number
+    count: number
+    packagingType: object
     imageIds: number[]
+}
+
+export interface ChatMessageDto {
+    id: number
+    chatId: number
+    message: string
+    authorId: number | null
+    /** @default false */
+    isServer: boolean
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+}
+
+export interface ChatDto {
+    id: number
+    opponents: number[]
+    type: object
+    providerRequestId: number | null
+    messages?: ChatMessageDto[]
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
 }
 
 export type QueryParamsType = Record<string | number, any>
@@ -609,12 +743,13 @@ export class Api<
             },
             params: RequestParams = {}
         ) =>
-            this.request<void, any>({
+            this.request<UploadDto, any>({
                 path: `/api/uploads`,
                 method: 'POST',
                 body: data,
                 secure: true,
                 type: ContentType.FormData,
+                format: 'json',
                 ...params,
             }),
 
@@ -704,7 +839,7 @@ export class Api<
             data: RegistrateUserDto,
             params: RequestParams = {}
         ) =>
-            this.request<AuthResultDto, ErrorDto>({
+            this.request<UserDto, ErrorDto>({
                 path: `/api/auth/registration`,
                 method: 'POST',
                 body: data,
@@ -756,18 +891,18 @@ export class Api<
         /**
          * No description
          *
-         * @tags Proposals
-         * @name ProposalsHorecaControllerCreate
+         * @tags HorecaRequests
+         * @name HorecaRequestsControllerCreate
          * @summary Create products(categories) set proposal required for HoReCa
-         * @request POST:/api/proposals/horeca
+         * @request POST:/api/requests/horeca
          * @secure
          */
-        proposalsHorecaControllerCreate: (
-            data: CreateProposalDto,
+        horecaRequestsControllerCreate: (
+            data: HorecaRequestCreateDto,
             params: RequestParams = {}
         ) =>
-            this.request<ProposalDto, ErrorDto>({
-                path: `/api/proposals/horeca`,
+            this.request<HorecaRequestDto, ErrorDto>({
+                path: `/api/requests/horeca`,
                 method: 'POST',
                 body: data,
                 secure: true,
@@ -779,18 +914,18 @@ export class Api<
         /**
          * No description
          *
-         * @tags Proposals
-         * @name ProposalsHorecaControllerCreateTemplate
+         * @tags HorecaRequests
+         * @name HorecaRequestsControllerCreateTemplate
          * @summary Create template of products(categories) set proposal required for HoReCa to use later
-         * @request POST:/api/proposals/horeca/template
+         * @request POST:/api/requests/horeca/template
          * @secure
          */
-        proposalsHorecaControllerCreateTemplate: (
-            data: CreateProposalTemplateDto,
+        horecaRequestsControllerCreateTemplate: (
+            data: HorecaRequestTemplateCreateDto,
             params: RequestParams = {}
         ) =>
-            this.request<ProposalTemplateDto, ErrorDto>({
-                path: `/api/proposals/horeca/template`,
+            this.request<HorecaRequestTemplateDto, ErrorDto>({
+                path: `/api/requests/horeca/template`,
                 method: 'POST',
                 body: data,
                 secure: true,
@@ -802,18 +937,18 @@ export class Api<
         /**
          * No description
          *
-         * @tags Proposals
-         * @name ProposalsHorecaControllerGetTemplate
+         * @tags HorecaRequests
+         * @name HorecaRequestsControllerGetTemplate
          * @summary Get template of products(categories) set proposal required for HoReCa
-         * @request GET:/api/proposals/horeca/template/{id}
+         * @request GET:/api/requests/horeca/template/{id}
          * @secure
          */
-        proposalsHorecaControllerGetTemplate: (
+        horecaRequestsControllerGetTemplate: (
             id: number,
             params: RequestParams = {}
         ) =>
-            this.request<ProposalTemplateDto, ErrorDto>({
-                path: `/api/proposals/horeca/template/${id}`,
+            this.request<HorecaRequestTemplateDto, ErrorDto>({
+                path: `/api/requests/horeca/template/${id}`,
                 method: 'GET',
                 secure: true,
                 format: 'json',
@@ -823,55 +958,43 @@ export class Api<
         /**
          * No description
          *
-         * @tags Proposals
-         * @name ProposalsProviderControllerFindAppropriateProposals
-         * @summary List of HoReCa proposals that matches with provider's offers
-         * @request GET:/api/proposals/provider
+         * @tags ProviderRequests
+         * @name ProviderRequestsControllerCreate
+         * @summary Create provider request on horeca's one
+         * @request POST:/api/requests/provider
          * @secure
          */
-        proposalsProviderControllerFindAppropriateProposals: (
-            query?: {
-                offset?: number
-                limit?: number
-                search?: string
-                /** fieldName(numeric)|ASC/DESC */
-                sort?: string
-            },
+        providerRequestsControllerCreate: (
+            data: ProviderRequestCreateDto,
             params: RequestParams = {}
         ) =>
-            this.request<
-                {
-                    data: ProposalDto[]
-                    total: number
-                },
-                ErrorDto
-            >({
-                path: `/api/proposals/provider`,
-                method: 'GET',
-                query: query,
-                secure: true,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Applications
-         * @name ApplicationsProviderControllerCreate
-         * @request POST:/api/proposals/provider
-         * @secure
-         */
-        applicationsProviderControllerCreate: (
-            data: CreateApplicationDto,
-            params: RequestParams = {}
-        ) =>
-            this.request<ApplicationDto, ErrorDto>({
-                path: `/api/proposals/provider`,
+            this.request<ProviderRequestDto, ErrorDto>({
+                path: `/api/requests/provider`,
                 method: 'POST',
                 body: data,
                 secure: true,
                 type: ContentType.Json,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ProviderRequests
+         * @name ProviderRequestsControllerApproveByHoreca
+         * @summary Approve by HoReCa to be able to start chat with
+         * @request POST:/api/requests/provider/{id}
+         * @secure
+         */
+        providerRequestsControllerApproveByHoreca: (
+            id: number,
+            params: RequestParams = {}
+        ) =>
+            this.request<SuccessDto, ErrorDto>({
+                path: `/api/requests/provider/${id}`,
+                method: 'POST',
+                secure: true,
                 format: 'json',
                 ...params,
             }),
@@ -880,16 +1003,16 @@ export class Api<
          * No description
          *
          * @tags Products
-         * @name ProductsProviderControllerCreate
+         * @name ProductsControllerCreate
          * @summary Create product from provider's offer
          * @request POST:/api/products/provider
          * @secure
          */
-        productsProviderControllerCreate: (
-            data: CreateProductProviderDto,
+        productsControllerCreate: (
+            data: ProductCreateDto,
             params: RequestParams = {}
         ) =>
-            this.request<ProductResponse, ErrorDto>({
+            this.request<ProductDto, ErrorDto>({
                 path: `/api/products/provider`,
                 method: 'POST',
                 body: data,
@@ -903,50 +1026,13 @@ export class Api<
          * No description
          *
          * @tags Products
-         * @name ProductsProviderControllerFindAll
-         * @summary Gat all products from provider's offer
-         * @request GET:/api/products/provider
-         * @secure
-         */
-        productsProviderControllerFindAll: (
-            query?: {
-                offset?: number
-                limit?: number
-                search?: ProductSearchDto
-                /** fieldName(numeric)|ASC/DESC */
-                sort?: string
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<
-                {
-                    data: ProductResponse[]
-                    total: number
-                },
-                ErrorDto
-            >({
-                path: `/api/products/provider`,
-                method: 'GET',
-                query: query,
-                secure: true,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Products
-         * @name ProductsProviderControllerGet
+         * @name ProductsControllerGet
          * @summary Get the specific product
          * @request GET:/api/products/provider/{id}
          * @secure
          */
-        productsProviderControllerGet: (
-            id: number,
-            params: RequestParams = {}
-        ) =>
-            this.request<ProductResponse, ErrorDto>({
+        productsControllerGet: (id: number, params: RequestParams = {}) =>
+            this.request<ProductDto, ErrorDto>({
                 path: `/api/products/provider/${id}`,
                 method: 'GET',
                 secure: true,
@@ -958,17 +1044,17 @@ export class Api<
          * No description
          *
          * @tags Products
-         * @name ProductsProviderControllerUpdate
+         * @name ProductsControllerUpdate
          * @summary Update the specific product
          * @request PUT:/api/products/provider/{id}
          * @secure
          */
-        productsProviderControllerUpdate: (
+        productsControllerUpdate: (
             id: number,
-            data: UpdateProductProviderDto,
+            data: ProductUpdateDto,
             params: RequestParams = {}
         ) =>
-            this.request<ProductResponse, ErrorDto>({
+            this.request<ProductDto, ErrorDto>({
                 path: `/api/products/provider/${id}`,
                 method: 'PUT',
                 body: data,
@@ -982,19 +1068,33 @@ export class Api<
          * No description
          *
          * @tags Products
-         * @name ProductsProviderControllerDelete
+         * @name ProductsControllerDelete
          * @summary Delete the specific product
          * @request DELETE:/api/products/provider/{id}
          * @secure
          */
-        productsProviderControllerDelete: (
-            id: number,
-            params: RequestParams = {}
-        ) =>
+        productsControllerDelete: (id: number, params: RequestParams = {}) =>
             this.request<void, any>({
                 path: `/api/products/provider/${id}`,
                 method: 'DELETE',
                 secure: true,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Chats
+         * @name ChatsControllerGetChat
+         * @request GET:/api/chats/{id}
+         * @secure
+         */
+        chatsControllerGetChat: (id: number, params: RequestParams = {}) =>
+            this.request<ChatDto, ErrorDto>({
+                path: `/api/chats/${id}`,
+                method: 'GET',
+                secure: true,
+                format: 'json',
                 ...params,
             }),
     }
