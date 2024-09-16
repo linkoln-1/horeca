@@ -1,0 +1,17 @@
+name: Deploy
+
+on:
+    push:
+        branches: ['master']
+
+jobs:
+    deploy:
+        runs-on: self-hosted
+        environment: production
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v3
+            - name: Create .env file
+              run: echo "${{ secrets.PROD_ENV_FILE }}" > .env
+            - name: run in docker
+              run: docker compose up --build -d
