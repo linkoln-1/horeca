@@ -5,7 +5,7 @@ import { ColorSchemeScript } from '@mantine/core'
 import type { Metadata } from 'next'
 
 import '@/styles/globals.css'
-import '@mantine/core/styles.css'
+import '@/styles/template.scss'
 
 export const metadata: Metadata = {
     description: 'Horeca corporation application',
