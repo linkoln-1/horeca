@@ -12,7 +12,7 @@ import { ModalsProvider } from '@mantine/modals'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { usePathname } from 'next/navigation'
 
-import { theme } from '@/shared/constants'
+import { outSidePages, theme } from '@/shared/constants'
 import { queryClient } from '@/shared/lib/reactQuery'
 
 import '@/styles/globals.css'
@@ -24,8 +24,6 @@ type ClientProvidersProps = {
 
 export function ClientProviders({ children }: ClientProvidersProps) {
     const path = usePathname()
-
-    const outSidePages = ['/', '/sign-up', '/sign-in']
 
     const isInsideApp = outSidePages.filter(url => url === path).length === 0
 
