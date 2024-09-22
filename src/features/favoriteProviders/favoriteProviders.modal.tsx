@@ -1,14 +1,19 @@
-import { Text, Flex, Button, Paper } from "@mantine/core"
+import { Text, Flex, Button, Paper } from '@mantine/core'
 
 export function FavoriteProvidersModal() {
-    return(
+    return (
         <Paper p='md'>
-            <Text fw='500' mb='20px' size="xl" ta='center'>
-                Вы уверены, что хотите удалить из избранного? Отменить это действие будет невозможно
+            <Text fw='500' mb='20px' size='xl' ta='center'>
+                Вы уверены, что хотите удалить из избранного? Отменить это
+                действие будет невозможно
             </Text>
-            <Flex justify='center' gap='40px'>
-                <Button size="md" radius='xl' w='40%' bg='indigo'>Нет</Button>
-                <Button size="md" radius='xl' w='40%' bg='pink.7'>Да</Button>
+            <Flex justify='center' gap='md'>
+                <Button size='md' radius='xl' w='40%' bg='indigo'>
+                    Нет
+                </Button>
+                <Button size='md' radius='xl' w='40%' bg='pink.7'>
+                    Да
+                </Button>
             </Flex>
         </Paper>
     )
