@@ -1,93 +1,136 @@
-import { Box, Button, Divider, Flex, Paper, Text, Title } from '@mantine/core'
+'use client'
 
-type Supplier = {
-    name: string
-    categories: string[]
-}
-
-const suppliers: Supplier[] = [
-    {
-        name: 'ООО МОРЕАНИ',
-        categories: ['Рыба, морепродукты, бакалея'],
-    },
-    {
-        name: 'ИП ИВАНОВ',
-        categories: ['Молочные продукты, яйца'],
-    },
-    {
-        name: 'ИП ПЕТРОВ',
-        categories: ['Посуда и кухонные принадлежности'],
-    },
-    {
-        name: 'ООО РОМАШКА',
-        categories: [
-            'Посуда и кухонные принадлежности',
-            'Прикасса (чипсы, снеки, семечки)',
-            'Продукты быстрого приготовления, лапша',
-            'Рыба и морепродукты',
-            'Свежие овощи, фрукты, зелень, грибы',
-            'Уборка и чистящие средства',
-            'Хлеб, хлебобулочные изделия',
-            'Чай, кофе, какао, заменители',
-        ],
-    },
-]
+import { FavoriteProvidersModal } from '@/features/favoriteProviders/favoriteProviders.modal'
+import {
+    Image as MantineImage,
+    Flex,
+    Paper,
+    Text,
+    Stack,
+    Button,
+} from '@mantine/core'
+import { modals } from '@mantine/modals'
+import Link from 'next/link'
+import { suppliers } from '@/shared/constants/favoriteProvidersData'
 
 export function FavoriteProviderViews() {
     return (
-        <Flex direction='column' gap='md' p='md'>
-            <Title order={2}>Избранные поставщики</Title>
-
-            <Paper bg='gray.0' radius='md' p='md'>
-                {/* Header Section */}
-                <Flex
-                    justify='space-between'
-                    mb='sm'
-                    className='border-b pb-[8px]'
-                >
-                    <Text fw={500}>Мои поставщики</Text>
-                    <Text fw={500}>Категория товаров</Text>
-                </Flex>
-
-                {/* Supplier List */}
-                {suppliers.map((supplier, index) => (
-                    <Flex
-                        key={index}
-                        justify='space-between'
-                        align='flex-start'
-                        mb='md'
-                        className='pb-[8px]'
-                        style={{
-                            '&:last-child': { borderBottom: 'none' },
-                        }}
-                    >
-                        {/* Supplier Name */}
-                        <Box
-                            style={{
-                                flex: '0 0 20%',
-                            }}
+        <Flex direction='column' gap='40px' p='md'>
+            {suppliers.map((suplier, index) => {
+                return (
+                    <Flex className='supplier' w='100%' key={index}>
+                        <Paper
+                            w='100%'
+                            px={100}
+                            py={63}
+                            withBorder
+                            shadow='sm'
+                            radius='lg'
+                            p='xl'
                         >
-                            <Text fw={index === 0 ? 700 : 500}>
-                                {supplier.name}
-                            </Text>
-                        </Box>
+                            <Flex className='supplierWrapper'>
+                                <Flex w='75%'>
+                                    <MantineImage
+                                        fit='cover'
+                                        mr='100px'
+                                        w={180}
+                                        h={180}
+                                        radius='md'
+                                        src={suplier.img}
+                                    />
 
-                        {/* Supplier Categories */}
-                        <Box style={{ flex: '1 0 60%' }}>
-                            {supplier.categories.map((category, idx) => (
-                                <Text key={idx}>{category}</Text>
-                            ))}
-                        </Box>
+                                    <Stack py='20px' justify='space-between'>
+                                        <Flex>
+                                            <Text size='20px'>
+                                                <Text fw={500} mr='5px' span>
+                                                    Наименование:
+                                                </Text>
 
-                        {/* Chat Button */}
-                        <Box style={{ flex: '0 0 15%', textAlign: 'right' }}>
-                            <Button variant='subtle' color='green'>
-                                открыть чат
-                            </Button>
-                        </Box>
+                                                <Text
+                                                    display='inline'
+                                                    size='20px'
+                                                >
+                                                    {suplier.name}
+                                                </Text>
+                                            </Text>
+                                        </Flex>
+                                        <Flex>
+                                            <Text size='20px'>
+                                                <Text fw={500} mr='5px' span>
+                                                    Рейтинг:
+                                                </Text>
+
+                                                <Text
+                                                    display='inline'
+                                                    size='20px'
+                                                >
+                                                    {suplier.rating} / 5
+                                                </Text>
+                                            </Text>
+                                        </Flex>
+                                        <Flex>
+                                            <Text size='20px'>
+                                                <Text fw={500} mr='5px' span>
+                                                    Категории товаров:
+                                                </Text>
+                                                <Text
+                                                    lh='md'
+                                                    display='inline'
+                                                    size='20px'
+                                                >
+                                                    {suplier.categories.map(
+                                                        category => {
+                                                            return (
+                                                                category + '; '
+                                                            )
+                                                        }
+                                                    )}
+                                                </Text>
+                                            </Text>
+                                        </Flex>
+                                    </Stack>
+                                </Flex>
+
+                                <Stack
+                                    className='flex-1'
+                                    justify='center'
+                                    gap='36px'
+                                    align='center'
+                                >
+                                    <Button
+                                        href='/user/horeca/chat/2'
+                                        component={Link}
+                                        size='20px'
+                                        className='cursor-pointer'
+                                        c='indigo'
+                                        variant='transparent'
+                                    >
+                                        Открыть список чатов
+                                    </Button>
+                                    <Text
+                                        onClick={handleModal}
+                                        size='20px'
+                                        className='cursor-pointer'
+                                        c='pink.7'
+                                    >
+                                        Удалить из избранного
+                                    </Text>
+                                </Stack>
+                            </Flex>
+                        </Paper>
                     </Flex>
-                ))}
-            </Paper>
+                )
+            })}
         </Flex>
     )
+}
+
+function handleModal() {
+    modals.open({
+        centered: true,
+        modalId: 'favoriteProvider',
+        radius: 'lg',
+        size: 'xl',
+        children: <FavoriteProvidersModal />,
+    })
 }

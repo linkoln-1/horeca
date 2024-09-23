@@ -1,0 +1,17 @@
+.sidebar {
+    padding: 0 24px 0 24px;
+    cursor: pointer;
+    color: #64748b;
+    &:hover {
+        background-color: #ecf2ff;
+        border-radius: 8px;
+        color: #336dff;
+    }
+}
+
+.active {
+    padding: 0 24px 0 24px;
+    background-color: #ecf2ff;
+    border-radius: 30px;
+    color: #336dff;
+}

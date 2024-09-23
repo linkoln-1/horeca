@@ -6,6 +6,7 @@ import type { Metadata } from 'next'
 
 import '@/styles/globals.css'
 import '@mantine/core/styles.css'
+import '@mantine/dates/styles.css'
 
 export const metadata: Metadata = {
     description: 'Horeca corporation application',

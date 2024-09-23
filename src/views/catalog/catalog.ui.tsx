@@ -127,7 +127,7 @@ export function Catalog() {
                             </Grid.Col>
                             <Grid.Col span={{ base: 12, md: 1 }}>
                                 <Flex justify='center'>
-                                    {product.images.map((x, index) => (
+                                    {product.images?.map((x, index) => (
                                         <MantineImage
                                             key={index}
                                             src={getImageUrl(`/${x.path}`)}

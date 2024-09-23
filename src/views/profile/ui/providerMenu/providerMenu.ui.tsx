@@ -22,7 +22,7 @@ export function ProviderMenuList() {
                     >
                         <Paper p='md' shadow='xs' bg='gray.1'>
                             <Link
-                                href={`/user/${user && user.profile.profileType.toLowerCase()}/${user && user.id}${x.link}`}
+                                href={`/user/${user && user.profile.profileType.toLowerCase()}${x.link}`}
                             >
                                 <Flex gap='md' h={120}>
                                     <Icon stroke={2} color='blue' size={60} />
@@ -44,7 +44,7 @@ export function ProviderMenuList() {
                                     fullWidth
                                     my='md'
                                     component={Link}
-                                    href={`/user/${user && user.profile.profileType.toLowerCase()}/${user && user.id}${x.link}`}
+                                    href={`/user/${user && user.profile.profileType.toLowerCase()}/${x.link}`}
                                 >
                                     {x.button}
                                 </Button>
