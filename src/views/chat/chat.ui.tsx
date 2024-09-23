@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 import {
     Flex,
@@ -23,6 +23,8 @@ import {
 
 import { requests } from '@/shared/constants/chatRequests'
 
+import '@/styles/chat.scss'
+
 export function ChatView() {
     const [activeRequest, setActiveRequest] = useState<string>('')
     const [message, setMessage] = useState<string>('')
@@ -43,14 +45,8 @@ export function ChatView() {
     }
 
     return (
-        <Flex mt='50px' direction='column'>
-            <Flex
-                px='55px'
-                align='center'
-                h='150px'
-                bg='indigo.1'
-                className='chatHeader'
-            >
+        <Flex mt='md' direction='column'>
+            <Flex px='md' py='md' align='center' bg='indigo.1'>
                 <Box miw='420px'>
                     <Text fw='500' size='xl'>
                         Все сообщения
@@ -64,7 +60,7 @@ export function ChatView() {
                         h={90}
                         radius='md'
                         src='/assets/images/bg-5.png'
-                    ></MantineImage>
+                    />
                     <Flex direction='column' justify='space-between'>
                         <Text fw='500' size='xl' className='chatName'>
                             ООО «МЕТРО Кэш энд Керри»
@@ -76,7 +72,7 @@ export function ChatView() {
                 </Flex>
             </Flex>
 
-            <Flex h='calc(100vh - 150px)' mah='100vh' className='chatBody'>
+            <Flex h='calc(100vh - 300px)' mah='100vh' className='chatBody'>
                 <Flex
                     direction='column'
                     style={{ overflowY: 'auto' }}
@@ -86,11 +82,10 @@ export function ChatView() {
                     <Group
                         style={{
                             borderBottom: `1px solid`,
-                            cursor: 'pointer',
                         }}
                         wrap='nowrap'
-                        px='55px'
-                        py='36px'
+                        px='md'
+                        py='md'
                     >
                         <MantineImage
                             mr='27px'
@@ -99,7 +94,7 @@ export function ChatView() {
                             h={90}
                             radius='md'
                             src='/assets/images/bg-5.png'
-                        ></MantineImage>
+                        />
                         <Flex direction='column' justify='space-between'>
                             <Text fw='500' size='xl' className='chatName'>
                                 Беседа
@@ -132,8 +127,8 @@ export function ChatView() {
                                     borderBottom: `1px solid`,
                                 }}
                                 wrap='nowrap'
-                                px='55px'
-                                py='36px'
+                                px='lg'
+                                py='lg'
                             >
                                 <Flex
                                     direction='column'
@@ -165,10 +160,10 @@ export function ChatView() {
                     })}
                 </Flex>
 
-                <Divider orientation='vertical' mt='md' mb='md' />
+                <Divider orientation='vertical' mt='md' mb='xs' />
 
                 <Flex pos='relative' direction='column' w='100%' h='100%'>
-                    <Text w='100%' my='30px' size='lg' c='gray.6' ta='center'>
+                    <Text w='100%' my='md' size='lg' c='gray.6' ta='center'>
                         30 июня, 2024
                     </Text>
 
@@ -178,6 +173,7 @@ export function ChatView() {
                         style={{ overflowY: 'auto' }}
                         flex='1'
                         mah='100%'
+                        className='custom-scrollbar'
                     >
                         <Paper
                             w='70%'
@@ -537,9 +533,9 @@ export function ChatView() {
                         w='100%'
                         bg='gray.1'
                         align='center'
-                        px='49px'
-                        py='40px'
-                        h='135px'
+                        px='md'
+                        py='md'
+                        // h='135px'
                         className='chatBodyMessagesInput'
                     >
                         <IconPaperclip

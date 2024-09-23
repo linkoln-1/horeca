@@ -9,10 +9,10 @@ import { roles } from '@/shared/constants'
 
 export function ProfileRootView() {
     const router = useRouter()
-    const user = useUserStore(state => state.user)
+    const { user, accessToken } = useUserStore(state => state)
 
     useEffect(() => {
-        if (user && user.profile.profileType === roles[0].role) {
+        if (user && accessToken && user.profile.profileType === roles[0].role) {
             router.push(`/user/provider`)
         } else {
             router.push(`/user/horeca`)

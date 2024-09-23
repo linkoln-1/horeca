@@ -1,10 +1,9 @@
 'use client'
 
 import { Box, Button, Card, Checkbox, Flex, List, Text } from '@mantine/core'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import '@mantine/core/styles.css'
+import '@/styles/template.scss'
 
 export function TemplateApplicationViews() {
     const path = usePathname()
