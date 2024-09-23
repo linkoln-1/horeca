@@ -2,6 +2,8 @@
 
 import { useRef, useState } from 'react'
 
+import { SaveModal } from '@/features/templates/saveModal'
+import { ThanksModal } from '@/features/templates/thanksModal'
 import {
     Flex,
     Select,
@@ -19,6 +21,7 @@ import {
 } from '@mantine/core'
 import { DateTimePicker, DateInput } from '@mantine/dates'
 import { FileWithPath } from '@mantine/dropzone'
+import { modals } from '@mantine/modals'
 import { IconPlus, IconX } from '@tabler/icons-react'
 
 import { CustomDropzone } from '@/shared/ui/CustomDropzone'
@@ -38,7 +41,7 @@ export function CreateRequestView() {
 
     return (
         <Flex justify='space-between' mt='md' gap='lg'>
-            <Box>
+            <Box miw='250px'>
                 <Select
                     label='Шаблоны'
                     placeholder='Новый шаблон'
@@ -225,10 +228,36 @@ export function CreateRequestView() {
                     </Flex>
 
                     <Flex justify='space-between'>
-                        <Button c='indigo' size='lg' fw='500' variant='outline'>
+                        <Button
+                            onClick={() =>
+                                handleModal(
+                                    'saveTemplateModal',
+                                    'Укажите имя для нового шаблона',
+                                    'lg',
+                                    <SaveModal />
+                                )
+                            }
+                            c='indigo'
+                            size='lg'
+                            fw='500'
+                            variant='outline'
+                        >
                             Сохранить шаблон
                         </Button>
-                        <Button c='white' size='lg' fw='500' bg='pink.5'>
+                        <Button
+                            onClick={() =>
+                                handleModal(
+                                    'thanksTemplateModal',
+                                    'Спасибо!',
+                                    'md',
+                                    <ThanksModal />
+                                )
+                            }
+                            c='white'
+                            size='lg'
+                            fw='500'
+                            bg='pink.5'
+                        >
                             Отправить заявку
                         </Button>
                     </Flex>
@@ -236,4 +265,20 @@ export function CreateRequestView() {
             </Paper>
         </Flex>
     )
+}
+
+function handleModal(
+    modalId: string,
+    title: string,
+    size: string,
+    children: React.ReactNode
+) {
+    modals.open({
+        title,
+        centered: true,
+        modalId,
+        radius: 'md',
+        size,
+        children,
+    })
 }
