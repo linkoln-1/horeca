@@ -71,6 +71,7 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
                     : null,
             repeatPassword: (value, values) =>
                 value !== values.password ? 'Пароли не совпадают' : null,
+            GDPRApproved: (value) => (value ? null : 'Необходимо согласие на обработку данных'),
         },
     })
 
