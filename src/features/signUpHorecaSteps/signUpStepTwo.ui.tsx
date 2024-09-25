@@ -2,7 +2,7 @@ import {
     Box,
     Button,
     Checkbox,
-    Group,
+    Group, NumberInput,
     Textarea,
     TextInput,
 } from '@mantine/core'
@@ -57,7 +57,7 @@ export function HorecaStepTwo({ form }: StepProps) {
 
     return (
         <>
-            <TextInput
+            <NumberInput
                 required
                 label='Контактный номер для связи с поставщиком'
                 placeholder='Номер мобильного телефона'
