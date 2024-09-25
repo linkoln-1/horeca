@@ -58,11 +58,12 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
                 ],
             },
         },
+        validateInputOnBlur: true,
         validate: {
             name: value =>
                 value.trim().length === 0 ? 'Имя обязательно' : null,
             tin: value =>
-                value.trim().length === 0 ? 'ИНН обязательно' : null,
+                value.length === 0 ? 'ИНН обязательно' : null,
             email: value => (!validateEmail(value) ? 'Email Обязателен' : null),
             password: value =>
                 value.length < 8
@@ -70,7 +71,6 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
                     : null,
             repeatPassword: (value, values) =>
                 value !== values.password ? 'Пароли не совпадают' : null,
-            phone: value => (!validatePhone(value) ? 'номер обязателен' : null),
         },
     })
 
@@ -78,14 +78,7 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
         userQueries.useRegisterUserMutation()
     const router = useRouter()
 
-    const isFullyFilledStepOne =
-        form.values.name &&
-        form.values.tin &&
-        form.values.email &&
-        form.values.password &&
-        form.values.repeatPassword &&
-        form.values.GDPRApproved
-
+    const isFullyFilledStepOne = form.isValid()
     const isFullyFilledStepTwo =
         form.values.phone && form.values.profile.addresses.length > 0
 
@@ -108,7 +101,7 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
 
             <Flex direction='column' justify='center' mt='xl' gap='lg'>
                 {currentStep < steps.length - 1 ? (
-                    <Button onClick={nextStep} disabled={!isFullyFilledStepOne}>
+                    <Button type='submit' disabled={!isFullyFilledStepOne}>
                         Продолжить
                     </Button>
                 ) : (
