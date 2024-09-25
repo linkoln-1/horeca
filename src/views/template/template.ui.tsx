@@ -1,41 +1,56 @@
 'use client'
 
 import { Box, Button, Card, Checkbox, Flex, List, Text } from '@mantine/core'
-import { usePathname } from 'next/navigation'
 
 import '@/styles/template.scss'
+import { IconArrowRight } from '@tabler/icons-react'
 
 export function TemplateApplicationViews() {
-    const path = usePathname()
 
     const templates = [
         {
             id: 1,
             title: 'Шаблон №1',
             created: '11.12.2024',
-            category: 'Безалкогольные напитки, вода, соки',
-            items: ['Вода Эвиан', 'Сок Рич', 'Смузи'],
+            products: [{
+                id: 1,
+                category: 'Безалкогольные напитки, вода, соки',
+                items: ['Вода Эвиан', 'Сок Рич', 'Смузи'],
+            }],
         },
         {
             id: 2,
             title: 'Шаблон №2',
             created: '11.12.2024',
             edited: '11.12.2024',
-            category: 'Мороженое, Шоколад',
-            items: [
-                'Ванильное',
-                'Шоколадное',
-                'Фисташковое',
-                'Горький',
-                'Белый',
+            products: [
+                {
+                    id: 1,
+                    category: 'Безалкогольные напитки, вода, соки',
+                    items: ['Вода Эвиан', 'Сок Рич', 'Смузи'],
+                },
+                {
+                    id: 2,
+                    category: 'Мороженое, Шоколад',
+                    items: [
+                        'Ванильное',
+                        'Шоколадное',
+                        'Фисташковое',
+                        'Горький',
+                        'Белый',
+                    ],
+                }
             ],
         },
         {
             id: 3,
             title: 'Шаблон №3',
             created: '11.12.2024',
-            category: 'Морепродукты',
-            items: ['Лосось', 'Сёмга'],
+            products: [{
+                id: 1,
+                category: 'Морепродукты',
+                items: ['Лосось', 'Сёмга'],
+            }],
         },
     ]
 
@@ -49,8 +64,6 @@ export function TemplateApplicationViews() {
                     id: 101,
                     title: 'Шаблон №1',
                     created: '11.12.2024',
-                    category: 'Безалкогольные напитки, вода, соки',
-                    items: ['Вода Эвиан', 'Сок Рич', 'Смузи'],
                     link: '/templates/101',
                 },
                 {
@@ -134,79 +147,99 @@ export function TemplateApplicationViews() {
     ]
 
     return (
-        <Flex gap='xl'>
-            <Flex direction='column' gap='md'>
+        <>
+            <Flex mb='lg' justify='flex-end'>
+                <Button ml='auto' w='fit-content' radius='lg' bg='pink.7'>
+                    Создать новый шаблон
+                    <IconArrowRight/>
+                </Button>
+            </Flex>
+            <Flex gap='xl'>
                 <Flex direction='column' gap='md'>
-                    <Box>
-                        <List>
-                            {templateMenuMock.map((x, index) => (
-                                <List.Item
-                                    py='sm'
-                                    mb='sm'
-                                    className='sidebar'
-                                    key={x.id}
+                    <Flex direction='column' gap='md'>
+                        <Box>
+                            <List>
+                                {templateMenuMock.map((x) => (
+                                    <List.Item
+                                        py='sm'
+                                        mb='sm'
+                                        className='sidebar border-b'
+                                        key={x.id}
+                                    >
+                                        <Text size='md' fw={500}>
+                                            {x.label}
+                                        </Text>
+                                    </List.Item>
+                                ))}
+                            </List>
+                        </Box>
+                    </Flex>
+
+                    <Flex direction='column' gap='md'>
+                        <Text fw={500} size='md'>
+                            Категории товаров
+                        </Text>
+                        <Checkbox radius='xs' color='indigo' label='Морепродукты' defaultChecked />
+                        <Checkbox radius='xs'  color='indigo' label='Мясо птицы' />
+                        <Checkbox radius='xs'  color='indigo' label='Мороженое' />
+                        <Checkbox radius='xs'  color='indigo' label='Алкогольные напитки' />
+                        <Checkbox radius='xs'  color='indigo' label='Безалкогольные напитки, вода, соки' />
+                    </Flex>
+                    <Button bg='indigo' radius='lg'>Применить</Button>
+                </Flex>
+
+                <Flex direction='column' gap='lg' w='100%'>
+                    {templates.map(template => (
+                        <Card
+                            key={template.id}
+                            shadow='sm'
+                            p={0}
+                            withBorder
+                            w='100%'
+                        >
+                            <Flex gap='md'>
+                                <Flex
+                                    w={250}
+                                    direction='column'
+                                    gap='md'
+                                    bg='indigo.6'
+                                    align='start'
+                                    c='#fff'
+                                    px='md'
+                                    py='lg'
                                 >
-                                    <Text size='md' fw={500}>
-                                        {x.label}
-                                    </Text>
-                                </List.Item>
-                            ))}
-                        </List>
-                    </Box>
-                    <Button w={200}>Создать новую папку</Button>
-                </Flex>
-
-                <Flex direction='column' gap='md'>
-                    <Text fw={500} size='md'>
-                        Категории товаров
-                    </Text>
-                    <Checkbox label='Морепродукты' defaultChecked />
-                    <Checkbox label='Мясо птицы' />
-                    <Checkbox label='Мороженое' />
-                    <Checkbox label='Алкогольные напитки' />
-                    <Checkbox label='Безалкогольные напитки, вода, соки' />
-                </Flex>
-            </Flex>
-
-            <Flex direction='column' gap='lg' w='100%'>
-                {templates.map(template => (
-                    <Card
-                        key={template.id}
-                        shadow='sm'
-                        p={0}
-                        withBorder
-                        w='100%'
-                    >
-                        <Flex gap='md'>
-                            <Flex
-                                w={250}
-                                direction='column'
-                                gap='md'
-                                bg='indigo.4'
-                                align='center'
-                                c='#fff'
-                                p='sm'
-                            >
-                                <Text>{template.title}</Text>
-                                <Text>Создан:</Text>
-                                <Text>{template.created}</Text>
-                            </Flex>
-
-                            <Flex direction='column' gap='md' p='md'>
-                                <Flex direction='column' gap='sm'>
-                                    <Text>Категория товаров:</Text>
-                                    <Text>{template.category}</Text>
+                                    <Text>{template.title}</Text>
+                                    <Text>Создан:</Text>
+                                    <Text>{template.created}</Text>
                                 </Flex>
 
-                                <Flex direction='column' gap='sm'>
-                                    <Text>Наименование:</Text>
-                                    <Text>{template.items.join(', ')}</Text>
+                                <Flex direction='column' gap='md' p='md'>
+                                    {template.products.map(product => {
+                                        return(
+                                            <div key={product.id}>
+                                                <Flex direction='column'>
+                                                    <Text c='gray.5'>Категория товаров:</Text>
+                                                    <Text>{product.category}</Text>
+                                                </Flex>
+
+                                                <Flex direction='column'>
+                                                    <Text c='gray.5'>Наименование:</Text>
+                                                    <Text>{product.items.join(', ')}</Text>
+                                                </Flex>
+                                            </div>
+                                        )
+                                    })}
+
+                                    <Flex gap='md'>
+                                        <Button c='blue' fw='500' px='0' variant='transparent'>Открыть для просмотра</Button>
+                                        <Button c='pink.7' fw='500' px='0' variant='transparent'>Редактировать шаблон</Button>
+                                    </Flex>
                                 </Flex>
                             </Flex>
-                        </Flex>
-                    </Card>
-                ))}
+                        </Card>
+                    ))}
+                </Flex>
             </Flex>
-        </Flex>
+        </>
     )
 }
