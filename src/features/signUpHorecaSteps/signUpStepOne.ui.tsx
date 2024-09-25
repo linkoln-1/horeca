@@ -1,4 +1,4 @@
-import { Checkbox, Flex, PasswordInput, TextInput } from '@mantine/core'
+import { Checkbox, Flex, NumberInput, PasswordInput, TextInput } from '@mantine/core'
 import { UseFormReturnType } from '@mantine/form'
 import { IconAt, IconLock } from '@tabler/icons-react'
 import Link from 'next/link'
@@ -18,8 +18,7 @@ export function HorecaStepOne({ form }: StepProps) {
                 placeholder='Например, ООО “Рыба”'
                 {...form.getInputProps('name')}
             />
-            <TextInput
-                type='text'
+            <NumberInput
                 label='Укажите ИНН компании'
                 placeholder='ИНН'
                 {...form.getInputProps('tin')}
