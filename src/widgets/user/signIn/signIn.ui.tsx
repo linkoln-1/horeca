@@ -42,16 +42,16 @@ export function SignIn() {
 
             <Flex direction='column' gap='lg'>
                 <TextInput
-                    label='Email'
+                    label='Электронная почта'
                     type='email'
-                    placeholder='Enter your email'
+                    placeholder='Введите адрес электронной почты'
                     leftSection={<IconAt size={16} />}
                     {...form.getInputProps('email')}
                 />
 
                 <PasswordInput
-                    label='Password'
-                    placeholder='Enter your password'
+                    label='Пароль'
+                    placeholder='Введите свой пароль'
                     {...form.getInputProps('password')}
                 />
 

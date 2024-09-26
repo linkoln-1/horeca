@@ -34,30 +34,22 @@ export function SupplierManufacturer({
                 minOrderAmount: 0,
             },
         },
+        validateInputOnBlur: true,
         validate: {
-            name: value => (value ? null : 'Имя обязательно'),
-            tin: value => (value ? null : 'ИНН обязателен'),
-            email: value => (value ? null : 'Email обязателен'),
-            phone: value => (value ? null : 'Телефон обязателен'),
-            password: value => (value ? null : 'Пароль обязателен'),
-            repeatPassword: (value, values) =>
-                value === values.password ? null : 'Пароли не совпадают',
-            GDPRApproved: value =>
-                value ? null : 'Необходимо согласие на обработку данных',
-        },
+            name: (value) => (value ? null : 'Имя обязательно'),
+            tin: (value) => (value ? null : 'ИНН обязателен'),
+            email: (value) => (value ? null : 'Email обязателен'),
+            password: (value) => (value ? null : 'Пароль обязателен'),
+            repeatPassword: (value, values) => (value === values.password ? null : 'Пароли не совпадают'),
+            GDPRApproved: (value) => (value ? null : 'Необходимо согласие на обработку данных')
+        }
     })
 
     const { mutateAsync: signUpUser, isPending } =
         userQueries.useRegisterUserMutation()
     const router = useRouter()
 
-    const isFullyFilledStepOne =
-        form.values.name &&
-        form.values.tin &&
-        form.values.email &&
-        form.values.password &&
-        form.values.repeatPassword &&
-        form.values.GDPRApproved
+    const isFullyFilledStepOne = form.isValid();
 
     const isFullyFilledStepTwo =
         form.values.profile.categories.length > 0 &&
@@ -83,7 +75,7 @@ export function SupplierManufacturer({
             </Flex>
             <Flex direction='column' justify='center' mt='xl' gap='lg'>
                 {currentStep < steps.length - 1 ? (
-                    <Button onClick={nextStep} disabled={!isFullyFilledStepOne}>
+                    <Button type='submit' disabled={!isFullyFilledStepOne}>
                         Продолжить
                     </Button>
                 ) : (
@@ -96,7 +88,7 @@ export function SupplierManufacturer({
                     </Button>
                 )}
                 <Button variant='default' component={Link} href='/#'>
-                    на главную
+                    На главную
                 </Button>
             </Flex>
         </form>
