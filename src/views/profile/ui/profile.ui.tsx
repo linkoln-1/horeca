@@ -81,7 +81,7 @@ export function ProfileView() {
                     }}
                 >
                     <Grid>
-                        {user?.profile.profileType === roles[0].role ? (
+                        {user?.profile?.profileType === roles[0].role ? (
                             <ProviderMenuList />
                         ) : (
                             <HorecaMenuList />

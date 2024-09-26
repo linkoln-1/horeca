@@ -4,7 +4,6 @@ import { SignUpStepTwo } from '@/features/signUpSupplierSteps'
 import { Button, Flex } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 import { FormValues } from '@/shared/constants'
 import { roles } from '@/shared/constants/roles'
@@ -36,20 +35,21 @@ export function SupplierManufacturer({
         },
         validateInputOnBlur: true,
         validate: {
-            name: (value) => (value ? null : 'Имя обязательно'),
-            tin: (value) => (value ? null : 'ИНН обязателен'),
-            email: (value) => (value ? null : 'Email обязателен'),
-            password: (value) => (value ? null : 'Пароль обязателен'),
-            repeatPassword: (value, values) => (value === values.password ? null : 'Пароли не совпадают'),
-            GDPRApproved: (value) => (value ? null : 'Необходимо согласие на обработку данных')
-        }
+            name: value => (value ? null : 'Имя обязательно'),
+            tin: value => (value ? null : 'ИНН обязателен'),
+            email: value => (value ? null : 'Email обязателен'),
+            password: value => (value ? null : 'Пароль обязателен'),
+            repeatPassword: (value, values) =>
+                value === values.password ? null : 'Пароли не совпадают',
+            GDPRApproved: value =>
+                value ? null : 'Необходимо согласие на обработку данных',
+        },
     })
 
     const { mutateAsync: signUpUser, isPending } =
         userQueries.useRegisterUserMutation()
-    const router = useRouter()
 
-    const isFullyFilledStepOne = form.isValid();
+    const isFullyFilledStepOne = form.isValid()
 
     const isFullyFilledStepTwo =
         form.values.profile.categories.length > 0 &&

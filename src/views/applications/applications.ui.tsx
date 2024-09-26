@@ -76,9 +76,15 @@ export function ApplicationsViews() {
                 />
             </Flex>
 
-            {orders.map((order, index) => (
-                <Flex direction='column' gap='md' key={index}>
-                    <Card shadow='sm' padding='lg' radius='lg' withBorder>
+            <Flex gap='md'>
+                {orders.map((order, index) => (
+                    <Card
+                        shadow='sm'
+                        padding='lg'
+                        radius='lg'
+                        withBorder
+                        key={index}
+                    >
                         <Text fw={500}>№ {order.id}</Text>
 
                         <Flex align='center' justify='space-between'>
@@ -132,8 +138,8 @@ export function ApplicationsViews() {
                             </Flex>
                         </Flex>
                     </Card>
-                </Flex>
-            ))}
+                ))}
+            </Flex>
         </Flex>
     )
 }
