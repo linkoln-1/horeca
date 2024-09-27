@@ -2,13 +2,13 @@ import {
     Box,
     Button,
     Checkbox,
-    Group,
+    Group, NumberInput,
     Textarea,
     TextInput,
 } from '@mantine/core'
 import { TimeInput } from '@mantine/dates'
 import { UseFormReturnType } from '@mantine/form'
-import { IconPlus } from '@tabler/icons-react'
+import { IconPlus, IconX } from '@tabler/icons-react'
 
 import { HorecaFormValues } from '@/shared/constants'
 import { Address, Weekday } from '@/shared/lib/horekaApi/Api'
@@ -55,9 +55,15 @@ export function HorecaStepTwo({ form }: StepProps) {
         form.insertListItem('profile.addresses', newAddress)
     }
 
+    const removeAddressForm = (index: number) => {
+        const newAddresses = form.getValues().profile.addresses.filter((_, i) => i !== index)
+
+        form.setFieldValue('profile.addresses', newAddresses)
+    }
+
     return (
         <>
-            <TextInput
+            <NumberInput
                 required
                 label='Контактный номер для связи с поставщиком'
                 placeholder='Номер мобильного телефона'
@@ -66,14 +72,17 @@ export function HorecaStepTwo({ form }: StepProps) {
 
             {form.values.profile.addresses.map((address, addressIndex) => (
                 <div key={addressIndex}>
-                    <TextInput
-                        required
-                        label={`Адрес доставки ${addressIndex + 1}`}
-                        placeholder='Адрес доставки'
-                        {...form.getInputProps(
-                            `profile.addresses.${addressIndex}.address`
-                        )}
-                    />
+                    <div className='relative'>
+                        <TextInput
+                            required
+                            label={`Адрес доставки ${addressIndex + 1}`}
+                            placeholder='Адрес доставки'
+                            {...form.getInputProps(
+                                `profile.addresses.${addressIndex}.address`
+                            )}
+                        />
+                        {addressIndex > 0 && <IconX className='absolute top-[-5px] right-0' cursor='pointer' onClick={() => removeAddressForm(addressIndex)} /> }
+                    </div>
 
                     {weekdays.map(day => (
                         <Group key={day.value} grow align='center' my='lg'>

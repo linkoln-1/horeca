@@ -12,7 +12,11 @@ export function ProfileRootView() {
     const { user, accessToken } = useUserStore(state => state)
 
     useEffect(() => {
-        if (user && accessToken && user.profile.profileType === roles[0].role) {
+        if (
+            user &&
+            accessToken &&
+            user.profile?.profileType === roles[0].role
+        ) {
             router.push(`/user/provider`)
         } else {
             router.push(`/user/horeca`)
