@@ -7,3 +7,7 @@ services:
       - NEXT_PUBLIC_APP_WS_CHATS_API=ws://95.163.222.187:4001/chats
     ports:
       - "80:3000"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
