@@ -3,24 +3,18 @@ import { HorecaStepOne, HorecaStepTwo } from '@/features/signUpHorecaSteps'
 import { Button, Flex } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 import { HorecaFormValues, roles } from '@/shared/constants'
+import {
+    validateAddresses,
+    validateEmail,
+    validatePhone,
+} from '@/shared/helpers/validateMantineForm'
 
 type PublicCateringProps = {
     nextStep: () => void
     currentStep: number
     activeTab: string
-}
-
-function validateEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-}
-
-function validatePhone(phone: string): boolean {
-    const phoneRegex = /^\+?[1-9]\d{1,14}$/
-    return phoneRegex.test(phone)
 }
 
 export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
@@ -59,25 +53,49 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
             },
         },
         validateInputOnBlur: true,
-        validate: {
-            name: value =>
-                value.trim().length === 0 ? 'Имя обязательно' : null,
-            tin: value =>
-                value.length === 0 ? 'ИНН обязательно' : null,
-            email: value => (!validateEmail(value) ? 'Email Обязателен' : null),
-            password: value =>
-                value.length < 8
-                    ? 'Пароль должен содержать не менее 8 символов'
-                    : null,
-            repeatPassword: (value, values) =>
-                value !== values.password ? 'Пароли не совпадают' : null,
-            GDPRApproved: (value) => (value ? null : 'Необходимо согласие на обработку данных'),
+        validate: values => {
+            const errors: Record<string, string> = {}
+
+            if (currentStep === 0) {
+                errors.name =
+                    values.name.trim().length === 0 ? 'Имя обязательно' : ''
+                errors.tin = values.tin.length === 0 ? 'ИНН обязательно' : ''
+                errors.email = !validateEmail(values.email)
+                    ? 'Email обязателен'
+                    : ''
+                errors.password =
+                    values.password.length < 8
+                        ? 'Пароль должен содержать не менее 8 символов'
+                        : ''
+                errors.repeatPassword =
+                    values.repeatPassword !== values.password
+                        ? 'Пароли не совпадают'
+                        : ''
+                errors.GDPRApproved = !values.GDPRApproved
+                    ? 'Необходимо согласие на обработку данных'
+                    : ''
+            }
+
+            if (currentStep === 1) {
+                errors.phone =
+                    values.phone.length === 0
+                        ? 'Телефон обязателен'
+                        : !validatePhone(values.phone)
+                          ? 'Введен некорректный телефон'
+                          : ''
+
+                const addressErrors = validateAddresses(
+                    values.profile.addresses
+                )
+                Object.assign(errors, addressErrors)
+            }
+
+            return errors
         },
     })
 
     const { mutateAsync: signUpUser, isPending } =
         userQueries.useRegisterUserMutation()
-    const router = useRouter()
 
     const isFullyFilledStepOne = form.isValid()
     const isFullyFilledStepTwo =

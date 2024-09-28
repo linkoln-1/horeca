@@ -2,7 +2,8 @@ import {
     Box,
     Button,
     Checkbox,
-    Group, NumberInput,
+    Group,
+    NumberInput,
     Textarea,
     TextInput,
 } from '@mantine/core'
@@ -56,17 +57,20 @@ export function HorecaStepTwo({ form }: StepProps) {
     }
 
     const removeAddressForm = (index: number) => {
-        const newAddresses = form.getValues().profile.addresses.filter((_, i) => i !== index)
+        const newAddresses = form
+            .getValues()
+            .profile.addresses.filter((_, i) => i !== index)
 
         form.setFieldValue('profile.addresses', newAddresses)
     }
 
     return (
         <>
-            <NumberInput
+            <TextInput
                 required
                 label='Контактный номер для связи с поставщиком'
                 placeholder='Номер мобильного телефона'
+                type='tel'
                 {...form.getInputProps('phone')}
             />
 
@@ -81,7 +85,13 @@ export function HorecaStepTwo({ form }: StepProps) {
                                 `profile.addresses.${addressIndex}.address`
                             )}
                         />
-                        {addressIndex > 0 && <IconX className='absolute top-[-5px] right-0' cursor='pointer' onClick={() => removeAddressForm(addressIndex)} /> }
+                        {addressIndex > 0 && (
+                            <IconX
+                                className='absolute top-[-5px] right-0'
+                                cursor='pointer'
+                                onClick={() => removeAddressForm(addressIndex)}
+                            />
+                        )}
                     </div>
 
                     {weekdays.map(day => (
@@ -133,7 +143,11 @@ export function HorecaStepTwo({ form }: StepProps) {
             ))}
 
             <Box className='flex justify-center'>
-                <Button onClick={addNewAddress} leftSection={<IconPlus />}>
+                <Button
+                    onClick={addNewAddress}
+                    leftSection={<IconPlus />}
+                    variant='transparent'
+                >
                     Добавить еще адрес
                 </Button>
             </Box>
