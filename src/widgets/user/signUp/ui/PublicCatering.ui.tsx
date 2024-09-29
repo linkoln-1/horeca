@@ -1,6 +1,6 @@
 import { userQueries } from '@/entities/user'
 import { HorecaStepOne, HorecaStepTwo } from '@/features/signUpHorecaSteps'
-import { Button, Flex } from '@mantine/core'
+import { Button, Flex, LoadingOverlay } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import Link from 'next/link'
 
@@ -54,50 +54,47 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
         },
         validateInputOnBlur: true,
         validate: values => {
-            const errors: Record<string, string> = {}
-
             if (currentStep === 0) {
-                errors.name =
-                    values.name.trim().length === 0 ? 'Имя обязательно' : ''
-                errors.tin = values.tin.length === 0 ? 'ИНН обязательно' : ''
-                errors.email = !validateEmail(values.email)
-                    ? 'Email обязателен'
-                    : ''
-                errors.password =
-                    values.password.length < 8
-                        ? 'Пароль должен содержать не менее 8 символов'
-                        : ''
-                errors.repeatPassword =
-                    values.repeatPassword !== values.password
-                        ? 'Пароли не совпадают'
-                        : ''
-                errors.GDPRApproved = !values.GDPRApproved
-                    ? 'Необходимо согласие на обработку данных'
-                    : ''
+                return {
+                    name:
+                        values.name.trim().length === 0
+                            ? 'Имя обязательно'
+                            : null,
+                    tin: values.tin.length === 0 ? 'ИНН обязательно' : null,
+                    email: !validateEmail(values.email)
+                        ? 'Некорректный email'
+                        : null,
+                    password:
+                        values.password.length < 8
+                            ? 'Пароль должен быть не менее 8 символов'
+                            : null,
+                    repeatPassword:
+                        values.repeatPassword !== values.password
+                            ? 'Пароли не совпадают'
+                            : null,
+                    GDPRApproved: !values.GDPRApproved
+                        ? 'Необходимо согласие на обработку данных'
+                        : null,
+                }
             }
 
             if (currentStep === 1) {
-                errors.phone =
-                    values.phone.length === 0
-                        ? 'Телефон обязателен'
-                        : !validatePhone(values.phone)
-                          ? 'Введен некорректный телефон'
-                          : ''
-
-                const addressErrors = validateAddresses(
-                    values.profile.addresses
-                )
-                Object.assign(errors, addressErrors)
+                return {
+                    phone: !validatePhone(values.phone)
+                        ? 'Некорректный телефон'
+                        : null,
+                    ...validateAddresses(values.profile.addresses),
+                }
             }
 
-            return errors
+            return {}
         },
     })
 
     const { mutateAsync: signUpUser, isPending } =
         userQueries.useRegisterUserMutation()
 
-    const isFullyFilledStepOne = form.isValid()
+    const isFullyFilledStepOne: boolean = form.isValid()
     const isFullyFilledStepTwo =
         form.values.phone && form.values.profile.addresses.length > 0
 
@@ -106,9 +103,9 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
 
     return (
         <form
-            onSubmit={form.onSubmit(async () => {
-                if (currentStep === steps.length - 1) {
-                    await signUpUser(form.values)
+            onSubmit={form.onSubmit(async values => {
+                if (currentStep === 1) {
+                    await signUpUser(values)
                 } else {
                     nextStep()
                 }
@@ -118,6 +115,11 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
                 <CurrentStepComponent form={form} />
             </Flex>
 
+            <LoadingOverlay
+                zIndex={1000}
+                overlayProps={{ blur: 2 }}
+                visible={isPending}
+            />
             <Flex direction='column' justify='center' mt='xl' gap='lg'>
                 {currentStep < steps.length - 1 ? (
                     <Button type='submit' disabled={!isFullyFilledStepOne}>
