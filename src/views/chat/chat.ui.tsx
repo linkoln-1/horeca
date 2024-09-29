@@ -20,8 +20,14 @@ import {
     IconThumbUpFilled,
     IconThumbDownFilled,
 } from '@tabler/icons-react'
+import { usePathname } from 'next/navigation'
 
-import { requests } from '@/shared/constants/chatRequests'
+import {
+    assistantMessages,
+    assistantChats,
+    supplierMessages,
+    supplierChats,
+} from '@/shared/constants'
 
 import '@/styles/chat.scss'
 
@@ -38,57 +44,49 @@ export function ChatView() {
     }
 
     const handleCheckActive = (requestNumber: string) => {
-        if (activeRequest === requestNumber) {
-            return true
-        }
-        return false
+        return activeRequest === requestNumber
     }
+
+    const path = usePathname()
+    const isAssistantPage = path.includes('assistant')
+
+    const messages = isAssistantPage ? assistantMessages : supplierMessages
+    const chats = isAssistantPage ? assistantChats : supplierChats
 
     return (
         <Flex mt='md' direction='column'>
-            <Flex px='md' py='md' align='center' bg='indigo.1'>
+            <Flex
+                className='rounded-t-xl'
+                px='md'
+                py='md'
+                align='center'
+                bg='indigo.1'
+            >
                 <Box miw='420px'>
                     <Text fw='500' size='xl'>
                         Все сообщения
                     </Text>
+                    {isAssistantPage && (
+                        <Text size='xl' c='gray.6'>
+                            Номера запросов
+                        </Text>
+                    )}
                 </Box>
-                <Flex w='calc(100% - 420px)'>
-                    <MantineImage
-                        mr='40px'
-                        fit='cover'
-                        w={90}
-                        h={90}
-                        radius='md'
-                        src='/assets/images/bg-5.png'
-                    />
-                    <Flex direction='column' justify='space-between'>
-                        <Text fw='500' size='xl' className='chatName'>
-                            ООО «МЕТРО Кэш энд Керри»
-                        </Text>
-                        <Text c='indigo' size='lg' className='status'>
-                            Онлайн
-                        </Text>
+                {isAssistantPage ? (
+                    <Flex w='calc(100% - 420px)'>
+                        <Flex direction='column' justify='space-between'>
+                            <Text fw='500' size='xl' className='chatName'>
+                                Поддержка СФЕРЫ HoReCa
+                            </Text>
+                            <Text c='indigo' size='lg' className='status'>
+                                Онлайн
+                            </Text>
+                        </Flex>
                     </Flex>
-                </Flex>
-            </Flex>
-
-            <Flex h='calc(100vh - 300px)' mah='100vh' className='chatBody'>
-                <Flex
-                    direction='column'
-                    style={{ overflowY: 'auto' }}
-                    miw='420px'
-                    mah='100%'
-                >
-                    <Group
-                        style={{
-                            borderBottom: `1px solid`,
-                        }}
-                        wrap='nowrap'
-                        px='md'
-                        py='md'
-                    >
+                ) : (
+                    <Flex w='calc(100% - 420px)'>
                         <MantineImage
-                            mr='27px'
+                            mr='40px'
                             fit='cover'
                             w={90}
                             h={90}
@@ -97,28 +95,66 @@ export function ChatView() {
                         />
                         <Flex direction='column' justify='space-between'>
                             <Text fw='500' size='xl' className='chatName'>
-                                Беседа
+                                ООО «МЕТРО Кэш энд Керри»
                             </Text>
-                            <Text c='gray.6' size='lg' className='status'>
-                                Сообщений пока нет
+                            <Text c='indigo' size='lg' className='status'>
+                                Онлайн
                             </Text>
                         </Flex>
-                    </Group>
+                    </Flex>
+                )}
+            </Flex>
 
-                    {requests.map((request, index) => {
+            <Flex h='calc(100vh - 300px)' mah='100vh'>
+                <Flex
+                    direction='column'
+                    className='overflow-y-auto custom-scrollbar'
+                    miw='420px'
+                    mah='100%'
+                >
+                    {!isAssistantPage && (
+                        <Group
+                            style={{
+                                borderBottom: `1px solid`,
+                            }}
+                            wrap='nowrap'
+                            px='md'
+                            py='md'
+                        >
+                            <MantineImage
+                                mr='27px'
+                                fit='cover'
+                                w={90}
+                                h={90}
+                                radius='md'
+                                src='/assets/images/bg-5.png'
+                            />
+
+                            <Flex direction='column' justify='space-between'>
+                                <Text fw='500' size='xl' className='chatName'>
+                                    Беседа
+                                </Text>
+                                <Text c='gray.6' size='lg' className='status'>
+                                    Сообщений пока нет
+                                </Text>
+                            </Flex>
+                        </Group>
+                    )}
+
+                    {chats.map((chat, index) => {
                         return (
                             <Group
                                 key={index}
                                 onClick={() =>
-                                    handleActiveRequest(request.requestNumber)
+                                    handleActiveRequest(chat.requestNumber)
                                 }
                                 c={
-                                    handleCheckActive(request.requestNumber)
+                                    handleCheckActive(chat.requestNumber)
                                         ? 'white'
                                         : ''
                                 }
                                 bg={
-                                    handleCheckActive(request.requestNumber)
+                                    handleCheckActive(chat.requestNumber)
                                         ? 'indigo'
                                         : ''
                                 }
@@ -139,12 +175,13 @@ export function ChatView() {
                                         size='xl'
                                         className='request'
                                     >
-                                        Заявка № {request.requestNumber}
+                                        {isAssistantPage ? '№' : 'Заявка №'}{' '}
+                                        {chat.requestNumber}
                                     </Text>
                                     <Text
                                         c={
                                             handleCheckActive(
-                                                request.requestNumber
+                                                chat.requestNumber
                                             )
                                                 ? 'white'
                                                 : 'gray.6'
@@ -152,7 +189,7 @@ export function ChatView() {
                                         size='lg'
                                         className='date'
                                     >
-                                        {request.requestDate}
+                                        {chat.requestDate}
                                     </Text>
                                 </Flex>
                             </Group>
@@ -170,363 +207,44 @@ export function ChatView() {
                     <Flex
                         direction='column'
                         px='xl'
-                        style={{ overflowY: 'auto' }}
                         flex='1'
                         mah='100%'
-                        className='custom-scrollbar'
+                        className='overflow-y-auto custom-scrollbar'
                     >
-                        <Paper
-                            w='70%'
-                            mb='lg'
-                            ml='auto'
-                            px='lg'
-                            py='md'
-                            withBorder
-                            shadow='sm'
-                        >
-                            <Text mb='sm' c='indigo'>
-                                Есть в наличии
-                            </Text>
-                            <Box mb='sm'>
-                                <Text mr='xs' fw='500' component='span'>
-                                    Категории товаров:
-                                </Text>
-                                <Text component='span'>
-                                    Безалкогольные напитки, вода, соки
-                                </Text>
-                            </Box>
-
-                            <Box mb='sm'>
-                                <Text
-                                    c='gray.5'
-                                    mr='xs'
-                                    fw='500'
-                                    component='span'
-                                >
-                                    Наименование:
-                                </Text>
-                                <Text component='span'>Сок Рич Гранатовый</Text>
-                            </Box>
-
-                            <Box mb='sm'>
-                                <Text
-                                    c='gray.5'
-                                    mr='xs'
-                                    fw='500'
-                                    component='span'
-                                >
-                                    Цена за 30 литров:
-                                </Text>
-                                <Text component='span'>50,000 руб.</Text>
-                            </Box>
-
-                            <Box mb='sm'>
-                                <Text
-                                    c='gray.5'
-                                    mr='xs'
-                                    fw='500'
-                                    component='span'
-                                >
-                                    Производитель:
-                                </Text>
-                                <Text component='span'>ООО “Суперджус”</Text>
-                            </Box>
-
-                            <Box mb='sm'>
-                                <Text c='gray.5' mr='xs' mb='sm' fw='500'>
-                                    Фотографии:
-                                </Text>
-                                <Flex
-                                    mah='100%'
-                                    gap='sm'
-                                    style={{ overflowX: 'auto' }}
-                                >
-                                    <Box
-                                        pos='relative'
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        <MantineImage
-                                            w='110px'
-                                            h='80px'
-                                            fit='cover'
-                                            src='/assets/images/bg-5.png'
-                                        />
-                                        <IconZoomIn
-                                            style={{
-                                                position: 'absolute',
-                                                top: 5,
-                                                right: 5,
-                                            }}
-                                            color='#fff'
-                                            stroke='2'
-                                        />
-                                    </Box>
-                                    <Box
-                                        pos='relative'
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        <MantineImage
-                                            w='110px'
-                                            h='80px'
-                                            fit='cover'
-                                            src='/assets/images/bg-5.png'
-                                        />
-                                        <IconZoomIn
-                                            style={{
-                                                position: 'absolute',
-                                                top: 5,
-                                                right: 5,
-                                            }}
-                                            color='#fff'
-                                            stroke='2'
-                                        />
-                                    </Box>
-                                    <Box
-                                        pos='relative'
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        <MantineImage
-                                            w='110px'
-                                            h='80px'
-                                            fit='cover'
-                                            src='/assets/images/bg-5.png'
-                                        />
-                                        <IconZoomIn
-                                            style={{
-                                                position: 'absolute',
-                                                top: 5,
-                                                right: 5,
-                                            }}
-                                            color='#fff'
-                                            stroke='2'
-                                        />
-                                    </Box>
-                                </Flex>
-                            </Box>
-
-                            <Divider my='lg' />
-
-                            <Box mb='sm'>
-                                <Text mr='xs' fw='500' component='span'>
-                                    Категория товаров:
-                                </Text>
-                                <Text component='span'>Шоколад</Text>
-                            </Box>
-
-                            <Box mb='sm'>
-                                <Text mr='xs' fw='500' component='span'>
-                                    Наименование:
-                                </Text>
-                                <Text component='span'>Горький</Text>
-                            </Box>
-
-                            <Box mb='sm'>
-                                <Text mr='xs' fw='500' component='span'>
-                                    Цена за 10 кг:
-                                </Text>
-                                <Text component='span'>30,000 руб.</Text>
-                            </Box>
-
-                            <Box mb='sm'>
-                                <Text mr='xs' fw='500' component='span'>
-                                    Производитель:
-                                </Text>
-                                <Text component='span'>ООО “Линдт”</Text>
-                            </Box>
-
-                            <Box mb='sm'>
-                                <Text c='gray.5' mr='xs' mb='sm' fw='500'>
-                                    Фотографии:
-                                </Text>
-                                <Flex gap='sm'>
-                                    <Box
-                                        pos='relative'
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        <MantineImage
-                                            w='110px'
-                                            h='80px'
-                                            fit='cover'
-                                            src='/assets/images/bg-5.png'
-                                        />
-                                        <IconZoomIn
-                                            style={{
-                                                position: 'absolute',
-                                                top: 5,
-                                                right: 5,
-                                            }}
-                                            color='#fff'
-                                            stroke='2'
-                                        />
-                                    </Box>
-                                    <Box
-                                        pos='relative'
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        <MantineImage
-                                            w='110px'
-                                            h='80px'
-                                            fit='cover'
-                                            src='/assets/images/bg-5.png'
-                                        />
-                                        <IconZoomIn
-                                            style={{
-                                                position: 'absolute',
-                                                top: 5,
-                                                right: 5,
-                                            }}
-                                            color='#fff'
-                                            stroke='2'
-                                        />
-                                    </Box>
-                                    <Box
-                                        pos='relative'
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        <MantineImage
-                                            w='110px'
-                                            h='80px'
-                                            fit='cover'
-                                            src='/assets/images/bg-5.png'
-                                        />
-                                        <IconZoomIn
-                                            style={{
-                                                position: 'absolute',
-                                                top: 5,
-                                                right: 5,
-                                            }}
-                                            color='#fff'
-                                            stroke='2'
-                                        />
-                                    </Box>
-                                </Flex>
-                            </Box>
-
-                            <Box mb='sm'>
-                                <Text
-                                    c='gray.5'
-                                    mr='xs'
-                                    fw='500'
-                                    component='span'
-                                >
-                                    Комментарий:
-                                </Text>
-                                <Text component='span'>
-                                    Есть Горький шоколад содержанием какаобобов
-                                    более 80%
-                                </Text>
-                            </Box>
-                        </Paper>
-
-                        <Box bg='indigo.1' className='speech-bubble-from-me'>
-                            Добрый день! Ваше предложение нас устраивает.
-                            Подскажите, не могли бы вы сделать 10% скидку на
-                            все, если мы закупим продукцию в большем объеме, чем
-                            изначально запрашивали?
-                        </Box>
-
-                        <Box
-                            c='white'
-                            bg='indigo.6'
-                            className='speech-bubble-to-me'
-                        >
-                            Все обсуждаемо. Однако зависит от конечного объема и
-                            сроков поставки.
-                        </Box>
-
-                        <Box bg='indigo.1' className='speech-bubble-from-me'>
-                            Хотели бы запас мороженного на два месяца вперед при
-                            условии сохранения его качества. По срокам - те же
-                            даты + можем дать 3 дня за поставку дополнительного
-                            объема.
-                        </Box>
-
-                        <Box
-                            c='white'
-                            bg='indigo.6'
-                            className='speech-bubble-to-me'
-                        >
-                            Окей, справимся. Начинам подготовку продукции к
-                            поставке. Будем держать в курсе.
-                        </Box>
-
-                        <Box bg='indigo.1' className='speech-bubble-from-me'>
-                            Спасибо большое за оперативность!
-                        </Box>
-
-                        <Paper
-                            w='70%'
-                            mb='lg'
-                            ml='auto'
-                            px='lg'
-                            py='md'
-                            withBorder
-                            shadow='sm'
-                        >
-                            <Text size='lg' mb='lg' fw='500'>
-                                Оцените сотрудничество с поставщиком
-                            </Text>
-
-                            <Box mb='md'>
-                                <Text size='md' mb='md'>
-                                    1. Товар был доставлен?
-                                </Text>
-                                <Flex>
-                                    <Button
-                                        fw='400'
-                                        color='#4DA225'
-                                        variant='transparent'
-                                        size='lg'
-                                    >
-                                        <IconThumbUpFilled
-                                            style={{ marginRight: '10px' }}
-                                        />
-                                        Да, доставлен
-                                    </Button>
-                                    <Button
-                                        fw='400'
-                                        color='#DB3C3E'
-                                        variant='transparent'
-                                        size='lg'
-                                    >
-                                        <IconThumbDownFilled
-                                            style={{ marginRight: '10px' }}
-                                        />
-                                        Нет, не доставлен
-                                    </Button>
-                                </Flex>
-                            </Box>
-
-                            <Box>
-                                <Text size='md' mb='md'>
-                                    2. Товар пришел качественным?
-                                </Text>
-                                <Flex>
-                                    <Button
-                                        fw='400'
-                                        color='#4DA225'
-                                        variant='transparent'
-                                        size='lg'
-                                    >
-                                        <IconThumbUpFilled
-                                            style={{ marginRight: '10px' }}
-                                        />
-                                        Удовлетворительно
-                                    </Button>
-                                    <Button
-                                        fw='400'
-                                        color='#DB3C3E'
-                                        variant='transparent'
-                                        size='lg'
-                                    >
-                                        <IconThumbDownFilled
-                                            style={{ marginRight: '10px' }}
-                                        />
-                                        Нет, возврат
-                                    </Button>
-                                </Flex>
-                            </Box>
-                        </Paper>
+                        {/*Chat body*/}
+                        {messages.map((message, index) => {
+                            if (message.type === 'request') {
+                                return (
+                                    <RequestCardMessage
+                                        key={index}
+                                        message={message}
+                                    />
+                                )
+                            } else if (
+                                message.type === 'message' &&
+                                message.from === 'me' &&
+                                message.text
+                            ) {
+                                return (
+                                    <MessageFromMe
+                                        key={index}
+                                        text={message.text}
+                                    />
+                                )
+                            } else if (
+                                message.type === 'message' &&
+                                message.from !== 'me' &&
+                                message.text
+                            ) {
+                                return (
+                                    <MessageToMe
+                                        key={index}
+                                        text={message.text}
+                                    />
+                                )
+                            }
+                        })}
+                        {!isAssistantPage && <RatingMessage />}
                     </Flex>
 
                     <Flex
@@ -554,10 +272,7 @@ export function ChatView() {
                             variant='unstyled'
                             w='100%'
                         />
-                        <Button
-                            variant='transparent'
-                            disabled={message ? false : true}
-                        >
+                        <Button variant='transparent' disabled={!message}>
                             <IconSend2
                                 width={36}
                                 height={36}
@@ -568,5 +283,223 @@ export function ChatView() {
                 </Flex>
             </Flex>
         </Flex>
+    )
+}
+
+function MessageToMe({ text }: { text: string }) {
+    return (
+        <Box c='white' bg='indigo.6' className='speech-bubble-to-me'>
+            {text}
+        </Box>
+    )
+}
+
+function MessageFromMe({ text }: { text: string }) {
+    return (
+        <Box bg='indigo.1' className='speech-bubble-from-me'>
+            {text}
+        </Box>
+    )
+}
+
+function RatingMessage() {
+    return (
+        <Paper w='70%' mb='lg' ml='auto' px='lg' py='md' withBorder shadow='sm'>
+            <Text size='lg' mb='lg' fw='500'>
+                Оцените сотрудничество с поставщиком
+            </Text>
+
+            <Box mb='md'>
+                <Text size='md' mb='md'>
+                    1. Товар был доставлен?
+                </Text>
+                <Flex>
+                    <Button
+                        fw='400'
+                        color='#4DA225'
+                        variant='transparent'
+                        size='lg'
+                    >
+                        <IconThumbUpFilled style={{ marginRight: '10px' }} />
+                        Да, доставлен
+                    </Button>
+                    <Button
+                        fw='400'
+                        color='#DB3C3E'
+                        variant='transparent'
+                        size='lg'
+                    >
+                        <IconThumbDownFilled style={{ marginRight: '10px' }} />
+                        Нет, не доставлен
+                    </Button>
+                </Flex>
+            </Box>
+
+            <Box>
+                <Text size='md' mb='md'>
+                    2. Товар пришел качественным?
+                </Text>
+                <Flex>
+                    <Button
+                        fw='400'
+                        color='#4DA225'
+                        variant='transparent'
+                        size='lg'
+                    >
+                        <IconThumbUpFilled style={{ marginRight: '10px' }} />
+                        Удовлетворительно
+                    </Button>
+                    <Button
+                        fw='400'
+                        color='#DB3C3E'
+                        variant='transparent'
+                        size='lg'
+                    >
+                        <IconThumbDownFilled style={{ marginRight: '10px' }} />
+                        Нет, возврат
+                    </Button>
+                </Flex>
+            </Box>
+        </Paper>
+    )
+}
+
+function RequestCardMessage({ message }: { message: any }) {
+    return (
+        <Paper w='70%' mb='lg' ml='auto' px='lg' py='md' withBorder shadow='sm'>
+            <Text mb='sm' c='indigo'>
+                {message.inStock}
+            </Text>
+            {message.products?.map((product: any) => {
+                return (
+                    <>
+                        <Box key={product.id}>
+                            <Box mb='sm'>
+                                <Text mr='xs' fw='500' component='span'>
+                                    Категории товаров:
+                                </Text>
+                                <Text component='span'>{product.category}</Text>
+                            </Box>
+                            {product.items?.map((item: any) => {
+                                return (
+                                    <>
+                                        <Box key={item.id}>
+                                            <Box mb='sm'>
+                                                <Text
+                                                    c='gray.5'
+                                                    mr='xs'
+                                                    fw='500'
+                                                    component='span'
+                                                >
+                                                    Наименование:
+                                                </Text>
+                                                <Text component='span'>
+                                                    {item.name}
+                                                </Text>
+                                            </Box>
+
+                                            <Box mb='sm'>
+                                                <Text
+                                                    c='gray.5'
+                                                    mr='xs'
+                                                    fw='500'
+                                                    component='span'
+                                                >
+                                                    Цена за 30 литров:
+                                                </Text>
+                                                <Text component='span'>
+                                                    {item.price}
+                                                </Text>
+                                            </Box>
+
+                                            <Box mb='sm'>
+                                                <Text
+                                                    c='gray.5'
+                                                    mr='xs'
+                                                    fw='500'
+                                                    component='span'
+                                                >
+                                                    Производитель:
+                                                </Text>
+                                                <Text component='span'>
+                                                    {item.manufacturer}
+                                                </Text>
+                                            </Box>
+                                            <Box mb='sm'>
+                                                <Text
+                                                    c='gray.5'
+                                                    mr='xs'
+                                                    mb='sm'
+                                                    fw='500'
+                                                >
+                                                    Фотографии:
+                                                </Text>
+                                                <Flex
+                                                    mah='100%'
+                                                    gap='sm'
+                                                    style={{
+                                                        overflowX: 'auto',
+                                                    }}
+                                                >
+                                                    {item.images?.map(
+                                                        (
+                                                            image: string,
+                                                            index: number
+                                                        ) => {
+                                                            return (
+                                                                <Box
+                                                                    key={index}
+                                                                    pos='relative'
+                                                                    style={{
+                                                                        cursor: 'pointer',
+                                                                    }}
+                                                                >
+                                                                    <MantineImage
+                                                                        w='110px'
+                                                                        h='80px'
+                                                                        fit='cover'
+                                                                        src={
+                                                                            image
+                                                                        }
+                                                                    />
+                                                                    <IconZoomIn
+                                                                        style={{
+                                                                            position:
+                                                                                'absolute',
+                                                                            top: 5,
+                                                                            right: 5,
+                                                                        }}
+                                                                        color='#fff'
+                                                                        stroke='2'
+                                                                    />
+                                                                </Box>
+                                                            )
+                                                        }
+                                                    )}
+                                                </Flex>
+                                            </Box>
+                                        </Box>
+                                    </>
+                                )
+                            })}
+                        </Box>
+                        {product.comment && (
+                            <Box mb='sm'>
+                                <Text
+                                    c='gray.5'
+                                    mr='xs'
+                                    fw='500'
+                                    component='span'
+                                >
+                                    Комментарий:
+                                </Text>
+                                <Text component='span'>{product.comment}</Text>
+                            </Box>
+                        )}
+                        <Divider my='lg' />
+                    </>
+                )
+            })}
+        </Paper>
     )
 }
