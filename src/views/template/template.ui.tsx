@@ -1,22 +1,23 @@
 'use client'
 
 import { Box, Button, Card, Checkbox, Flex, List, Text } from '@mantine/core'
-
-import '@/styles/template.scss'
 import { IconArrowRight } from '@tabler/icons-react'
 
-export function TemplateApplicationViews() {
+import '@/styles/template.scss'
 
+export function TemplateApplicationViews() {
     const templates = [
         {
             id: 1,
             title: 'Шаблон №1',
             created: '11.12.2024',
-            products: [{
-                id: 1,
-                category: 'Безалкогольные напитки, вода, соки',
-                items: ['Вода Эвиан', 'Сок Рич', 'Смузи'],
-            }],
+            products: [
+                {
+                    id: 1,
+                    category: 'Безалкогольные напитки, вода, соки',
+                    items: ['Вода Эвиан', 'Сок Рич', 'Смузи'],
+                },
+            ],
         },
         {
             id: 2,
@@ -39,18 +40,20 @@ export function TemplateApplicationViews() {
                         'Горький',
                         'Белый',
                     ],
-                }
+                },
             ],
         },
         {
             id: 3,
             title: 'Шаблон №3',
             created: '11.12.2024',
-            products: [{
-                id: 1,
-                category: 'Морепродукты',
-                items: ['Лосось', 'Сёмга'],
-            }],
+            products: [
+                {
+                    id: 1,
+                    category: 'Морепродукты',
+                    items: ['Лосось', 'Сёмга'],
+                },
+            ],
         },
     ]
 
@@ -151,7 +154,7 @@ export function TemplateApplicationViews() {
             <Flex mb='lg' justify='flex-end'>
                 <Button ml='auto' w='fit-content' radius='lg' bg='pink.7'>
                     Создать новый шаблон
-                    <IconArrowRight/>
+                    <IconArrowRight />
                 </Button>
             </Flex>
             <Flex gap='xl'>
@@ -159,7 +162,7 @@ export function TemplateApplicationViews() {
                     <Flex direction='column' gap='md'>
                         <Box>
                             <List>
-                                {templateMenuMock.map((x) => (
+                                {templateMenuMock.map(x => (
                                     <List.Item
                                         py='sm'
                                         mb='sm'
@@ -179,13 +182,36 @@ export function TemplateApplicationViews() {
                         <Text fw={500} size='md'>
                             Категории товаров
                         </Text>
-                        <Checkbox radius='xs' color='indigo' label='Морепродукты' defaultChecked />
-                        <Checkbox radius='xs'  color='indigo' label='Мясо птицы' />
-                        <Checkbox radius='xs'  color='indigo' label='Мороженое' />
-                        <Checkbox radius='xs'  color='indigo' label='Алкогольные напитки' />
-                        <Checkbox radius='xs'  color='indigo' label='Безалкогольные напитки, вода, соки' />
+                        <Checkbox
+                            radius='xs'
+                            color='indigo'
+                            label='Морепродукты'
+                            defaultChecked
+                        />
+                        <Checkbox
+                            radius='xs'
+                            color='indigo'
+                            label='Мясо птицы'
+                        />
+                        <Checkbox
+                            radius='xs'
+                            color='indigo'
+                            label='Мороженое'
+                        />
+                        <Checkbox
+                            radius='xs'
+                            color='indigo'
+                            label='Алкогольные напитки'
+                        />
+                        <Checkbox
+                            radius='xs'
+                            color='indigo'
+                            label='Безалкогольные напитки, вода, соки'
+                        />
                     </Flex>
-                    <Button bg='indigo' radius='lg'>Применить</Button>
+                    <Button bg='indigo' radius='lg'>
+                        Применить
+                    </Button>
                 </Flex>
 
                 <Flex direction='column' gap='lg' w='100%'>
@@ -215,24 +241,48 @@ export function TemplateApplicationViews() {
 
                                 <Flex direction='column' gap='md' p='md'>
                                     {template.products.map(product => {
-                                        return(
+                                        return (
                                             <div key={product.id}>
                                                 <Flex direction='column'>
-                                                    <Text c='gray.5'>Категория товаров:</Text>
-                                                    <Text>{product.category}</Text>
+                                                    <Text c='gray.5'>
+                                                        Категория товаров:
+                                                    </Text>
+                                                    <Text>
+                                                        {product.category}
+                                                    </Text>
                                                 </Flex>
 
                                                 <Flex direction='column'>
-                                                    <Text c='gray.5'>Наименование:</Text>
-                                                    <Text>{product.items.join(', ')}</Text>
+                                                    <Text c='gray.5'>
+                                                        Наименование:
+                                                    </Text>
+                                                    <Text>
+                                                        {product.items.join(
+                                                            ', '
+                                                        )}
+                                                    </Text>
                                                 </Flex>
                                             </div>
                                         )
                                     })}
 
                                     <Flex gap='md'>
-                                        <Button c='blue' fw='500' px='0' variant='transparent'>Открыть для просмотра</Button>
-                                        <Button c='pink.7' fw='500' px='0' variant='transparent'>Редактировать шаблон</Button>
+                                        <Button
+                                            c='blue'
+                                            fw='500'
+                                            px='0'
+                                            variant='transparent'
+                                        >
+                                            Открыть для просмотра
+                                        </Button>
+                                        <Button
+                                            c='pink.7'
+                                            fw='500'
+                                            px='0'
+                                            variant='transparent'
+                                        >
+                                            Редактировать шаблон
+                                        </Button>
                                     </Flex>
                                 </Flex>
                             </Flex>

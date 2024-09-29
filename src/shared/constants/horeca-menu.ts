@@ -43,7 +43,8 @@ export const horecaMenu = [
         id: 5,
         name: 'Служба заботы',
         icon: IconHelpSquareRounded,
-        description: 'Здесь вы можете следить за минимальным остатком и планировать закупки',
+        description:
+            'Здесь вы можете следить за минимальным остатком и планировать закупки',
         subDescription: 'В разработке',
         link: '/assistant',
     },

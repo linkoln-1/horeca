@@ -11,6 +11,7 @@ import {
 } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import Link from 'next/link'
+
 import { suppliers } from '@/shared/constants/favoriteProvidersData'
 
 export function FavoriteProviderViews() {
