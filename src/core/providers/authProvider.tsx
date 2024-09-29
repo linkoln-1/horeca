@@ -19,18 +19,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const { data, isLoading } = userQueries.useGetMeQuery()
 
     useEffect(() => {
-        const handleAuthentication = async () => {
-            if (user) {
-                if (outSidePages.includes(path) && accessToken) {
-                    router.push(`/user`)
-                }
-            } else {
-                if (!outSidePages.includes(path) && !accessToken) {
-                    router.push('/sign-in')
-                }
+        if (user) {
+            if (outSidePages.includes(path) && accessToken) {
+                router.push(`/user`)
+            }
+        } else {
+            if (!outSidePages.includes(path) && !accessToken) {
+                router.push('/sign-in')
             }
         }
-        handleAuthentication()
     }, [user, path, accessToken])
 
     useEffect(() => {
