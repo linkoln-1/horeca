@@ -1,26 +1,20 @@
 import { userQueries } from '@/entities/user'
 import { HorecaStepOne, HorecaStepTwo } from '@/features/signUpHorecaSteps'
-import { Button, Flex } from '@mantine/core'
+import { Button, Flex, LoadingOverlay } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 import { HorecaFormValues, roles } from '@/shared/constants'
+import {
+    validateAddresses,
+    validateEmail,
+    validatePhone,
+} from '@/shared/helpers/validateMantineForm'
 
 type PublicCateringProps = {
     nextStep: () => void
     currentStep: number
     activeTab: string
-}
-
-function validateEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-}
-
-function validatePhone(phone: string): boolean {
-    const phoneRegex = /^\+?[1-9]\d{1,14}$/
-    return phoneRegex.test(phone)
 }
 
 export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
@@ -59,27 +53,48 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
             },
         },
         validateInputOnBlur: true,
-        validate: {
-            name: value =>
-                value.trim().length === 0 ? 'Имя обязательно' : null,
-            tin: value =>
-                value.length === 0 ? 'ИНН обязательно' : null,
-            email: value => (!validateEmail(value) ? 'Email Обязателен' : null),
-            password: value =>
-                value.length < 8
-                    ? 'Пароль должен содержать не менее 8 символов'
-                    : null,
-            repeatPassword: (value, values) =>
-                value !== values.password ? 'Пароли не совпадают' : null,
-            GDPRApproved: (value) => (value ? null : 'Необходимо согласие на обработку данных'),
+        validate: values => {
+            if (currentStep === 0) {
+                return {
+                    name:
+                        values.name.trim().length === 0
+                            ? 'Имя обязательно'
+                            : null,
+                    tin: values.tin.length === 0 ? 'ИНН обязательно' : null,
+                    email: !validateEmail(values.email)
+                        ? 'Некорректный email'
+                        : null,
+                    password:
+                        values.password.length < 8
+                            ? 'Пароль должен быть не менее 8 символов'
+                            : null,
+                    repeatPassword:
+                        values.repeatPassword !== values.password
+                            ? 'Пароли не совпадают'
+                            : null,
+                    GDPRApproved: !values.GDPRApproved
+                        ? 'Необходимо согласие на обработку данных'
+                        : null,
+                }
+            }
+
+            if (currentStep === 1) {
+                return {
+                    phone: !validatePhone(values.phone)
+                        ? 'Некорректный телефон'
+                        : null,
+                    ...validateAddresses(values.profile.addresses),
+                }
+            }
+
+            return {}
         },
     })
 
     const { mutateAsync: signUpUser, isPending } =
         userQueries.useRegisterUserMutation()
-    const router = useRouter()
 
-    const isFullyFilledStepOne = form.isValid()
+    const isFullyFilledStepOne: boolean = form.isValid()
     const isFullyFilledStepTwo =
         form.values.phone && form.values.profile.addresses.length > 0
 
@@ -88,9 +103,9 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
 
     return (
         <form
-            onSubmit={form.onSubmit(async () => {
-                if (currentStep === steps.length - 1) {
-                    await signUpUser(form.values)
+            onSubmit={form.onSubmit(async values => {
+                if (currentStep === 1) {
+                    await signUpUser(values)
                 } else {
                     nextStep()
                 }
@@ -100,6 +115,11 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
                 <CurrentStepComponent form={form} />
             </Flex>
 
+            <LoadingOverlay
+                zIndex={1000}
+                overlayProps={{ blur: 2 }}
+                visible={isPending}
+            />
             <Flex direction='column' justify='center' mt='xl' gap='lg'>
                 {currentStep < steps.length - 1 ? (
                     <Button type='submit' disabled={!isFullyFilledStepOne}>
