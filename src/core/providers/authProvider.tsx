@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useEffect } from 'react'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { userQueries } from '@/entities/user'

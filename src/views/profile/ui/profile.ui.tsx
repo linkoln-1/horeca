@@ -1,15 +1,39 @@
 'use client'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
+import { imageQueries } from '@/entities/uploads'
 import { HorecaMenuList } from '@/views/profile/ui/horecaMenu'
 import { ProviderMenuList } from '@/views/profile/ui/providerMenu'
 import { Box, Button, Flex, Grid, Paper, Text } from '@mantine/core'
+import { useForm } from '@mantine/form'
 
 import { roles } from '@/shared/constants'
+import { getImageUrl } from '@/shared/helpers'
 import { CustomAvatarUpload } from '@/shared/ui/CustomAvatarUpload'
 
+type Image = {
+    url: string
+}
+
+type profileProps = {
+    avatar?: Image
+}
+
 export function ProfileView() {
+    const form = useForm<profileProps>({
+        initialValues: {},
+    })
+
     const user = useUserStore(state => state.user)
+    const { mutateAsync: uploadImage } = imageQueries.useImageUploadMutation()
+
+    const handleAvatarChange = async (payload: File | null) => {
+        if (payload) {
+            await uploadImage({
+                file: payload,
+            })
+        }
+    }
 
     return (
         <Flex direction='column' gap='md'>
@@ -25,8 +49,14 @@ export function ProfileView() {
                             <Flex gap='md' align='center' direction='column'>
                                 <Box w={240} h={240}>
                                     <CustomAvatarUpload
-                                        onChange={() => {}}
-                                        src={''}
+                                        onChange={handleAvatarChange}
+                                        src={
+                                            form.values.avatar
+                                                ? getImageUrl(
+                                                      form.values.avatar.url
+                                                  )
+                                                : undefined
+                                        }
                                         size='100%'
                                         color='blue'
                                         className='aspect-square cursor-pointer'
