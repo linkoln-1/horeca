@@ -19,25 +19,93 @@ import {
     Group,
     CheckIcon,
 } from '@mantine/core'
-import { DateTimePicker, DateInput } from '@mantine/dates'
+import { DateTimePicker, DateInput, DateValue } from '@mantine/dates'
 import { FileWithPath } from '@mantine/dropzone'
 import { modals } from '@mantine/modals'
 import { IconPlus, IconX } from '@tabler/icons-react'
 
 import { CustomDropzone } from '@/shared/ui/CustomDropzone'
+import { Categories, HorecaProfileDto, HorecaRequestCreateDto } from '@/shared/lib/horekaApi/Api'
+import { useForm } from '@mantine/form'
+import { useUserStore } from '@/core/providers/userStoreContext'
+import { CategoryLabels } from '@/shared/constants'
+import { PaymentMethod } from '@/shared/constants/paymentMethod'
 
 export function CreateRequestView() {
+    const user = useUserStore(state => state.user)
+    const categories = (user?.profile as HorecaProfileDto)?.categories.map(
+        x => CategoryLabels[x as Categories]
+    )
+
+    const form = useForm<HorecaRequestCreateDto>({
+        initialValues: {
+            items: [
+                {
+                    name: '',
+                    amount: 0,
+                    unit: '',
+                    category: categories as unknown as Categories
+                }
+            ],
+            address: '',
+            deliveryTime: '',
+            acceptUntill: '',
+            paymentType: PaymentMethod.Prepayment,
+            name: '',
+            phone: ''
+        }
+    })
+
     const dropzone = useRef<() => void>(null)
     const [images, setImages] = useState<FileWithPath[]>([])
-    const [category, setCategory] = useState([])
+    const [category, setCategory] = useState<string | null>()
+    const [comment, setComment] = useState<string>('')
+    const [address, setAddress] = useState<string>('')
+    const [deliveryTime, setDeliveryTime] = useState<DateValue>()
+    const [acceptUntill, setAcceptUntill] = useState<DateValue>()
+    const [paymentType, setPaymentType] = useState<string>()
+    const [name, setName] = useState<string>()
+    const [phone, setPhone] = useState<string>()
+
+    const addNewProducts = () => {
+        const newProducts = {
+        name: '',
+        amount: 0,
+        unit: '',
+        category: categories as unknown as Categories
+    }
+        form.insertListItem('items', newProducts)
+    }
+
+    // const [categories, setCategories] = useState([
+    //     {
+    //         name: '',
+    //         products: [
+    //             {
+    //                 name: '',
+    //                 quantity: '',
+    //                 unit: '',
+    //             },
+    //         ],
+    //     },
+    // ])
 
     const handleImages = (files: FileWithPath[]) => {
         setImages(files)
     }
 
-    const createNewProduct = () => {}
+    const createNewCategory = () => {
+        setCategories([
+            ...categories,
+            { name: '', products: [{ name: '', quantity: '', unit: '' }] },
+        ])
+    }
 
-    const createNewCategory = () => {}
+    const createNewProduct = (index: number) => {
+        const newCategories = [...categories]
+        newCategories[index].products.push({ name: '', quantity: '', unit: '' })
+        setCategories(newCategories)
+    }
 
     return (
         <Flex justify='space-between' mt='md' gap='lg'>
@@ -54,25 +122,94 @@ export function CreateRequestView() {
                 />
             </Box>
             <Paper p='md' w='100%' shadow='md' withBorder>
-                <Text fw='500'>Каталог</Text>
                 <form action=''>
-                    <Box>
-                        <Select
-                            placeholder='Безалкогольные напитки, вода, соки'
-                            data={[
-                                'Безалкогольные напитки, вода, соки',
-                                'Шоколад',
-                                'Мясные продукты',
-                                'Молочные продукты',
-                            ]}
-                            mb='md'
-                        />
-                        <Flex mb='md' justify='space-between' gap='5px'>
-                            <TextInput label='Название' />
-                            <TextInput type='number' label='Кол-во' />
-                            <TextInput label='Ед. изм.' />
-                        </Flex>
-                    </Box>
+                    {categories.map((category, index) => (
+                        <Box key={index}>
+                            <Text fw='500'>Категория</Text>
+                            <Select
+                                placeholder='Безалкогольные напитки, вода, соки'
+                                data={[
+                                    'Безалкогольные напитки, вода, соки',
+                                    'Шоколад',
+                                    'Мясные продукты',
+                                    'Молочные продукты',
+                                ]}
+                                mb='md'
+                                onChange={e => setCategory(e)}
+                            />
+                            {category.products.map((product, productIndex) => (
+                                <Flex
+                                    key={productIndex}
+                                    mb='md'
+                                    justify='space-between'
+                                    gap='5px'
+                                >
+                                    <TextInput
+                                        label='Название'
+                                        onChange={e => {
+                                            const newProduct = {
+                                                ...product,
+                                                name: e.target.value,
+                                            }
+                                            const newCategories = [
+                                                ...categories,
+                                            ]
+                                            newCategories[index].products[
+                                                productIndex
+                                            ] = newProduct
+                                            setCategories(newCategories)
+                                        }}
+                                    />
+                                    <TextInput
+                                        type='number'
+                                        label='Кол-во'
+                                        value={product.quantity}
+                                        onChange={e => {
+                                            const newProduct = {
+                                                ...product,
+                                                quantity: e.target.value,
+                                            }
+                                            const newCategories = [
+                                                ...categories,
+                                            ]
+                                            newCategories[index].products[
+                                                productIndex
+                                            ] = newProduct
+                                            setCategories(newCategories)
+                                        }}
+                                    />
+                                    <TextInput
+                                        label='Ед. изм.'
+                                        value={product.unit}
+                                        onChange={e => {
+                                            const newProduct = {
+                                                ...product,
+                                                unit: e.target.value,
+                                            }
+                                            const newCategories = [
+                                                ...categories,
+                                            ]
+                                            newCategories[index].products[
+                                                productIndex
+                                            ] = newProduct
+                                            setCategories(newCategories)
+                                        }}
+                                    />
+                                </Flex>
+                            ))}
+                            <Button
+                                onClick={() => createNewProduct(index)}
+                                variant='transparent'
+                            >
+                                <Flex gap='sm' c='indigo'>
+                                    <IconPlus />
+                                    <Text size='lg'>
+                                        Добавить новый товар в категории
+                                    </Text>
+                                </Flex>
+                            </Button>
+                        </Box>
+                    ))}
 
                     <Flex
                         mb='sm'
@@ -80,17 +217,6 @@ export function CreateRequestView() {
                         align='flex-start'
                         direction='column'
                     >
-                        <Button
-                            onClick={createNewProduct}
-                            variant='transparent'
-                        >
-                            <Flex gap='sm' c='indigo'>
-                                <IconPlus />
-                                <Text size='lg'>
-                                    Добавить новый товар в категории
-                                </Text>
-                            </Flex>
-                        </Button>
                         <Button
                             onClick={createNewCategory}
                             variant='transparent'
@@ -177,11 +303,15 @@ export function CreateRequestView() {
                         <Textarea
                             label='Комментарий к заявке'
                             description='До 400 символов'
+                            onChange={e => setComment(e.target.value)}
                         />
                     </Box>
 
                     <Box mb='sm'>
-                        <Autocomplete label='Адрес доставки' />
+                        <Autocomplete
+                            label='Адрес доставки'
+                            onChange={value => setAddress(value)}
+                        />
                     </Box>
 
                     <Flex mb='md' justify='space-between'>
@@ -190,11 +320,17 @@ export function CreateRequestView() {
                             valueFormat='DD/MM/YYYY HH:mm:ss'
                             label='Привезите товар не позднее:'
                             placeholder='ДД/ММ/ГГГГ ЧЧ:ММ'
+                            onChange={value => {
+                                setDeliveryTime(value)
+                            }}
                         />
                         <DateInput
                             valueFormat='DD/MM/YY'
                             label='Принимать заявки до:'
                             placeholder='ДД.ММ.ГГ'
+                            onChange={value => {
+                                setAcceptUntill(value)
+                            }}
                         />
                     </Flex>
 
@@ -202,6 +338,9 @@ export function CreateRequestView() {
                         name='paymentMethod'
                         mb='md'
                         label='Способ оплаты'
+                        onChange={e => {
+                            setPaymentType(e)
+                        }}
                     >
                         <Group mt='xs'>
                             <Radio
@@ -223,8 +362,18 @@ export function CreateRequestView() {
                     </Radio.Group>
 
                     <Flex mb='xl' justify='space-between'>
-                        <TextInput placeholder='Название компании' />
-                        <TextInput placeholder='Номер телефона' />
+                        <TextInput
+                            placeholder='Название компании'
+                            onChange={e => {
+                                setName(e.target.value)
+                            }}
+                        />
+                        <TextInput
+                            placeholder='Номер телефона'
+                            onChange={e => {
+                                setPhone(e.target.value)
+                            }}
+                        />
                     </Flex>
 
                     <Flex justify='space-between'>
