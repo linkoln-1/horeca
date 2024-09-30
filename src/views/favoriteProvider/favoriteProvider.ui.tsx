@@ -11,81 +11,61 @@ import {
 } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import Link from 'next/link'
+
 import { suppliers } from '@/shared/constants/favoriteProvidersData'
 
 export function FavoriteProviderViews() {
     return (
-        <Flex direction='column' gap='40px' p='md'>
+        <Flex direction='column' gap='xl' p='md'>
             {suppliers.map((suplier, index) => {
                 return (
-                    <Flex className='supplier' w='100%' key={index}>
+                    <Flex w='100%' key={index}>
                         <Paper
                             w='100%'
-                            px={100}
-                            py={63}
                             withBorder
                             shadow='sm'
                             radius='lg'
-                            p='xl'
+                            p='lg'
                         >
-                            <Flex className='supplierWrapper'>
-                                <Flex w='75%'>
+                            <Flex>
+                                <Flex w='100%' gap='md'>
                                     <MantineImage
                                         fit='cover'
-                                        mr='100px'
                                         w={180}
                                         h={180}
                                         radius='md'
                                         src={suplier.img}
                                     />
 
-                                    <Stack py='20px' justify='space-between'>
-                                        <Flex>
-                                            <Text size='20px'>
-                                                <Text fw={500} mr='5px' span>
-                                                    Наименование:
-                                                </Text>
+                                    <Stack py='md' justify='space-between'>
+                                        <Flex gap='md'>
+                                            <Text fw={600} span size='md'>
+                                                Наименование:
+                                            </Text>
 
-                                                <Text
-                                                    display='inline'
-                                                    size='20px'
-                                                >
-                                                    {suplier.name}
-                                                </Text>
+                                            <Text display='inline' size='md'>
+                                                {suplier.name}
                                             </Text>
                                         </Flex>
-                                        <Flex>
-                                            <Text size='20px'>
-                                                <Text fw={500} mr='5px' span>
-                                                    Рейтинг:
-                                                </Text>
+                                        <Flex gap='md'>
+                                            <Text fw={600} span size='md'>
+                                                Рейтинг:
+                                            </Text>
 
-                                                <Text
-                                                    display='inline'
-                                                    size='20px'
-                                                >
-                                                    {suplier.rating} / 5
-                                                </Text>
+                                            <Text display='inline' size='md'>
+                                                {suplier.rating} / 5
                                             </Text>
                                         </Flex>
-                                        <Flex>
-                                            <Text size='20px'>
-                                                <Text fw={500} mr='5px' span>
-                                                    Категории товаров:
-                                                </Text>
-                                                <Text
-                                                    lh='md'
-                                                    display='inline'
-                                                    size='20px'
-                                                >
-                                                    {suplier.categories.map(
-                                                        category => {
-                                                            return (
-                                                                category + '; '
-                                                            )
-                                                        }
-                                                    )}
-                                                </Text>
+                                        <Flex gap='md'>
+                                            <Text fw={600} size='md'>
+                                                Категории товаров:
+                                            </Text>
+                                            <Text size='md'>
+                                                {suplier.categories.map(
+                                                    category => {
+                                                        return category + '; '
+                                                    }
+                                                )}
                                             </Text>
                                         </Flex>
                                     </Stack>
