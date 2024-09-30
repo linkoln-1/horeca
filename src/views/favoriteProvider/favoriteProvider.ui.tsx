@@ -31,7 +31,6 @@ export function FavoriteProviderViews() {
                                 <Flex w='100%' gap='md'>
                                     <MantineImage
                                         fit='cover'
-                                        // mr='100px'
                                         w={180}
                                         h={180}
                                         radius='md'
