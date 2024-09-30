@@ -4,7 +4,7 @@ import { ClientProviders } from '@/core/providers/ClientProviders'
 import { ColorSchemeScript } from '@mantine/core'
 import type { Metadata } from 'next'
 
-import '@/styles/globals.css'
+import '@/styles/globals.scss'
 import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 

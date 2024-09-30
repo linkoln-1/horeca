@@ -15,7 +15,7 @@ import { usePathname } from 'next/navigation'
 import { outSidePages, theme } from '@/shared/constants'
 import { queryClient } from '@/shared/lib/reactQuery'
 
-import '@/styles/globals.css'
+import '@/styles/globals.scss'
 import '@mantine/core/styles.css'
 
 type ClientProvidersProps = {
