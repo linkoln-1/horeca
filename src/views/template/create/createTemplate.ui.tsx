@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 
 import { DeleteCategoryModal } from '@/features/templates/deleteCategoryModal'
 import { PageLeaveModal } from '@/features/templates/pageLeaveModal'
+import { SendRequestModal } from '@/features/templates/sendRequestModal'
 import {
     Box,
     Flex,
@@ -304,7 +305,13 @@ export function CreateTemplateUi() {
                     <Button fw='500' size='md' radius='xl' bg='indigo'>
                         Сохранить изменения
                     </Button>
-                    <Button fw='500' size='md' radius='xl' bg='pink'>
+                    <Button
+                        onClick={handleSendRequestModal}
+                        fw='500'
+                        size='md'
+                        radius='xl'
+                        bg='pink'
+                    >
                         Отправить заявку
                     </Button>
                 </Flex>
@@ -330,5 +337,15 @@ function handleDeleteCategoryModal() {
         radius: 'lg',
         size: 'lg',
         children: <DeleteCategoryModal />,
+    })
+}
+
+function handleSendRequestModal() {
+    modals.open({
+        centered: true,
+        modalId: 'sendRequest',
+        radius: 'lg',
+        size: 'lg',
+        children: <SendRequestModal />,
     })
 }
