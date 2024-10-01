@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 
+import { useUserStore } from '@/core/providers/userStoreContext'
 import { SaveModal } from '@/features/templates/saveModal'
 import { ThanksModal } from '@/features/templates/thanksModal'
 import {
@@ -19,23 +20,27 @@ import {
     Group,
     CheckIcon,
 } from '@mantine/core'
-import { DateTimePicker, DateInput, DateValue } from '@mantine/dates'
+import { DateTimePicker, DateInput } from '@mantine/dates'
 import { FileWithPath } from '@mantine/dropzone'
+import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { IconPlus, IconX } from '@tabler/icons-react'
 
-import { CustomDropzone } from '@/shared/ui/CustomDropzone'
-import { Categories, HorecaProfileDto, HorecaRequestCreateDto } from '@/shared/lib/horekaApi/Api'
-import { useForm } from '@mantine/form'
-import { useUserStore } from '@/core/providers/userStoreContext'
 import { CategoryLabels } from '@/shared/constants'
 import { PaymentMethod } from '@/shared/constants/paymentMethod'
+import {
+    Categories,
+    HorecaProfileDto,
+    HorecaRequestCreateDto,
+} from '@/shared/lib/horekaApi/Api'
+import { CustomDropzone } from '@/shared/ui/CustomDropzone'
 
 export function CreateRequestView() {
     const user = useUserStore(state => state.user)
-    const categories = (user?.profile as HorecaProfileDto)?.categories.map(
-        x => CategoryLabels[x as Categories]
-    )
+
+    const [showCategory, setShowCategory] = useState(true)
+    const dropzone = useRef<() => void>(null)
+    const [images, setImages] = useState<FileWithPath[]>([])
 
     const form = useForm<HorecaRequestCreateDto>({
         initialValues: {
@@ -44,67 +49,57 @@ export function CreateRequestView() {
                     name: '',
                     amount: 0,
                     unit: '',
-                    category: categories as unknown as Categories
-                }
+                    category: [''] as unknown as Categories,
+                },
             ],
             address: '',
             deliveryTime: '',
             acceptUntill: '',
             paymentType: PaymentMethod.Prepayment,
             name: '',
-            phone: ''
-        }
+            phone: '',
+        },
     })
 
-    const dropzone = useRef<() => void>(null)
-    const [images, setImages] = useState<FileWithPath[]>([])
-    const [category, setCategory] = useState<string | null>()
-    const [comment, setComment] = useState<string>('')
-    const [address, setAddress] = useState<string>('')
-    const [deliveryTime, setDeliveryTime] = useState<DateValue>()
-    const [acceptUntill, setAcceptUntill] = useState<DateValue>()
-    const [paymentType, setPaymentType] = useState<string>()
-    const [name, setName] = useState<string>()
-    const [phone, setPhone] = useState<string>()
-
-    const addNewProducts = () => {
-        const newProducts = {
-        name: '',
-        amount: 0,
-        unit: '',
-        category: categories as unknown as Categories
-    }
-        form.insertListItem('items', newProducts)
+    const addNewProduct = () => {
+        const newProduct = {
+            name: '',
+            amount: 0,
+            unit: '',
+        }
+        form.insertListItem('items', newProduct)
     }
 
-    // const [categories, setCategories] = useState([
-    //     {
-    //         name: '',
-    //         products: [
-    //             {
-    //                 name: '',
-    //                 quantity: '',
-    //                 unit: '',
-    //             },
-    //         ],
-    //     },
-    // ])
+    const addNewCategory = () => {
+        const newCategory = {
+            name: '',
+            amount: 0,
+            unit: '',
+            category: '',
+        }
+        form.insertListItem('items', newCategory)
+    }
+
+    const removeProduct = (productIndex: number) => {
+        form.removeListItem('items', productIndex)
+    }
 
     const handleImages = (files: FileWithPath[]) => {
         setImages(files)
     }
 
-    const createNewCategory = () => {
-        setCategories([
-            ...categories,
-            { name: '', products: [{ name: '', quantity: '', unit: '' }] },
-        ])
-    }
+    const handleFormSubmit = (values: HorecaRequestCreateDto) => {
+        const formattedData = {
+            ...values,
+            items: values.items.map(item => ({
+                name: item.name,
+                amount: item.amount,
+                unit: item.unit,
+                category: item.category || null,
+            })),
+        }
 
-    const createNewProduct = (index: number) => {
-        const newCategories = [...categories]
-        newCategories[index].products.push({ name: '', quantity: '', unit: '' })
-        setCategories(newCategories)
+        console.log('Отправка данных: ', formattedData)
     }
 
     return (
@@ -122,94 +117,63 @@ export function CreateRequestView() {
                 />
             </Box>
             <Paper p='md' w='100%' shadow='md' withBorder>
-                <form action=''>
-                    {categories.map((category, index) => (
-                        <Box key={index}>
-                            <Text fw='500'>Категория</Text>
-                            <Select
-                                placeholder='Безалкогольные напитки, вода, соки'
-                                data={[
-                                    'Безалкогольные напитки, вода, соки',
-                                    'Шоколад',
-                                    'Мясные продукты',
-                                    'Молочные продукты',
-                                ]}
-                                mb='md'
-                                onChange={e => setCategory(e)}
-                            />
-                            {category.products.map((product, productIndex) => (
-                                <Flex
-                                    key={productIndex}
-                                    mb='md'
-                                    justify='space-between'
-                                    gap='5px'
-                                >
+                <form
+                    onSubmit={form.onSubmit(handleFormSubmit)}
+                    className='flex flex-col gap-5'
+                >
+                    {form.values.items.map((item, index) => {
+                        return (
+                            <Box key={index}>
+                                {showCategory && (
+                                    <Select
+                                        label='Категория'
+                                        placeholder='Выберите категорию'
+                                        data={(
+                                            user?.profile as HorecaProfileDto
+                                        )?.categories?.map(x => ({
+                                            value: x,
+                                            label: CategoryLabels[
+                                                x as Categories
+                                            ],
+                                        }))}
+                                        {...form.getInputProps(
+                                            `items.${index}.category`
+                                        )}
+                                        mb='md'
+                                    />
+                                )}
+
+                                <Flex mb='md' justify='space-between' gap='5px'>
                                     <TextInput
-                                        label='Название'
-                                        onChange={e => {
-                                            const newProduct = {
-                                                ...product,
-                                                name: e.target.value,
-                                            }
-                                            const newCategories = [
-                                                ...categories,
-                                            ]
-                                            newCategories[index].products[
-                                                productIndex
-                                            ] = newProduct
-                                            setCategories(newCategories)
-                                        }}
+                                        label='Название товара'
+                                        {...form.getInputProps(
+                                            `items.${index}.name`
+                                        )}
                                     />
                                     <TextInput
                                         type='number'
                                         label='Кол-во'
-                                        value={product.quantity}
-                                        onChange={e => {
-                                            const newProduct = {
-                                                ...product,
-                                                quantity: e.target.value,
-                                            }
-                                            const newCategories = [
-                                                ...categories,
-                                            ]
-                                            newCategories[index].products[
-                                                productIndex
-                                            ] = newProduct
-                                            setCategories(newCategories)
-                                        }}
+                                        {...form.getInputProps(
+                                            `items.${index}.amount`
+                                        )}
                                     />
                                     <TextInput
                                         label='Ед. изм.'
-                                        value={product.unit}
-                                        onChange={e => {
-                                            const newProduct = {
-                                                ...product,
-                                                unit: e.target.value,
-                                            }
-                                            const newCategories = [
-                                                ...categories,
-                                            ]
-                                            newCategories[index].products[
-                                                productIndex
-                                            ] = newProduct
-                                            setCategories(newCategories)
-                                        }}
+                                        {...form.getInputProps(
+                                            `items.${index}.unit`
+                                        )}
                                     />
+
+                                    {index > 0 && (
+                                        <IconX
+                                            cursor='pointer'
+                                            onClick={() => removeProduct(index)}
+                                        />
+                                    )}
                                 </Flex>
-                            ))}
-                            <Button
-                                onClick={() => createNewProduct(index)}
-                                variant='transparent'
-                            >
-                                <Flex gap='sm' c='indigo'>
-                                    <IconPlus />
-                                    <Text size='lg'>
-                                        Добавить новый товар в категории
-                                    </Text>
-                                </Flex>
-                            </Button>
-                        </Box>
-                    ))}
+                            </Box>
+                        )
+                    })}
 
                     <Flex
                         mb='sm'
@@ -217,10 +181,14 @@ export function CreateRequestView() {
                         align='flex-start'
                         direction='column'
                     >
-                        <Button
-                            onClick={createNewCategory}
-                            variant='transparent'
-                        >
+                        <Button onClick={addNewProduct} variant='transparent'>
+                            <Flex gap='sm' c='indigo'>
+                                <IconPlus />
+                                <Text size='lg'>Добавить новый товар</Text>
+                            </Flex>
+                        </Button>
+
+                        <Button onClick={addNewCategory} variant='transparent'>
                             <Flex gap='sm' c='indigo'>
                                 <IconPlus />
                                 <Text size='lg'>Добавить новую категорию</Text>
@@ -303,34 +271,30 @@ export function CreateRequestView() {
                         <Textarea
                             label='Комментарий к заявке'
                             description='До 400 символов'
-                            onChange={e => setComment(e.target.value)}
+                            {...form.getInputProps('comment')}
                         />
                     </Box>
 
                     <Box mb='sm'>
                         <Autocomplete
                             label='Адрес доставки'
-                            onChange={value => setAddress(value)}
+                            {...form.getInputProps('address')}
                         />
                     </Box>
 
-                    <Flex mb='md' justify='space-between'>
+                    <Flex mb='md' gap='xl'>
                         <DateTimePicker
                             w='fit-content'
                             valueFormat='DD/MM/YYYY HH:mm:ss'
                             label='Привезите товар не позднее:'
                             placeholder='ДД/ММ/ГГГГ ЧЧ:ММ'
-                            onChange={value => {
-                                setDeliveryTime(value)
-                            }}
+                            {...form.getInputProps('deliveryTime')}
                         />
                         <DateInput
                             valueFormat='DD/MM/YY'
                             label='Принимать заявки до:'
                             placeholder='ДД.ММ.ГГ'
-                            onChange={value => {
-                                setAcceptUntill(value)
-                            }}
+                            {...form.getInputProps('acceptUntill')}
                         />
                     </Flex>
 
@@ -338,41 +302,35 @@ export function CreateRequestView() {
                         name='paymentMethod'
                         mb='md'
                         label='Способ оплаты'
-                        onChange={e => {
-                            setPaymentType(e)
-                        }}
+                        {...form.getInputProps('paymentType')}
                     >
                         <Group mt='xs'>
                             <Radio
                                 icon={CheckIcon}
-                                value='prepayment'
+                                value={PaymentMethod.Prepayment}
                                 label='Предоплата'
                             />
                             <Radio
                                 icon={CheckIcon}
-                                value='deferment'
+                                value={PaymentMethod.Deferment}
                                 label='Отсрочка'
                             />
                             <Radio
                                 icon={CheckIcon}
-                                value='fact'
+                                value={PaymentMethod.PaymentUponDelivery}
                                 label='По факту'
                             />
                         </Group>
                     </Radio.Group>
 
-                    <Flex mb='xl' justify='space-between'>
+                    <Flex mb='xl' gap='xl'>
                         <TextInput
                             placeholder='Название компании'
-                            onChange={e => {
-                                setName(e.target.value)
-                            }}
+                            {...form.getInputProps('name')}
                         />
                         <TextInput
                             placeholder='Номер телефона'
-                            onChange={e => {
-                                setPhone(e.target.value)
-                            }}
+                            {...form.getInputProps('phone')}
                         />
                     </Flex>
 
