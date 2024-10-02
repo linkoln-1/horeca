@@ -22,7 +22,7 @@ export const horecaMenu = [
         icon: IconFilePencil,
         description:
             'Если хотите найти редкий товар или собрать эксклюзивные предложения поставщиков',
-        link: '/create/request',
+        link: '/edit/request',
         button: 'Перейти к запросу',
     },
     {
@@ -43,7 +43,8 @@ export const horecaMenu = [
         id: 5,
         name: 'Служба заботы',
         icon: IconHelpSquareRounded,
-        description: 'Здесь вы можете следить за минимальным остатком и планировать закупки',
+        description:
+            'Здесь вы можете следить за минимальным остатком и планировать закупки',
         subDescription: 'В разработке',
         link: '/assistant',
     },
