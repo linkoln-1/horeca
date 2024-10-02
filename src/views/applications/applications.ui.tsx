@@ -1,3 +1,8 @@
+'use client'
+
+import React from 'react'
+
+import { OpenApplicationModal } from '@/features/application/detail/openApplicationModal'
 import {
     Badge,
     Box,
@@ -8,6 +13,7 @@ import {
     Select,
     Text,
 } from '@mantine/core'
+import { modals } from '@mantine/modals'
 import { IconChevronRight, IconMessage } from '@tabler/icons-react'
 import Link from 'next/link'
 
@@ -83,10 +89,16 @@ export function ApplicationsViews() {
                         radius='lg'
                         withBorder
                         key={index}
+                        className='cursor-pointer'
+                        onClick={handleOpenApplicationModal}
                     >
                         <Text fw={500}>№ {order.id}</Text>
 
-                        <Flex align='center' justify='space-between'>
+                        <Flex
+                            className='cursor-pointer'
+                            align='center'
+                            justify='space-between'
+                        >
                             <Flex align='center' gap='md'>
                                 <Badge
                                     color={order.success ? 'green' : 'red'}
@@ -138,7 +150,8 @@ export function ApplicationsViews() {
                             <Divider orientation='horizontal' mt='md' mb='md' />
                             <Flex justify='flex-start'>
                                 <Button
-                                    href={`/user/horeca/applications/${index}`}
+                                    href={`#`}
+                                    onClick={e => e.stopPropagation()}
                                     component={Link}
                                     variant='transparent'
                                     c='indigo'
@@ -153,4 +166,16 @@ export function ApplicationsViews() {
             </Flex>
         </Flex>
     )
+}
+
+function handleOpenApplicationModal() {
+    modals.open({
+        modalId: 'openApplicationModal',
+        title: 'Заявка № 8978735892560',
+        size: '900px',
+        centered: true,
+        radius: 'lg',
+        padding: 'xl',
+        children: <OpenApplicationModal />,
+    })
 }

@@ -1,8 +1,10 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 
-import { FinishApplicationModal } from '@/features/application/detail'
+import { FinishApplicationModal } from '@/features/application/detail/finishApplicationModal'
+import { OpenApplicationModal } from '@/features/application/detail/openApplicationModal'
+import { OpenOfferModal } from '@/features/application/detail/openOfferModal'
 import {
     Box,
     Button,
@@ -20,6 +22,8 @@ import { IconProgress, IconZoomIn } from '@tabler/icons-react'
 import { applicationResponse } from '@/shared/constants'
 
 export function ApplicationsDetailViews() {
+    const [opened, setOpened] = useState<number | null>(null)
+
     const orders = [
         {
             id: 1,
@@ -102,6 +106,7 @@ export function ApplicationsDetailViews() {
                                         fw='500'
                                         px='0'
                                         variant='transparent'
+                                        onClick={handleOpenApplicationModal}
                                     >
                                         Открыть для просмотра
                                     </Button>
@@ -128,8 +133,15 @@ export function ApplicationsDetailViews() {
 
                 {applicationResponse.map((response, index) => {
                     return (
-                        <Paper mb='lg' key={index} withBorder shadow='sm'>
-                            <Flex>
+                        <Paper
+                            mb='lg'
+                            key={index}
+                            withBorder
+                            shadow='sm'
+                            mah={opened !== index ? '435px' : ''}
+                            className='overflow-hidden transition-all duration-200'
+                        >
+                            <Flex className='cursor-pointer' mih='435px'>
                                 <Box miw={200}>
                                     <Flex
                                         c={
@@ -206,7 +218,12 @@ export function ApplicationsDetailViews() {
                                     {response.products?.map((product: any) => {
                                         return (
                                             <>
-                                                <Box key={product.id}>
+                                                <Box
+                                                    key={product.id}
+                                                    onClick={e =>
+                                                        handleOpenOfferModal(e)
+                                                    }
+                                                >
                                                     <Box mb='sm'>
                                                         <Text
                                                             mr='xs'
@@ -359,13 +376,29 @@ export function ApplicationsDetailViews() {
                                             </>
                                         )
                                     })}
-                                    <Flex justify='flex-end'>
+                                    <Flex
+                                        top='356px'
+                                        right='20px'
+                                        pos={
+                                            opened !== index
+                                                ? 'absolute'
+                                                : undefined
+                                        }
+                                        justify='flex-end'
+                                    >
                                         <Button
                                             size='md'
                                             fw='500'
                                             variant='transparent'
+                                            onClick={
+                                                opened !== index
+                                                    ? () => setOpened(index)
+                                                    : () => setOpened(null)
+                                            }
                                         >
-                                            Свернуть
+                                            {opened === index
+                                                ? 'Свернуть'
+                                                : 'Развернуть'}
                                         </Button>
                                         <Button
                                             size='md'
@@ -387,11 +420,36 @@ export function ApplicationsDetailViews() {
 
 function handleFinishApplicationModal() {
     modals.open({
-        modalId: 'finishApplication',
+        modalId: 'finishApplicationModal',
         size: 'lg',
         centered: true,
         radius: 'lg',
         padding: 'md',
         children: <FinishApplicationModal />,
+    })
+}
+
+function handleOpenApplicationModal() {
+    modals.open({
+        modalId: 'openApplicationModal',
+        title: 'Заявка № 8978735892560',
+        size: '900px',
+        centered: true,
+        radius: 'lg',
+        padding: 'xl',
+        children: <OpenApplicationModal />,
+    })
+}
+
+function handleOpenOfferModal(e: React.MouseEvent<HTMLDivElement>) {
+    e.stopPropagation()
+    modals.open({
+        modalId: 'openOfferModal',
+        title: 'Предложение № 89777',
+        size: '900px',
+        centered: true,
+        radius: 'lg',
+        padding: 'xl',
+        children: <OpenOfferModal />,
     })
 }
