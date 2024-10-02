@@ -5,12 +5,11 @@ import {
     Card,
     Divider,
     Flex,
-    Group,
     Select,
-    Space,
     Text,
 } from '@mantine/core'
-import { IconMessage } from '@tabler/icons-react'
+import { IconChevronRight, IconMessage } from '@tabler/icons-react'
+import Link from 'next/link'
 
 export function ApplicationsViews() {
     const orders = [
@@ -76,7 +75,7 @@ export function ApplicationsViews() {
                 />
             </Flex>
 
-            <Flex gap='md'>
+            <Flex direction='column' gap='md'>
                 {orders.map((order, index) => (
                     <Card
                         shadow='sm'
@@ -135,6 +134,18 @@ export function ApplicationsViews() {
                                         Дата доставки: {order.deliveryDate}
                                     </Text>
                                 </Flex>
+                            </Flex>
+                            <Divider orientation='horizontal' mt='md' mb='md' />
+                            <Flex justify='flex-start'>
+                                <Button
+                                    href={`/user/horeca/applications/${index}`}
+                                    component={Link}
+                                    variant='transparent'
+                                    c='indigo'
+                                    rightSection={<IconChevronRight />}
+                                >
+                                    Смотреть все
+                                </Button>
                             </Flex>
                         </Flex>
                     </Card>
