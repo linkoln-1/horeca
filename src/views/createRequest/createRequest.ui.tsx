@@ -98,7 +98,6 @@ export function CreateRequestView() {
                 category: item.category || null,
             })),
         }
-
         console.log('Отправка данных: ', formattedData)
     }
 

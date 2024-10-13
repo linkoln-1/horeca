@@ -35,7 +35,7 @@ import {
 import { CategoryLabels } from '@/shared/constants'
 import { CustomDropzone } from '@/shared/ui/CustomDropzone'
 
-export function CreateTemplateUi() {
+export function EditTemplateUi() {
     const dropzone = useRef<() => void>(null)
     const [images, setImages] = useState<FileWithPath[]>([])
 
