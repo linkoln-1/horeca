@@ -1,18 +1,24 @@
+"use client"
+import { applications } from '@/shared/constants/applications'
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 import {
     Badge,
     Box,
-    Button,
     Card,
     Divider,
     Flex,
-    Group,
-    Select,
-    Space,
+    SegmentedControl,
     Text,
 } from '@mantine/core'
 import { IconMessage } from '@tabler/icons-react'
+import { useState } from 'react'
 
 export function ApplicationsViews() {
+    const [activeTab, setActiveTab] = useState(applications[0].label)
+    const isMobile = useBreakpoint('sm')
+    const handleTabChange = (tab: string) => {
+        setActiveTab(tab)
+    }
     const orders = [
         {
             id: '82725225279 от 20.07.2023',
@@ -56,23 +62,13 @@ export function ApplicationsViews() {
     return (
         <Flex direction='column' gap='md'>
             <Flex gap='md' align='center'>
-                <Button variant='transparent' c='gray' p={0}>
-                    Все заявки
-                </Button>
-
-                <Select
-                    placeholder='Выберите из списка'
-                    data={[
-                        'Текущие заявки',
-                        'В работе(чат доступен)',
-                        'Ожидает подтверждения(чат недоступен)',
-                    ]}
-                    defaultValue='Текущие заявки'
-                />
-                <Select
-                    placeholder='Выберите из списка'
-                    data={['Успешные', 'Неуспешные', 'Завершенные заказы']}
-                    defaultValue='Завершенные заказы'
+                <SegmentedControl
+                    fullWidth
+                    onChange={handleTabChange}
+                    value={activeTab}
+                    color='blue'
+                    data={[applications[0].label, applications[1].label, applications[2].label]}
+                    orientation={isMobile ? 'vertical' : 'horizontal'}
                 />
             </Flex>
 
