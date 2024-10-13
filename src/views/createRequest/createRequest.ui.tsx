@@ -27,11 +27,11 @@ import { modals } from '@mantine/modals'
 import { IconPlus, IconX } from '@tabler/icons-react'
 
 import { CategoryLabels } from '@/shared/constants'
+import { HorecaRequestForm } from '@/shared/constants'
 import { PaymentMethod } from '@/shared/constants/paymentMethod'
 import {
     Categories,
     HorecaProfileDto,
-    HorecaRequestCreateDto,
 } from '@/shared/lib/horekaApi/Api'
 import { CustomDropzone } from '@/shared/ui/CustomDropzone'
 
@@ -42,14 +42,18 @@ export function CreateRequestView() {
     const dropzone = useRef<() => void>(null)
     const [images, setImages] = useState<FileWithPath[]>([])
 
-    const form = useForm<HorecaRequestCreateDto>({
+    const form = useForm<HorecaRequestForm>({
         initialValues: {
             items: [
                 {
-                    name: '',
-                    amount: 0,
-                    unit: '',
-                    category: [''] as unknown as Categories,
+                    category: '',
+                    products: [
+                        {
+                            name: '',
+                            amount: 0,
+                            unit: '',
+                        },
+                    ],
                 },
             ],
             address: '',
@@ -61,44 +65,55 @@ export function CreateRequestView() {
         },
     })
 
-    const addNewProduct = () => {
+    const addNewProduct = (index: number) => {
         const newProduct = {
             name: '',
             amount: 0,
             unit: '',
         }
-        form.insertListItem('items', newProduct)
+        form.insertListItem(`items.${index}.products`, newProduct)
+        console.log(form.values)
     }
 
     const addNewCategory = () => {
         const newCategory = {
-            name: '',
-            amount: 0,
-            unit: '',
             category: '',
+            products: [
+                {
+                    name: '',
+                    amount: 0,
+                    unit: '',
+                },
+            ],
         }
         form.insertListItem('items', newCategory)
     }
 
-    const removeProduct = (productIndex: number) => {
-        form.removeListItem('items', productIndex)
+    const removeCategory = (categoryIndex: number) => {
+        form.removeListItem('items', categoryIndex)
+    }
+
+    const removeProduct = (categoryIndex: number, productIndex: number) => {
+        form.removeListItem(`items.${categoryIndex}.products`, productIndex)
     }
 
     const handleImages = (files: FileWithPath[]) => {
         setImages(files)
     }
 
-    const handleFormSubmit = (values: HorecaRequestCreateDto) => {
+    const handleFormSubmit = (values: HorecaRequestForm) => {
         const formattedData = {
             ...values,
-            items: values.items.map(item => ({
-                name: item.name,
-                amount: item.amount,
-                unit: item.unit,
-                category: item.category || null,
-            })),
+            items: values.items.map(item => {
+                return item.products.map(product => ({
+                    name: product.name,
+                    amount: product.amount,
+                    unit: product.unit,
+                    category: item.category || null,
+                }))
+            }),
         }
-        console.log('Отправка данных: ', formattedData)
+        console.log(formattedData)
     }
 
     return (
@@ -120,56 +135,100 @@ export function CreateRequestView() {
                     onSubmit={form.onSubmit(handleFormSubmit)}
                     className='flex flex-col gap-5'
                 >
-                    {form.values.items.map((item, index) => {
+                    {form.values.items.map((item, categoryIndex) => {
                         return (
-                            <Box key={index}>
-                                {showCategory && (
-                                    <Select
-                                        label='Категория'
-                                        placeholder='Выберите категорию'
-                                        data={(
-                                            user?.profile as HorecaProfileDto
-                                        )?.categories?.map(x => ({
-                                            value: x,
-                                            label: CategoryLabels[
-                                                x as Categories
-                                            ],
-                                        }))}
-                                        {...form.getInputProps(
-                                            `items.${index}.category`
-                                        )}
-                                        mb='md'
-                                    />
-                                )}
-
-                                <Flex mb='md' justify='space-between' gap='5px'>
-                                    <TextInput
-                                        label='Название товара'
-                                        {...form.getInputProps(
-                                            `items.${index}.name`
-                                        )}
-                                    />
-                                    <TextInput
-                                        type='number'
-                                        label='Кол-во'
-                                        {...form.getInputProps(
-                                            `items.${index}.amount`
-                                        )}
-                                    />
-                                    <TextInput
-                                        label='Ед. изм.'
-                                        {...form.getInputProps(
-                                            `items.${index}.unit`
-                                        )}
-                                    />
-
-                                    {index > 0 && (
-                                        <IconX
-                                            cursor='pointer'
-                                            onClick={() => removeProduct(index)}
+                            <Box key={categoryIndex}>
+                                <Box pos='relative'>
+                                    {showCategory && (
+                                        <Select
+                                            label='Категория'
+                                            placeholder='Выберите категорию'
+                                            data={(
+                                                user?.profile as HorecaProfileDto
+                                            )?.categories?.map(x => ({
+                                                value: x,
+                                                label: CategoryLabels[
+                                                    x as Categories
+                                                ],
+                                            }))}
+                                            {...form.getInputProps(
+                                                `items.${categoryIndex}.category`
+                                            )}
+                                            mb='md'
                                         />
                                     )}
-                                </Flex>
+                                    {categoryIndex > 0 && (
+                                        <Button
+                                            size='md'
+                                            className='absolute right-0 -top-4'
+                                            c='red'
+                                            onClick={() =>
+                                                removeCategory(categoryIndex)
+                                            }
+                                            variant='transparent'
+                                            rightSection={<IconX color='red' />}
+                                        >
+                                            Удалить категорию
+                                        </Button>
+                                    )}
+                                </Box>
+                                {item.products.map((product, productIndex) => {
+                                    return (
+                                        <Flex
+                                            pos='relative'
+                                            key={productIndex}
+                                            mb='md'
+                                            justify='space-between'
+                                            gap='5px'
+                                        >
+                                            <TextInput
+                                                label='Название товара'
+                                                {...form.getInputProps(
+                                                    `items.${categoryIndex}.products.${productIndex}.name`
+                                                )}
+                                            />
+                                            <TextInput
+                                                type='number'
+                                                label='Кол-во'
+                                                {...form.getInputProps(
+                                                    `items.${categoryIndex}.products.${productIndex}.amount`
+                                                )}
+                                            />
+                                            <TextInput
+                                                label='Ед. изм.'
+                                                {...form.getInputProps(
+                                                    `items.${categoryIndex}.products.${productIndex}.unit`
+                                                )}
+                                            />
+
+                                            {productIndex > 0 && (
+                                                <IconX
+                                                    color='red'
+                                                    className='absolute right-0'
+                                                    cursor='pointer'
+                                                    onClick={() =>
+                                                        removeProduct(
+                                                            categoryIndex,
+                                                            productIndex
+                                                        )
+                                                    }
+                                                />
+                                            )}
+                                        </Flex>
+                                    )
+                                })}
+
+                                <Button
+                                    onClick={() => addNewProduct(categoryIndex)}
+                                    variant='transparent'
+                                >
+                                    <Flex gap='sm' c='indigo'>
+                                        <IconPlus />
+                                        <Text size='lg'>
+                                            Добавить новый товар
+                                        </Text>
+                                    </Flex>
+                                </Button>
                             </Box>
                         )
                     })}
@@ -180,13 +239,6 @@ export function CreateRequestView() {
                         align='flex-start'
                         direction='column'
                     >
-                        <Button onClick={addNewProduct} variant='transparent'>
-                            <Flex gap='sm' c='indigo'>
-                                <IconPlus />
-                                <Text size='lg'>Добавить новый товар</Text>
-                            </Flex>
-                        </Button>
-
                         <Button onClick={addNewCategory} variant='transparent'>
                             <Flex gap='sm' c='indigo'>
                                 <IconPlus />
@@ -363,6 +415,7 @@ export function CreateRequestView() {
                             size='lg'
                             fw='500'
                             bg='pink.5'
+                            type='submit'
                         >
                             Отправить заявку
                         </Button>
