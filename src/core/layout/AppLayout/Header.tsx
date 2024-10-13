@@ -24,7 +24,7 @@ export function Header() {
         <Paper w='100%' bg='gray.1' p='sm'>
             <Container>
                 <Flex justify='space-between' align='center'>
-                    <Link href={`/user${role({ user })}`}>
+                    <Link href={`/user${role({ user })}/applications`}>
                         <MantineImage
                             src='/assets/icons/logo.svg'
                             alt='Horeka logo'

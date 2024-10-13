@@ -1,4 +1,10 @@
-import { Checkbox, Flex, NumberInput, PasswordInput, TextInput } from '@mantine/core'
+import {
+    Checkbox,
+    Flex,
+    NumberInput,
+    PasswordInput,
+    TextInput,
+} from '@mantine/core'
 import { UseFormReturnType } from '@mantine/form'
 import { IconAt, IconLock } from '@tabler/icons-react'
 import Link from 'next/link'
