@@ -1,23 +1,24 @@
-'use client'
-
-import React from 'react'
-
-import { OpenApplicationModal } from '@/features/application/detail/openApplicationModal'
+"use client"
+import { applications } from '@/shared/constants/applications'
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 import {
     Badge,
     Box,
-    Button,
     Card,
     Divider,
     Flex,
-    Select,
+    SegmentedControl,
     Text,
 } from '@mantine/core'
-import { modals } from '@mantine/modals'
-import { IconChevronRight, IconMessage } from '@tabler/icons-react'
-import Link from 'next/link'
+import { IconMessage } from '@tabler/icons-react'
+import { useState } from 'react'
 
 export function ApplicationsViews() {
+    const [activeTab, setActiveTab] = useState(applications[0].label)
+    const isMobile = useBreakpoint('sm')
+    const handleTabChange = (tab: string) => {
+        setActiveTab(tab)
+    }
     const orders = [
         {
             id: '82725225279 от 20.07.2023',
@@ -61,27 +62,17 @@ export function ApplicationsViews() {
     return (
         <Flex direction='column' gap='md'>
             <Flex gap='md' align='center'>
-                <Button variant='transparent' c='gray' p={0}>
-                    Все заявки
-                </Button>
-
-                <Select
-                    placeholder='Выберите из списка'
-                    data={[
-                        'Текущие заявки',
-                        'В работе(чат доступен)',
-                        'Ожидает подтверждения(чат недоступен)',
-                    ]}
-                    defaultValue='Текущие заявки'
-                />
-                <Select
-                    placeholder='Выберите из списка'
-                    data={['Успешные', 'Неуспешные', 'Завершенные заказы']}
-                    defaultValue='Завершенные заказы'
+                <SegmentedControl
+                    fullWidth
+                    onChange={handleTabChange}
+                    value={activeTab}
+                    color='blue'
+                    data={[applications[0].label, applications[1].label, applications[2].label]}
+                    orientation={isMobile ? 'vertical' : 'horizontal'}
                 />
             </Flex>
 
-            <Flex direction='column' gap='md'>
+            <Flex gap='md'>
                 {orders.map((order, index) => (
                     <Card
                         shadow='sm'
@@ -89,16 +80,10 @@ export function ApplicationsViews() {
                         radius='lg'
                         withBorder
                         key={index}
-                        className='cursor-pointer'
-                        onClick={handleOpenApplicationModal}
                     >
                         <Text fw={500}>№ {order.id}</Text>
 
-                        <Flex
-                            className='cursor-pointer'
-                            align='center'
-                            justify='space-between'
-                        >
+                        <Flex align='center' justify='space-between'>
                             <Flex align='center' gap='md'>
                                 <Badge
                                     color={order.success ? 'green' : 'red'}
@@ -147,35 +132,10 @@ export function ApplicationsViews() {
                                     </Text>
                                 </Flex>
                             </Flex>
-                            <Divider orientation='horizontal' mt='md' mb='md' />
-                            <Flex justify='flex-start'>
-                                <Button
-                                    href={`#`}
-                                    onClick={e => e.stopPropagation()}
-                                    component={Link}
-                                    variant='transparent'
-                                    c='indigo'
-                                    rightSection={<IconChevronRight />}
-                                >
-                                    Смотреть все
-                                </Button>
-                            </Flex>
                         </Flex>
                     </Card>
                 ))}
             </Flex>
         </Flex>
     )
-}
-
-function handleOpenApplicationModal() {
-    modals.open({
-        modalId: 'openApplicationModal',
-        title: 'Заявка № 8978735892560',
-        size: '900px',
-        centered: true,
-        radius: 'lg',
-        padding: 'xl',
-        children: <OpenApplicationModal />,
-    })
 }
