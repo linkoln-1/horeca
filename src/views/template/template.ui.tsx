@@ -1,6 +1,7 @@
 'use client'
 
 import { Box, Button, Card, Checkbox, Flex, List, Text } from '@mantine/core'
+import Link from 'next/link'
 
 import '@/styles/template.scss'
 
@@ -273,6 +274,8 @@ export function TemplateApplicationViews() {
                                             fw='500'
                                             px='0'
                                             variant='transparent'
+                                            component={Link}
+                                            href={`/user/horeca/template/edit/${template.id}`}
                                         >
                                             Редактировать шаблон
                                         </Button>

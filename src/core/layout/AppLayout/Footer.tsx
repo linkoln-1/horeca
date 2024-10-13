@@ -6,13 +6,16 @@ import {
     Flex,
     Image as MantineImage,
     Paper,
+    PaperProps,
 } from '@mantine/core'
 import { IconBrandTelegram } from '@tabler/icons-react'
 import Link from 'next/link'
 
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 
-export function Footer() {
+type FooterProps = PaperProps & {}
+
+export function Footer(props: FooterProps) {
     const isMobile = useBreakpoint('sm')
     const rightSection = (
         <div className='rounded-full bg-blue-800 p-0.5'>
@@ -20,7 +23,7 @@ export function Footer() {
         </div>
     )
     return (
-        <Paper w='100%' bg='gray.1'>
+        <Paper w='100%' bg='gray.1' {...props}>
             <Container my='md'>
                 <Flex justify='space-between' align='center'>
                     <MantineImage

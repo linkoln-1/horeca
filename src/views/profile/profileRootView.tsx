@@ -19,7 +19,7 @@ export function ProfileRootView() {
         ) {
             router.push(`/user/provider`)
         } else {
-            router.push(`/user/horeca`)
+            router.push(`/user/horeca/applications`)
         }
     }, [user])
 
