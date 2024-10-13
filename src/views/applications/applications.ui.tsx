@@ -1,17 +1,21 @@
-"use client"
-import { applications } from '@/shared/constants/applications'
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
+'use client'
+
+import { useState } from 'react'
+
 import {
     Badge,
     Box,
     Card,
     Divider,
     Flex,
+    Grid,
     SegmentedControl,
     Text,
 } from '@mantine/core'
 import { IconMessage } from '@tabler/icons-react'
-import { useState } from 'react'
+
+import { applications } from '@/shared/constants/applications'
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 
 export function ApplicationsViews() {
     const [activeTab, setActiveTab] = useState(applications[0].label)
@@ -67,75 +71,81 @@ export function ApplicationsViews() {
                     onChange={handleTabChange}
                     value={activeTab}
                     color='blue'
-                    data={[applications[0].label, applications[1].label, applications[2].label]}
+                    data={[
+                        applications[0].label,
+                        applications[1].label,
+                        applications[2].label,
+                    ]}
                     orientation={isMobile ? 'vertical' : 'horizontal'}
                 />
             </Flex>
 
-            <Flex gap='md'>
+            <Grid>
                 {orders.map((order, index) => (
-                    <Card
-                        shadow='sm'
-                        padding='lg'
-                        radius='lg'
-                        withBorder
+                    <Grid.Col
+                        span={{
+                            base: 12,
+                            md: 6,
+                        }}
                         key={index}
                     >
-                        <Text fw={500}>№ {order.id}</Text>
+                        <Card shadow='sm' padding='lg' radius='lg' withBorder>
+                            <Text fw={500}>№ {order.id}</Text>
 
-                        <Flex align='center' justify='space-between'>
-                            <Flex align='center' gap='md'>
-                                <Badge
-                                    color={order.success ? 'green' : 'red'}
-                                    variant='light'
-                                >
-                                    {order.status}
-                                </Badge>
-                                {order.message && (
-                                    <Text
-                                        size='sm'
-                                        c='blue'
-                                        style={{ marginBottom: 5 }}
+                            <Flex align='center' justify='space-between'>
+                                <Flex align='center' gap='md'>
+                                    <Badge
+                                        color={order.success ? 'green' : 'red'}
+                                        variant='light'
                                     >
-                                        {order.message}{' '}
-                                    </Text>
-                                )}
-                            </Flex>
-
-                            <Box>
-                                <IconMessage size={30} />
-                            </Box>
-                        </Flex>
-                        <Divider orientation='horizontal' mt='md' mb='md' />
-
-                        <Flex direction='column' gap='md'>
-                            <Text size='sm'>
-                                <strong>Информация по вашему заказу</strong>
-                            </Text>
-
-                            <Flex justify='space-between' align='center'>
-                                <Flex direction='column' gap='md'>
-                                    <Text size='sm'>
-                                        Название: {order.name}
-                                    </Text>
-                                    <Text size='sm'>
-                                        Количество: {order.weight}
-                                    </Text>
+                                        {order.status}
+                                    </Badge>
+                                    {order.message && (
+                                        <Text
+                                            size='sm'
+                                            c='blue'
+                                            style={{ marginBottom: 5 }}
+                                        >
+                                            {order.message}{' '}
+                                        </Text>
+                                    )}
                                 </Flex>
 
-                                <Flex direction='column' gap='md'>
-                                    <Text size='sm'>
-                                        Адрес доставки: {order.address}
-                                    </Text>
-                                    <Text size='sm'>
-                                        Дата доставки: {order.deliveryDate}
-                                    </Text>
+                                <Box>
+                                    <IconMessage size={30} />
+                                </Box>
+                            </Flex>
+                            <Divider orientation='horizontal' mt='md' mb='md' />
+
+                            <Flex direction='column' gap='md'>
+                                <Text size='sm'>
+                                    <strong>Информация по вашему заказу</strong>
+                                </Text>
+
+                                <Flex justify='space-between' align='center'>
+                                    <Flex direction='column' gap='md'>
+                                        <Text size='sm'>
+                                            Название: {order.name}
+                                        </Text>
+                                        <Text size='sm'>
+                                            Количество: {order.weight}
+                                        </Text>
+                                    </Flex>
+
+                                    <Flex direction='column' gap='md'>
+                                        <Text size='sm'>
+                                            Адрес доставки: {order.address}
+                                        </Text>
+                                        <Text size='sm'>
+                                            Дата доставки: {order.deliveryDate}
+                                        </Text>
+                                    </Flex>
                                 </Flex>
                             </Flex>
-                        </Flex>
-                    </Card>
+                        </Card>
+                    </Grid.Col>
                 ))}
-            </Flex>
+            </Grid>
         </Flex>
     )
 }
