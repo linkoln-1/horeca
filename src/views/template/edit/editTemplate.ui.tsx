@@ -21,16 +21,10 @@ import {
     CheckIcon,
 } from '@mantine/core'
 import { Image as MantineImage } from '@mantine/core'
-import { DateInput, TimeInput } from '@mantine/dates'
+import { DateInput, DateTimePicker } from '@mantine/dates'
 import { FileWithPath } from '@mantine/dropzone'
 import { modals } from '@mantine/modals'
-import {
-    IconCalendar,
-    IconClock,
-    IconPlus,
-    IconTrash,
-    IconX,
-} from '@tabler/icons-react'
+import { IconCalendar, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 
 import { CategoryLabels } from '@/shared/constants'
 import { CustomDropzone } from '@/shared/ui/CustomDropzone'
@@ -144,96 +138,12 @@ export function EditTemplateUi() {
                 </Flex>
                 <Divider my='lg' />
                 <Flex gap='xl' justify='space-between' mb='xl'>
-                    <Flex direction='column' gap='xl' w='50%'>
-                        <TextInput
-                            label='Наименование заказчика'
-                            placeholder='ООО "РОМАШКА"'
-                        />
-                        <Autocomplete
-                            label='Адрес доставки'
-                            placeholder='Г. Сочи, ул. Курортный пр-т, 109'
-                        />
-                        <TextInput
-                            label='Менеджер'
-                            placeholder='Макаров Василий Сергеевич'
-                        />
-                        <Textarea
-                            label='Комментарии'
-                            placeholder='Вас встретит наш сотрудник, Виталий, менеджер по закупкам'
-                        />
-                    </Flex>
-                    <Flex direction='column' gap='xl' w='50%'>
-                        <Flex justify='space-between' gap='sm'>
-                            <TextInput
-                                flex={1}
-                                label='Телефон для связи'
-                                placeholder='+7 (986) 860 90 56'
-                            />
-                            <DateInput
-                                flex={1}
-                                size='md'
-                                placeholder='ДД.ММ.ГГ'
-                                valueFormat='DD.MM.YY'
-                                minDate={new Date()}
-                                rightSection={
-                                    <IconCalendar
-                                        color={'var(--mantine-color-indigo-6)'}
-                                    />
-                                }
-                                label='Принимать заявки до'
-                            />
-                        </Flex>
-                        <Flex align='flex-end' justify='space-between' gap='sm'>
-                            <Box flex={1}>
-                                <DateInput
-                                    size='md'
-                                    placeholder='ДД.ММ.ГГ'
-                                    valueFormat='DD.MM.YY'
-                                    minDate={new Date()}
-                                    rightSection={
-                                        <IconCalendar
-                                            color={
-                                                'var(--mantine-color-indigo-6)'
-                                            }
-                                        />
-                                    }
-                                    label='Привезите товар не позднее'
-                                />
-                            </Box>
-                            <Box flex={1}>
-                                <TimeInput
-                                    rightSection={
-                                        <IconClock color='var(--mantine-color-indigo-6)' />
-                                    }
-                                />
-                            </Box>
-                        </Flex>
-                        <Flex>
-                            <Radio.Group
-                                name='paymentMethod'
-                                mb='md'
-                                label='Способ оплаты'
-                                w='100%'
-                            >
-                                <Group justify='space-between' mt='xs'>
-                                    <Radio
-                                        icon={CheckIcon}
-                                        value='prepayment'
-                                        label='Предоплата'
-                                    />
-                                    <Radio
-                                        icon={CheckIcon}
-                                        value='deferment'
-                                        label='Отсрочка'
-                                    />
-                                    <Radio
-                                        icon={CheckIcon}
-                                        value='fact'
-                                        label='По факту'
-                                    />
-                                </Group>
-                            </Radio.Group>
-                        </Flex>
+                    <Flex
+                        justify='space-between'
+                        direction='column'
+                        gap='xl'
+                        w='50%'
+                    >
                         <Box mb='sm'>
                             <CustomDropzone
                                 display='none'
@@ -298,6 +208,89 @@ export function EditTemplateUi() {
                                 )}
                             </Flex>
                         </Box>
+
+                        <Textarea
+                            size='md'
+                            h='fit-content'
+                            styles={{ input: { minHeight: '130px' } }}
+                            description='До 400 символов'
+                            label='Комментарий к заявке'
+                            placeholder='Вас встретит наш сотрудник, Виталий, менеджер по закупкам'
+                        />
+                        <Autocomplete
+                            label='Адрес доставки'
+                            placeholder='Г. Сочи, ул. Курортный пр-т, 109'
+                        />
+                        {/*<TextInput*/}
+                        {/*    label='Менеджер'*/}
+                        {/*    placeholder='Макаров Василий Сергеевич'*/}
+                        {/*/>*/}
+                    </Flex>
+                    <Flex direction='column' gap='xl' w='50%'>
+                        <Flex align='flex-end' justify='space-between' gap='sm'>
+                            <DateTimePicker
+                                flex={1}
+                                size='md'
+                                valueFormat='DD/MM/YYYY HH:mm:ss'
+                                label='Привезите товар не позднее:'
+                                placeholder='ДД/ММ/ГГГГ ЧЧ:ММ'
+                                rightSection={
+                                    <IconCalendar
+                                        color={'var(--mantine-color-indigo-6)'}
+                                    />
+                                }
+                            />
+                            <DateInput
+                                flex={1}
+                                size='md'
+                                placeholder='ДД.ММ.ГГ'
+                                valueFormat='DD.MM.YY'
+                                minDate={new Date()}
+                                rightSection={
+                                    <IconCalendar
+                                        color={'var(--mantine-color-indigo-6)'}
+                                    />
+                                }
+                                label='Принимать заявки до'
+                            />
+                        </Flex>
+                        <Flex>
+                            <Radio.Group
+                                name='paymentMethod'
+                                mb='md'
+                                label='Способ оплаты'
+                                w='100%'
+                            >
+                                <Group justify='space-between' mt='xs'>
+                                    <Radio
+                                        icon={CheckIcon}
+                                        value='prepayment'
+                                        label='Предоплата'
+                                    />
+                                    <Radio
+                                        icon={CheckIcon}
+                                        value='deferment'
+                                        label='Отсрочка'
+                                    />
+                                    <Radio
+                                        icon={CheckIcon}
+                                        value='fact'
+                                        label='По факту'
+                                    />
+                                </Group>
+                            </Radio.Group>
+                        </Flex>
+                        <Flex justify='space-between' gap='sm'>
+                            <TextInput
+                                label='Наименование заказчика'
+                                placeholder='ООО "РОМАШКА"'
+                            />
+                            <TextInput
+                                flex={1}
+                                label='Телефон для связи'
+                                placeholder='+7 (986) 860 90 56'
+                            />
+                        </Flex>
                     </Flex>
                 </Flex>
                 <Divider />
