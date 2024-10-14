@@ -32,81 +32,73 @@ export function Footer(props: FooterProps) {
                     />
 
                     {!isMobile && (
-                        <Flex gap='md' align='center'>
-                            <Button
-                                component={Link}
-                                href={''}
-                                color='blue.9'
-                                size='compact-sm'
-                                variant='transparent'
-                            >
-                                О платформе
-                            </Button>
-                            <Button
-                                component={Link}
-                                href={'/help'}
-                                color='blue.9'
-                                size='compact-sm'
-                                variant='transparent'
-                            >
-                                Помощь
-                            </Button>
-                            <Button
-                                component={Link}
-                                href={''}
-                                color='blue.9'
-                                size='compact-sm'
-                                variant='transparent'
-                            >
-                                Выйти
-                            </Button>
+                        <Flex className='flex-row' gap='md' align='center'>
+                            <Flex className='flex-col' gap='md'>
+                                <Button
+                                    component={Link}
+                                    href={''}
+                                    color='blue.9'
+                                    size='compact-sm'
+                                    variant='transparent'
+                                >
+                                    О платформе
+                                </Button>
+                                <Button
+                                    component={Link}
+                                    href={'/help'}
+                                    color='blue.9'
+                                    size='compact-sm'
+                                    variant='transparent'
+                                >
+                                    Помощь
+                                </Button>
+                            </Flex>
+
+                            <Flex gap='md' className='flex-col'>
+                                <Button
+                                    component={Link}
+                                    href={''}
+                                    color='blue.9'
+                                    size='compact-sm'
+                                    variant='transparent'
+                                >
+                                    Пользовательское соглашение
+                                </Button>
+                                <Button
+                                    component={Link}
+                                    href={''}
+                                    color='blue.9'
+                                    size='compact-sm'
+                                    variant='transparent'
+                                >
+                                    Политика конфиденциальности
+                                </Button>
+                            </Flex>
                         </Flex>
                     )}
-                </Flex>
-            </Container>
 
-            <Divider
-                my='xs'
-                size='xs'
-                color='cyan.1'
-                orientation='horizontal'
-            />
-            <Container>
-                <Flex
-                    className={
-                        isMobile ? 'flex-wrap gap-7' : ' justify-between'
-                    }
-                >
-                    <Flex
-                        gap='md'
-                        className={isMobile ? 'flex-wrap gap-7' : ''}
-                    >
+                    <Flex className='flex-col gap-y-2' align={'flex-start'}>
+                        <Box className='text-[12px] font-semibold text-[#2F49A6]'>
+                            Свяжитесь с нами
+                        </Box>
                         <Button
                             component={Link}
                             href={''}
                             color='blue.9'
-                            size='compact-sm'
                             variant='transparent'
-                            className='underline'
+                            className='flex items-start justify-start'
                         >
-                            Пользовательское соглашение
+                            <MantineImage
+                                src='/assets/icons/telegram.svg'
+                                alt='Horeka profile'
+                            />
+                            <Box className='text-[12px]'>Telegram</Box>
                         </Button>
                         <Button
                             component={Link}
                             href={''}
                             color='blue.9'
-                            size='compact-sm'
-                            variant='transparent'
-                        >
-                            Политика конфиденциальности
-                        </Button>
-                    </Flex>
-                    <Flex direction='column' align='center' gap='md'>
-                        <Button
-                            component={Link}
-                            href={''}
-                            color='blue.9'
-                            size='compact-sm'
+                            size='compact-xs'
                             variant='transparent'
                         >
                             + 7 (9**) ***-**-**
@@ -115,20 +107,10 @@ export function Footer(props: FooterProps) {
                             component={Link}
                             href={''}
                             color='blue.9'
-                            size='compact-sm'
+                            size='compact-xs'
                             variant='transparent'
                         >
                             sphere.horec@gmail.ru
-                        </Button>
-                        <Button
-                            component={Link}
-                            href={''}
-                            color='blue.9'
-                            size='compact-sm'
-                            variant='transparent'
-                            rightSection={rightSection}
-                        >
-                            Telegram
                         </Button>
                     </Flex>
                 </Flex>
