@@ -1,8 +1,8 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 
-import { useUserStore } from '@/core/providers/userStoreContext'
+import { requestQueries } from '@/entities/request'
 import { SaveModal } from '@/features/templates/saveModal'
 import { ThanksModal } from '@/features/templates/thanksModal'
 import {
@@ -29,24 +29,15 @@ import { IconPlus, IconX } from '@tabler/icons-react'
 import { CategoryLabels } from '@/shared/constants'
 import { HorecaRequestForm } from '@/shared/constants'
 import { PaymentMethod } from '@/shared/constants/paymentMethod'
-import {
-    Categories,
-    HorecaProfileDto,
-} from '@/shared/lib/horekaApi/Api'
+import { Categories, HorecaRequestCreateDto } from '@/shared/lib/horekaApi/Api'
 import { CustomDropzone } from '@/shared/ui/CustomDropzone'
 
 export function CreateRequestView() {
-    const user = useUserStore(state => state.user)
-
-    const [showCategory, setShowCategory] = useState(true)
-    const dropzone = useRef<() => void>(null)
-    const [images, setImages] = useState<FileWithPath[]>([])
-
     const form = useForm<HorecaRequestForm>({
         initialValues: {
             items: [
                 {
-                    category: '',
+                    category: CategoryLabels.alcoholicDrinks as Categories,
                     products: [
                         {
                             name: '',
@@ -65,6 +56,12 @@ export function CreateRequestView() {
         },
     })
 
+    const [showCategory, setShowCategory] = useState(true)
+    const dropzone = useRef<() => void>(null)
+    const [images, setImages] = useState<FileWithPath[]>([])
+
+    const { mutate: createRequest } = requestQueries.useCreateRequestMutation()
+
     const addNewProduct = (index: number) => {
         const newProduct = {
             name: '',
@@ -72,7 +69,6 @@ export function CreateRequestView() {
             unit: '',
         }
         form.insertListItem(`items.${index}.products`, newProduct)
-        console.log(form.values)
     }
 
     const addNewCategory = () => {
@@ -102,18 +98,25 @@ export function CreateRequestView() {
     }
 
     const handleFormSubmit = (values: HorecaRequestForm) => {
-        const formattedData = {
+        const formattedData: HorecaRequestCreateDto = {
             ...values,
-            items: values.items.map(item => {
-                return item.products.map(product => ({
+            items: values.items.flatMap(item =>
+                item.products.map(product => ({
+                    category: item.category,
                     name: product.name,
                     amount: product.amount,
                     unit: product.unit,
-                    category: item.category || null,
                 }))
-            }),
+            ),
+            deliveryTime: new Date(values.deliveryTime).toISOString(),
+            acceptUntill: new Date(values.acceptUntill).toISOString(),
+            paymentType: values.paymentType,
+            name: values.name,
+            phone: values.phone,
+            comment: values.comment || undefined,
         }
-        console.log(formattedData)
+
+        createRequest(formattedData)
     }
 
     return (
@@ -143,14 +146,15 @@ export function CreateRequestView() {
                                         <Select
                                             label='Категория'
                                             placeholder='Выберите категорию'
-                                            data={(
-                                                user?.profile as HorecaProfileDto
-                                            )?.categories?.map(x => ({
-                                                value: x,
-                                                label: CategoryLabels[
-                                                    x as Categories
-                                                ],
+                                            data={Object.entries(
+                                                CategoryLabels
+                                            ).map(([value, label]) => ({
+                                                value,
+                                                label,
                                             }))}
+                                            {...form.getInputProps(
+                                                `items.${categoryIndex}.category`
+                                            )}
                                             {...form.getInputProps(
                                                 `items.${categoryIndex}.category`
                                             )}

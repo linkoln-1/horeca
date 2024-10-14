@@ -7,7 +7,7 @@ export type HorecaRequestFormCategoryItems = {
 }
 
 export type HorecaRequestFormItem = {
-    category: '' | Categories
+    category: Categories
     products: [] | HorecaRequestFormCategoryItems[]
 }
 
