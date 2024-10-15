@@ -11,8 +11,8 @@ import {
     Grid,
     SegmentedControl,
     Text,
+    Image as MantineImage,
 } from '@mantine/core'
-import { IconMessage } from '@tabler/icons-react'
 
 import { applications } from '@/shared/constants/applications'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
@@ -111,8 +111,12 @@ export function ApplicationsViews() {
                                     )}
                                 </Flex>
 
-                                <Box>
-                                    <IconMessage size={30} />
+                                <Box className='w-[43px] h-[47px]'>
+                                    {order.message ? (
+                                        <MantineImage src='/assets/icons/message.svg'/>
+                                    ) : (
+                                        <MantineImage src='/assets/icons/noMessage.svg' />
+                                    )}
                                 </Box>
                             </Flex>
                             <Divider orientation='horizontal' mt='md' mb='md' />
