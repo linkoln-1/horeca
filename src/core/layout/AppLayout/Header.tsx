@@ -9,6 +9,8 @@ import {
     useCombobox,
     Menu,
 } from '@mantine/core'
+import { IconUserCircle } from '@tabler/icons-react'
+import { IconSquareRoundedChevronDown } from '@tabler/icons-react'
 import Link from 'next/link'
 
 import { role } from '@/shared/helpers/getRole'
@@ -55,30 +57,14 @@ export function Header() {
                             >
                                 Помощь
                             </Button>
+
                             <Menu>
                                 <Menu.Target>
-                                    <Button
-                                        variant='transparent'
-                                        className='gap-8'
-                                    >
-                                        <Flex gap='sm' align='center'>
-                                            <div>
-                                                <MantineImage
-                                                    src='/assets/icons/profile.svg'
-                                                    alt='Horeka profile'
-                                                />
-                                            </div>
-                                            <div className='text-black'>
-                                                Профиль
-                                            </div>
-                                            <div>
-                                                <MantineImage
-                                                    src='/assets/icons/arrow.svg'
-                                                    alt='Horeka arrow'
-                                                />
-                                            </div>
-                                        </Flex>
-                                    </Button>
+                                    <Flex className='cursor-pointer' gap='xs'>
+                                        <IconUserCircle />
+
+                                        <IconSquareRoundedChevronDown />
+                                    </Flex>
                                 </Menu.Target>
 
                                 <Menu.Dropdown>
