@@ -6,7 +6,7 @@ import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
 
 export function useGetRequestQuery() {
     return useCustomQuery({
-        queryKey: ['request, horeca'],
+        queryKey: ['horeca-request, horeca'],
         queryFn: () => api.horecaRequestsControllerFindAll(),
     })
 }
@@ -20,7 +20,7 @@ export function useCreateRequestMutation() {
 
         onSuccess: async ({ data }) => {
             await queryClient.invalidateQueries({
-                queryKey: ['request, horeca'],
+                queryKey: ['horeca-request, horeca'],
             })
         },
     })

@@ -28,7 +28,7 @@ import {
 export function Catalog() {
     const user = useUserStore(state => state.user)
 
-    const { data, isPending } = productsQueries.useProductsInfiniteQuery()
+    const { data, isPending } = productsQueries.useGetProductsInfiniteQuery()
 
     if (!data) return <Loader />
 

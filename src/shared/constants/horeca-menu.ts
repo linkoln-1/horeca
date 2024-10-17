@@ -22,7 +22,7 @@ export const horecaMenu = [
         icon: IconFilePencil,
         description:
             'Если хотите найти редкий товар или собрать эксклюзивные предложения поставщиков',
-        link: '/create/request',
+        link: '/create/horeca-request',
         button: 'Перейти к запросу',
     },
     {

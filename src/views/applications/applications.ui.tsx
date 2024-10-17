@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { requestQueries } from '@/entities/request'
+import { requestQueries } from '../../entities/horeca-request'
 import {
     Badge,
     Box,

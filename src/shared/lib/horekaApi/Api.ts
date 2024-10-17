@@ -547,21 +547,21 @@ export type QueryParamsType = Record<string | number, any>
 export type ResponseFormat = keyof Omit<Body, 'body' | 'bodyUsed'>
 
 export interface FullRequestParams extends Omit<RequestInit, 'body'> {
-    /** set parameter to `true` for call `securityWorker` for this request */
+    /** set parameter to `true` for call `securityWorker` for this horeca-request */
     secure?: boolean
-    /** request path */
+    /** horeca-request path */
     path: string
-    /** content type of request body */
+    /** content type of horeca-request body */
     type?: ContentType
     /** query params */
     query?: QueryParamsType
     /** format of response (i.e. response.json() -> format: "json") */
     format?: ResponseFormat
-    /** request body */
+    /** horeca-request body */
     body?: unknown
     /** base url */
     baseUrl?: string
-    /** request cancellation token */
+    /** horeca-request cancellation token */
     cancelToken?: CancelToken
 }
 
@@ -807,7 +807,7 @@ export class Api<
          *
          * @tags Uploads
          * @name UploadsControllerUpload
-         * @request POST:/api/uploads
+         * @horeca-request POST:/api/uploads
          * @secure
          */
         uploadsControllerUpload: (
@@ -832,7 +832,7 @@ export class Api<
          *
          * @tags Uploads
          * @name UploadsControllerRead
-         * @request GET:/api/uploads/{id}
+         * @horeca-request GET:/api/uploads/{id}
          * @secure
          */
         uploadsControllerRead: (id: number, params: RequestParams = {}) =>
@@ -849,7 +849,7 @@ export class Api<
          *
          * @tags Uploads
          * @name UploadsControllerDelete
-         * @request DELETE:/api/uploads/{id}
+         * @horeca-request DELETE:/api/uploads/{id}
          * @secure
          */
         uploadsControllerDelete: (id: number, params: RequestParams = {}) =>
@@ -866,7 +866,7 @@ export class Api<
          * @tags Users
          * @name UsersControllerUpdate
          * @summary Update users profile
-         * @request PUT:/api/users/me
+         * @horeca-request PUT:/api/users/me
          * @secure
          */
         usersControllerUpdate: (
@@ -889,7 +889,7 @@ export class Api<
          * @tags Users
          * @name UsersControllerGet
          * @summary Get users profile
-         * @request GET:/api/users/me
+         * @horeca-request GET:/api/users/me
          * @secure
          */
         usersControllerGet: (params: RequestParams = {}) =>
@@ -907,7 +907,7 @@ export class Api<
          * @tags Authorization
          * @name AuthorizationControllerRegistrate
          * @summary Registrate user
-         * @request POST:/api/auth/registration
+         * @horeca-request POST:/api/auth/registration
          */
         authorizationControllerRegistrate: (
             data: RegistrateUserDto,
@@ -928,7 +928,7 @@ export class Api<
          * @tags Authorization
          * @name AuthorizationControllerLogin
          * @summary Authenticate user
-         * @request POST:/api/auth/login
+         * @horeca-request POST:/api/auth/login
          */
         authorizationControllerLogin: (
             data: LoginUserDto,
@@ -949,7 +949,7 @@ export class Api<
          * @tags Authorization
          * @name AuthorizationControllerActivateAccount
          * @summary Activate profile by link in the confirmation email
-         * @request GET:/api/auth/activate/{uuid}
+         * @horeca-request GET:/api/auth/activate/{uuid}
          */
         authorizationControllerActivateAccount: (
             uuid: string,
@@ -968,7 +968,7 @@ export class Api<
          * @tags HorecaRequests
          * @name HorecaRequestsControllerCreate
          * @summary Create products(categories) set proposal required for HoReCa
-         * @request POST:/api/horeca/requests
+         * @horeca-request POST:/api/horeca/requests
          * @secure
          */
         horecaRequestsControllerCreate: (
@@ -991,7 +991,7 @@ export class Api<
          * @tags HorecaRequests
          * @name HorecaRequestsControllerFindAll
          * @summary All Horeca requests
-         * @request GET:/api/horeca/requests
+         * @horeca-request GET:/api/horeca/requests
          * @secure
          */
         horecaRequestsControllerFindAll: (
@@ -1024,8 +1024,8 @@ export class Api<
          *
          * @tags HorecaRequests
          * @name HorecaRequestsControllerGet
-         * @summary Get Horeca request with Provider's requests to compare
-         * @request GET:/api/horeca/requests/{id}
+         * @summary Get Horeca horeca-request with Provider's requests to compare
+         * @horeca-request GET:/api/horeca/requests/{id}
          * @secure
          */
         horecaRequestsControllerGet: (id: number, params: RequestParams = {}) =>
@@ -1042,8 +1042,8 @@ export class Api<
          *
          * @tags HorecaRequests
          * @name HorecaRequestsControllerApproveProviderRequest
-         * @summary Approve one of providers request to be able to start chat with
-         * @request POST:/api/horeca/requests/approve
+         * @summary Approve one of providers horeca-request to be able to start chat with
+         * @horeca-request POST:/api/horeca/requests/approve
          * @secure
          */
         horecaRequestsControllerApproveProviderRequest: (
@@ -1066,7 +1066,7 @@ export class Api<
          * @tags HorecaRequests Template
          * @name HorecaRequestsTemplateControllerCreateTemplate
          * @summary Create template of products(categories) set proposal required for HoReCa to use later
-         * @request POST:/api/horeca/requests/template
+         * @horeca-request POST:/api/horeca/requests/template
          * @secure
          */
         horecaRequestsTemplateControllerCreateTemplate: (
@@ -1089,7 +1089,7 @@ export class Api<
          * @tags HorecaRequests Template
          * @name HorecaRequestsTemplateControllerGetTemplate
          * @summary Get template of products(categories) set proposal required for HoReCa
-         * @request GET:/api/horeca/requests/template/{id}
+         * @horeca-request GET:/api/horeca/requests/template/{id}
          * @secure
          */
         horecaRequestsTemplateControllerGetTemplate: (
@@ -1110,7 +1110,7 @@ export class Api<
          * @tags ProviderRequests
          * @name ProviderRequestsControllerFindForProvider
          * @summary List of HoReCa proposals that matches with provider's offers
-         * @request GET:/api/provider/requests/income
+         * @horeca-request GET:/api/provider/requests/income
          * @secure
          */
         providerRequestsControllerFindForProvider: (
@@ -1143,8 +1143,8 @@ export class Api<
          *
          * @tags ProviderRequests
          * @name ProviderRequestsControllerSetStatus
-         * @summary Hide or view income request
-         * @request POST:/api/provider/requests/income/status
+         * @summary Hide or view income horeca-request
+         * @horeca-request POST:/api/provider/requests/income/status
          * @secure
          */
         providerRequestsControllerSetStatus: (
@@ -1166,8 +1166,8 @@ export class Api<
          *
          * @tags ProviderRequests
          * @name ProviderRequestsControllerCreate
-         * @summary Create provider request on horeca's one
-         * @request POST:/api/provider/requests
+         * @summary Create provider horeca-request on horeca's one
+         * @horeca-request POST:/api/provider/requests
          * @secure
          */
         providerRequestsControllerCreate: (
@@ -1190,7 +1190,7 @@ export class Api<
          * @tags ProviderRequests
          * @name ProviderRequestsControllerFindAll
          * @summary Get all provider requests
-         * @request GET:/api/provider/requests
+         * @horeca-request GET:/api/provider/requests
          * @secure
          */
         providerRequestsControllerFindAll: (
@@ -1224,7 +1224,7 @@ export class Api<
          * @tags Products
          * @name ProductsControllerCreate
          * @summary Create product from provider's offer
-         * @request POST:/api/products/provider
+         * @horeca-request POST:/api/products/provider
          * @secure
          */
         productsControllerCreate: (
@@ -1247,7 +1247,7 @@ export class Api<
          * @tags Products
          * @name ProductsControllerFindAll
          * @summary Gat all products from provider's offer
-         * @request GET:/api/products/provider
+         * @horeca-request GET:/api/products/provider
          * @secure
          */
         productsControllerFindAll: (
@@ -1281,7 +1281,7 @@ export class Api<
          * @tags Products
          * @name ProductsControllerGet
          * @summary Get the specific product
-         * @request GET:/api/products/provider/{id}
+         * @horeca-request GET:/api/products/provider/{id}
          * @secure
          */
         productsControllerGet: (id: number, params: RequestParams = {}) =>
@@ -1299,7 +1299,7 @@ export class Api<
          * @tags Products
          * @name ProductsControllerUpdate
          * @summary Update the specific product
-         * @request PUT:/api/products/provider/{id}
+         * @horeca-request PUT:/api/products/provider/{id}
          * @secure
          */
         productsControllerUpdate: (
@@ -1323,7 +1323,7 @@ export class Api<
          * @tags Products
          * @name ProductsControllerDelete
          * @summary Delete the specific product
-         * @request DELETE:/api/products/provider/{id}
+         * @horeca-request DELETE:/api/products/provider/{id}
          * @secure
          */
         productsControllerDelete: (id: number, params: RequestParams = {}) =>
@@ -1340,7 +1340,7 @@ export class Api<
          * @tags Chats
          * @name ChatsControllerCreateChat
          * @summary Creates chat
-         * @request POST:/api/chats
+         * @horeca-request POST:/api/chats
          * @secure
          */
         chatsControllerCreateChat: (
@@ -1363,7 +1363,7 @@ export class Api<
          * @tags Chats
          * @name ChatsControllerFindAll
          * @summary Get all chats
-         * @request GET:/api/chats
+         * @horeca-request GET:/api/chats
          * @secure
          */
         chatsControllerFindAll: (
@@ -1397,7 +1397,7 @@ export class Api<
          * @tags Chats
          * @name ChatsControllerGetChat
          * @summary Get chat
-         * @request GET:/api/chats/{id}
+         * @horeca-request GET:/api/chats/{id}
          * @secure
          */
         chatsControllerGetChat: (
@@ -1432,7 +1432,7 @@ export class Api<
          * @tags Favourites
          * @name FavouritesControllerCreate
          * @summary Add provider in favourites to be able to chat
-         * @request POST:/api/horeca/favourites
+         * @horeca-request POST:/api/horeca/favourites
          * @secure
          */
         favouritesControllerCreate: (
@@ -1455,7 +1455,7 @@ export class Api<
          * @tags Favourites
          * @name FavouritesControllerGet
          * @summary Delete provider from favourites
-         * @request DELETE:/api/horeca/favourites/{providerId}
+         * @horeca-request DELETE:/api/horeca/favourites/{providerId}
          * @secure
          */
         favouritesControllerGet: (

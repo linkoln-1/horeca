@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react'
 
-import { requestQueries } from '@/entities/request'
+import { requestQueries } from '../../entities/horeca-request'
 import { SaveModal } from '@/features/templates/saveModal'
 import { ThanksModal } from '@/features/templates/thanksModal'
 import {
