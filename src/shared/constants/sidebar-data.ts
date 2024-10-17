@@ -32,21 +32,21 @@ export const sidebarData: SidebarItem[] = [
     {
         id: 1,
         type: 'link',
-        label: 'Мои заявки',
-        icon: IconChecklist,
-        description: 'История ваших заявок и чат с поставщиками',
-        link: '/applications',
-        button: 'Перейти к заказам',
-    },
-    {
-        id: 2,
-        type: 'link',
-        label: 'Сделать запрос',
+        label: 'Создать заявку',
         icon: IconFilePencil,
         description:
             'Если хотите найти редкий товар или собрать эксклюзивные предложения поставщиков',
         link: '/create/request',
         button: 'Перейти к запросу',
+    },
+    {
+        id: 2,
+        type: 'link',
+        label: 'Мои заявки',
+        icon: IconChecklist,
+        description: 'История ваших заявок и чат с поставщиками',
+        link: '/applications',
+        button: 'Перейти к заказам',
     },
     {
         id: 3,
@@ -60,7 +60,7 @@ export const sidebarData: SidebarItem[] = [
     {
         id: 4,
         type: 'link',
-        label: 'Шаблоны',
+        label: 'Шаблоны моих заявок',
         icon: IconTablePlus,
         description: 'Заполните матрицу и сравнивайте цены прямо внутри',
         link: '/template/application',
@@ -68,20 +68,20 @@ export const sidebarData: SidebarItem[] = [
     {
         id: 5,
         type: 'link',
+        label: 'Настройки профиля',
+        icon: IconSettings,
+        description:
+            'Здесь вы можете изменить условия приемки и контактный номер',
+        link: '/settings/edit',
+    },
+    {
+        id: 6,
+        type: 'link',
         label: 'Служба заботы',
         icon: IconHelpSquareRounded,
         description:
             'Здесь вы можете следить за минимальным остатком и планировать закупки',
         subDescription: 'В разработке',
         link: '/assistant',
-    },
-    {
-        id: 6,
-        type: 'link',
-        label: 'Настройки',
-        icon: IconSettings,
-        description:
-            'Здесь вы можете изменить условия приемки и контактный номер',
-        link: '/settings/edit',
     },
 ]
