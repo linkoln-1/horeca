@@ -13,5 +13,3 @@ export function useProviderRequestGetStatusQuery() {}
 export function useProviderRequestMutation() {}
 
 export function useProviderRequestUpdateQuery() {}
-
-// 89889040755
