@@ -36,7 +36,7 @@ export const sidebarData: SidebarItem[] = [
         icon: IconFilePencil,
         description:
             'Если хотите найти редкий товар или собрать эксклюзивные предложения поставщиков',
-        link: '/create/horeca-request',
+        link: '/create/request',
         button: 'Перейти к запросу',
     },
     {

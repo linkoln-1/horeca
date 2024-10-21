@@ -58,28 +58,14 @@ export function Header() {
                                 Помощь
                             </Button>
 
-                            <Menu>
-                                <Menu.Target>
-                                    <Flex className='cursor-pointer' gap='xs'>
-                                        <IconUserCircle />
-
-                                        <IconSquareRoundedChevronDown />
-                                    </Flex>
-                                </Menu.Target>
-
-                                <Menu.Dropdown>
-                                    <Menu.Item>
-                                        <Button
-                                            color='dark'
-                                            size='compact-sm'
-                                            variant='transparent'
-                                            onClick={logOut}
-                                        >
-                                            Выйти
-                                        </Button>
-                                    </Menu.Item>
-                                </Menu.Dropdown>
-                            </Menu>
+                            <Button
+                                color='dark'
+                                size='compact-sm'
+                                variant='transparent'
+                                onClick={logOut}
+                            >
+                                Выйти
+                            </Button>
                         </Flex>
                     )}
                 </Flex>
