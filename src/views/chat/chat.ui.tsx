@@ -54,7 +54,7 @@ export function ChatView() {
     const chats = isAssistantPage ? assistantChats : supplierChats
 
     return (
-        <Flex mt='md' direction='column'>
+        <Flex direction='column'>
             <Flex
                 className='rounded-t-xl'
                 px='md'
@@ -211,7 +211,6 @@ export function ChatView() {
                         mah='100%'
                         className='overflow-y-auto custom-scrollbar'
                     >
-                        {/*Chat body*/}
                         {messages.map((message, index) => {
                             if (message.type === 'request') {
                                 return (
@@ -253,7 +252,6 @@ export function ChatView() {
                         align='center'
                         px='md'
                         py='md'
-                        // h='135px'
                         className='chatBodyMessagesInput'
                     >
                         <IconPaperclip

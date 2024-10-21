@@ -175,7 +175,6 @@ export function AppLayout({ children }: AppLayoutProps) {
                                 sm: isMobile ? 12 : 'auto',
                                 md: isMobile ? 12 : 9,
                             }}
-                            mt='md'
                         >
                             {children}
                         </Grid.Col>
