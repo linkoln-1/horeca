@@ -17,7 +17,7 @@ export function ProfileRootView() {
             accessToken &&
             user.profile?.profileType === roles[0].role
         ) {
-            router.push(`/user/provider`)
+            router.push(`/user/provider/requests`)
         } else {
             router.push(`/user/horeca/applications`)
         }
