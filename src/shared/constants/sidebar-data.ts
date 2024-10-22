@@ -2,11 +2,15 @@ import { FC } from 'react'
 
 import { BadgeProps } from '@mantine/core'
 import {
+    IconCalendarClock,
     IconChecklist,
     IconFilePencil,
     IconHelpSquareRounded,
     IconLayout2Filled,
+    IconLayoutBoardSplit,
+    IconLayoutList,
     IconSettings,
+    IconShoppingCart,
     IconTablePlus,
 } from '@tabler/icons-react'
 
@@ -28,7 +32,7 @@ type SidebarDividerItem = {
 
 type SidebarItem = SidebarLinkItem | SidebarDividerItem
 
-export const sidebarData: SidebarItem[] = [
+export const horecaSidebarData: SidebarItem[] = [
     {
         id: 1,
         type: 'link',
@@ -83,5 +87,63 @@ export const sidebarData: SidebarItem[] = [
             'Здесь вы можете следить за минимальным остатком и планировать закупки',
         subDescription: 'В разработке',
         link: '/assistant',
+    },
+]
+
+export const providerSidebarData: SidebarItem[] = [
+    {
+        id: 1,
+        type: 'link',
+        label: 'История заявок',
+        icon: IconCalendarClock,
+        description: 'История ваших предложений и чаты с покупателями',
+        link: '/requests',
+        button: 'Перейти к предложениям',
+    },
+    {
+        id: 2,
+        type: 'link',
+        label: 'Входящие заявки',
+        icon: IconLayoutList,
+        description: 'Вы можете откликаться на любые заявки!',
+        link: '/products/applications',
+        button: 'Перейти к заявкам',
+    },
+    {
+        id: 3,
+        type: 'link',
+        label: 'Мой каталог',
+        icon: IconLayoutBoardSplit,
+        description: 'Предложите ваши товары всему общепиту на площадке!',
+        link: '/catalog',
+    },
+
+    { type: 'divider' },
+
+    {
+        id: 4,
+        type: 'link',
+        label: 'Постоянные клиенты',
+        icon: IconShoppingCart,
+        description: 'Здесь можно купить рекламу на площадке',
+        link: '/advertising/advertisement',
+    },
+    {
+        id: 5,
+        type: 'link',
+        label: 'Служба заботы',
+        icon: IconHelpSquareRounded,
+        description: 'У вас пока нет ни одного запроса к нам',
+        subDescription: 'В разработке',
+        link: '/service',
+    },
+    {
+        id: 6,
+        type: 'link',
+        label: 'Настройки профиля',
+        icon: IconSettings,
+        description:
+            'Вы можете изменить условия доставки и категории товара, по которым принимаете заявки',
+        link: '/settings/edit',
     },
 ]

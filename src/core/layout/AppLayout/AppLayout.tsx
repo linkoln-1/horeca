@@ -18,7 +18,11 @@ import { useForm } from '@mantine/form'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import { sidebarData } from '@/shared/constants'
+import {
+    horecaSidebarData,
+    providerSidebarData,
+    roles,
+} from '@/shared/constants'
 import { getImageUrl } from '@/shared/helpers'
 import { role } from '@/shared/helpers/getRole'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
@@ -45,6 +49,11 @@ export function AppLayout({ children }: AppLayoutProps) {
 
     const user = useUserStore(state => state.user)
     const { mutateAsync: uploadImage } = imageQueries.useImageUploadMutation()
+
+    const roleSidebar =
+        user?.profile.profileType === roles[0].role
+            ? providerSidebarData
+            : horecaSidebarData
 
     const handleAvatarChange = async (payload: File | null) => {
         if (payload) {
@@ -133,7 +142,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
                                         <Divider color='#A0AAC8' />
 
-                                        {sidebarData.map((x, index) => {
+                                        {roleSidebar.map((x, index) => {
                                             if (x.type === 'divider') {
                                                 return (
                                                     <Divider
@@ -156,6 +165,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                                                     <Flex
                                                         gap={20}
                                                         align='center'
+                                                        pos='relative'
                                                     >
                                                         <x.icon />
                                                         {x.label}

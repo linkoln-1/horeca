@@ -10,8 +10,9 @@ type UseUploadImageMutation = {
 
 export function useGetImageByIdQuery({ id }: { id: number }) {
     return useCustomQuery({
-        queryKey: ['image'],
+        queryKey: ['image', id],
         queryFn: () => api.uploadsControllerRead(id),
+        enabled: !!id,
     })
 }
 

@@ -28,7 +28,7 @@ import {
 export function Catalog() {
     const user = useUserStore(state => state.user)
 
-    const { data, isPending } = productsQueries.useGetProductsInfiniteQuery()
+    const { data } = productsQueries.useGetProductsInfiniteQuery()
 
     if (!data) return <Loader />
 
@@ -59,7 +59,7 @@ export function Catalog() {
 
             <Flex direction='column' gap='md'>
                 <Paper p='md' withBorder bg='indigo.4'>
-                    <Grid justify='space-between'>
+                    <Grid justify='space-around'>
                         {[
                             'Наименование',
                             'Производитель',
@@ -86,7 +86,7 @@ export function Catalog() {
                     </Grid>
                 </Paper>
 
-                {data.data.map((product, index) => (
+                {data.data?.map((product, index) => (
                     <Paper p='md' withBorder key={index} bg='gray.0'>
                         <Grid justify='space-between'>
                             <Grid.Col span={{ base: 12, md: 1 }}>
