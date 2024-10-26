@@ -1,7 +1,7 @@
 'use client'
 
 import { Box, Button, Card, Checkbox, Flex, List, Text } from '@mantine/core'
-import { IconArrowRight } from '@tabler/icons-react'
+import Link from 'next/link'
 
 import '@/styles/template.scss'
 
@@ -151,12 +151,6 @@ export function TemplateApplicationViews() {
 
     return (
         <>
-            <Flex mb='lg' justify='flex-end'>
-                <Button ml='auto' w='fit-content' radius='lg' bg='pink.7'>
-                    Создать новый шаблон
-                    <IconArrowRight />
-                </Button>
-            </Flex>
             <Flex gap='xl'>
                 <Flex direction='column' gap='md'>
                     <Flex direction='column' gap='md'>
@@ -280,6 +274,8 @@ export function TemplateApplicationViews() {
                                             fw='500'
                                             px='0'
                                             variant='transparent'
+                                            component={Link}
+                                            href={`/user/horeca/template/edit/${template.id}`}
                                         >
                                             Редактировать шаблон
                                         </Button>

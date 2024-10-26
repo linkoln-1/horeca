@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 
+import { useUserStore } from '@/core/providers/userStoreContext'
 import { SaveModal } from '@/features/templates/saveModal'
 import { ThanksModal } from '@/features/templates/thanksModal'
 import {
@@ -21,23 +22,84 @@ import {
 } from '@mantine/core'
 import { DateTimePicker, DateInput } from '@mantine/dates'
 import { FileWithPath } from '@mantine/dropzone'
+import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { IconPlus, IconX } from '@tabler/icons-react'
 
+import { CategoryLabels } from '@/shared/constants'
+import { PaymentMethod } from '@/shared/constants/paymentMethod'
+import {
+    Categories,
+    HorecaProfileDto,
+    HorecaRequestCreateDto,
+} from '@/shared/lib/horekaApi/Api'
 import { CustomDropzone } from '@/shared/ui/CustomDropzone'
 
 export function CreateRequestView() {
+    const user = useUserStore(state => state.user)
+
+    const [showCategory, setShowCategory] = useState(true)
     const dropzone = useRef<() => void>(null)
     const [images, setImages] = useState<FileWithPath[]>([])
-    const [category, setCategory] = useState([])
+
+    const form = useForm<HorecaRequestCreateDto>({
+        initialValues: {
+            items: [
+                {
+                    name: '',
+                    amount: 0,
+                    unit: '',
+                    category: [''] as unknown as Categories,
+                },
+            ],
+            address: '',
+            deliveryTime: '',
+            acceptUntill: '',
+            paymentType: PaymentMethod.Prepayment,
+            name: '',
+            phone: '',
+        },
+    })
+
+    const addNewProduct = () => {
+        const newProduct = {
+            name: '',
+            amount: 0,
+            unit: '',
+        }
+        form.insertListItem('items', newProduct)
+    }
+
+    const addNewCategory = () => {
+        const newCategory = {
+            name: '',
+            amount: 0,
+            unit: '',
+            category: '',
+        }
+        form.insertListItem('items', newCategory)
+    }
+
+    const removeProduct = (productIndex: number) => {
+        form.removeListItem('items', productIndex)
+    }
 
     const handleImages = (files: FileWithPath[]) => {
         setImages(files)
     }
 
-    const createNewProduct = () => {}
-
-    const createNewCategory = () => {}
+    const handleFormSubmit = (values: HorecaRequestCreateDto) => {
+        const formattedData = {
+            ...values,
+            items: values.items.map(item => ({
+                name: item.name,
+                amount: item.amount,
+                unit: item.unit,
+                category: item.category || null,
+            })),
+        }
+        console.log('Отправка данных: ', formattedData)
+    }
 
     return (
         <Flex justify='space-between' mt='md' gap='lg'>
@@ -54,25 +116,63 @@ export function CreateRequestView() {
                 />
             </Box>
             <Paper p='md' w='100%' shadow='md' withBorder>
-                <Text fw='500'>Каталог</Text>
-                <form action=''>
-                    <Box>
-                        <Select
-                            placeholder='Безалкогольные напитки, вода, соки'
-                            data={[
-                                'Безалкогольные напитки, вода, соки',
-                                'Шоколад',
-                                'Мясные продукты',
-                                'Молочные продукты',
-                            ]}
-                            mb='md'
-                        />
-                        <Flex mb='md' justify='space-between' gap='5px'>
-                            <TextInput label='Название' />
-                            <TextInput type='number' label='Кол-во' />
-                            <TextInput label='Ед. изм.' />
-                        </Flex>
-                    </Box>
+                <form
+                    onSubmit={form.onSubmit(handleFormSubmit)}
+                    className='flex flex-col gap-5'
+                >
+                    {form.values.items.map((item, index) => {
+                        return (
+                            <Box key={index}>
+                                {showCategory && (
+                                    <Select
+                                        label='Категория'
+                                        placeholder='Выберите категорию'
+                                        data={(
+                                            user?.profile as HorecaProfileDto
+                                        )?.categories?.map(x => ({
+                                            value: x,
+                                            label: CategoryLabels[
+                                                x as Categories
+                                            ],
+                                        }))}
+                                        {...form.getInputProps(
+                                            `items.${index}.category`
+                                        )}
+                                        mb='md'
+                                    />
+                                )}
+
+                                <Flex mb='md' justify='space-between' gap='5px'>
+                                    <TextInput
+                                        label='Название товара'
+                                        {...form.getInputProps(
+                                            `items.${index}.name`
+                                        )}
+                                    />
+                                    <TextInput
+                                        type='number'
+                                        label='Кол-во'
+                                        {...form.getInputProps(
+                                            `items.${index}.amount`
+                                        )}
+                                    />
+                                    <TextInput
+                                        label='Ед. изм.'
+                                        {...form.getInputProps(
+                                            `items.${index}.unit`
+                                        )}
+                                    />
+
+                                    {index > 0 && (
+                                        <IconX
+                                            cursor='pointer'
+                                            onClick={() => removeProduct(index)}
+                                        />
+                                    )}
+                                </Flex>
+                            </Box>
+                        )
+                    })}
 
                     <Flex
                         mb='sm'
@@ -80,21 +180,14 @@ export function CreateRequestView() {
                         align='flex-start'
                         direction='column'
                     >
-                        <Button
-                            onClick={createNewProduct}
-                            variant='transparent'
-                        >
+                        <Button onClick={addNewProduct} variant='transparent'>
                             <Flex gap='sm' c='indigo'>
                                 <IconPlus />
-                                <Text size='lg'>
-                                    Добавить новый товар в категории
-                                </Text>
+                                <Text size='lg'>Добавить новый товар</Text>
                             </Flex>
                         </Button>
-                        <Button
-                            onClick={createNewCategory}
-                            variant='transparent'
-                        >
+
+                        <Button onClick={addNewCategory} variant='transparent'>
                             <Flex gap='sm' c='indigo'>
                                 <IconPlus />
                                 <Text size='lg'>Добавить новую категорию</Text>
@@ -177,24 +270,30 @@ export function CreateRequestView() {
                         <Textarea
                             label='Комментарий к заявке'
                             description='До 400 символов'
+                            {...form.getInputProps('comment')}
                         />
                     </Box>
 
                     <Box mb='sm'>
-                        <Autocomplete label='Адрес доставки' />
+                        <Autocomplete
+                            label='Адрес доставки'
+                            {...form.getInputProps('address')}
+                        />
                     </Box>
 
-                    <Flex mb='md' justify='space-between'>
+                    <Flex mb='md' gap='xl'>
                         <DateTimePicker
                             w='fit-content'
                             valueFormat='DD/MM/YYYY HH:mm:ss'
                             label='Привезите товар не позднее:'
                             placeholder='ДД/ММ/ГГГГ ЧЧ:ММ'
+                            {...form.getInputProps('deliveryTime')}
                         />
                         <DateInput
                             valueFormat='DD/MM/YY'
                             label='Принимать заявки до:'
                             placeholder='ДД.ММ.ГГ'
+                            {...form.getInputProps('acceptUntill')}
                         />
                     </Flex>
 
@@ -202,29 +301,36 @@ export function CreateRequestView() {
                         name='paymentMethod'
                         mb='md'
                         label='Способ оплаты'
+                        {...form.getInputProps('paymentType')}
                     >
                         <Group mt='xs'>
                             <Radio
                                 icon={CheckIcon}
-                                value='prepayment'
+                                value={PaymentMethod.Prepayment}
                                 label='Предоплата'
                             />
                             <Radio
                                 icon={CheckIcon}
-                                value='deferment'
+                                value={PaymentMethod.Deferment}
                                 label='Отсрочка'
                             />
                             <Radio
                                 icon={CheckIcon}
-                                value='fact'
+                                value={PaymentMethod.PaymentUponDelivery}
                                 label='По факту'
                             />
                         </Group>
                     </Radio.Group>
 
-                    <Flex mb='xl' justify='space-between'>
-                        <TextInput placeholder='Название компании' />
-                        <TextInput placeholder='Номер телефона' />
+                    <Flex mb='xl' gap='xl'>
+                        <TextInput
+                            placeholder='Название компании'
+                            {...form.getInputProps('name')}
+                        />
+                        <TextInput
+                            placeholder='Номер телефона'
+                            {...form.getInputProps('phone')}
+                        />
                     </Flex>
 
                     <Flex justify='space-between'>
