@@ -8,6 +8,7 @@ const nextConfig = {
     },
     reactStrictMode: false,
     experimental: {
+        webpackMemoryOptimizations: true,
         optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
     },
     typescript: {
