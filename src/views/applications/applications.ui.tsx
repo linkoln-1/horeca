@@ -28,12 +28,10 @@ export function ApplicationsViews() {
     }
     const { data: requests } = requestQueries.useGetRequestQuery()
 
-    if (!requests) return <Loader />
-
     // TODO тут насколько я понял запрос не по типам возвращает данные, после как бэк вернется, нужно проверить
     return (
         <Flex direction='column' gap='md'>
-            {!requests.data ? (
+            {!requests?.data ? (
                 <Flex justify='center' align='center'>
                     <Text size='lg' c='gray'>
                         Сейчас у вас созданных заявок нет
