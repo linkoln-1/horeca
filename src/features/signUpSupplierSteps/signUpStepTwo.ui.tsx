@@ -64,7 +64,7 @@ export function SignUpStepTwo({ form }: StepTwoProps) {
 
             <Flex direction='column' gap='md'>
                 <Text size='md' fw={600}>
-                    Возможный способ доставки
+                    Возможные способы доставки
                 </Text>
                 {deliveryMethodOptions.map(option => (
                     <Checkbox
