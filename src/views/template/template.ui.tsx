@@ -209,81 +209,98 @@ export function TemplateApplicationViews() {
                 </Flex>
 
                 <Flex direction='column' gap='lg' w='100%'>
-                    {templates.map(template => (
-                        <Card
-                            key={template.id}
-                            shadow='sm'
-                            p={0}
-                            withBorder
-                            w='100%'
-                        >
-                            <Flex gap='md'>
-                                <Flex
-                                    w={250}
-                                    direction='column'
-                                    gap='md'
-                                    bg='indigo.6'
-                                    align='start'
-                                    c='#fff'
-                                    px='md'
-                                    py='lg'
-                                >
-                                    <Text>{template.title}</Text>
-                                    <Text>Создан:</Text>
-                                    <Text>{template.created}</Text>
-                                </Flex>
+                    {templates ? (
+                        templates.map(template => (
+                            <Card
+                                key={template.id}
+                                shadow='sm'
+                                p={0}
+                                withBorder
+                                w='100%'
+                            >
+                                <Flex gap='md'>
+                                    <Flex
+                                        w={250}
+                                        direction='column'
+                                        gap='md'
+                                        bg='indigo.6'
+                                        align='start'
+                                        c='#fff'
+                                        px='md'
+                                        py='lg'
+                                    >
+                                        <Text>{template.title}</Text>
+                                        <Text>Создан:</Text>
+                                        <Text>{template.created}</Text>
+                                    </Flex>
 
-                                <Flex direction='column' gap='md' p='md'>
-                                    {template.products.map(product => {
-                                        return (
-                                            <div key={product.id}>
-                                                <Flex direction='column'>
-                                                    <Text c='gray.5'>
-                                                        Категория товаров:
-                                                    </Text>
-                                                    <Text>
-                                                        {product.category}
-                                                    </Text>
-                                                </Flex>
+                                    <Flex direction='column' gap='md' p='md'>
+                                        {template.products.map(product => {
+                                            return (
+                                                <div key={product.id}>
+                                                    <Flex direction='column'>
+                                                        <Text c='gray.5'>
+                                                            Категория товаров:
+                                                        </Text>
+                                                        <Text>
+                                                            {product.category}
+                                                        </Text>
+                                                    </Flex>
 
-                                                <Flex direction='column'>
-                                                    <Text c='gray.5'>
-                                                        Наименование:
-                                                    </Text>
-                                                    <Text>
-                                                        {product.items.join(
-                                                            ', '
-                                                        )}
-                                                    </Text>
-                                                </Flex>
-                                            </div>
-                                        )
-                                    })}
+                                                    <Flex direction='column'>
+                                                        <Text c='gray.5'>
+                                                            Наименование:
+                                                        </Text>
+                                                        <Text>
+                                                            {product.items.join(
+                                                                ', '
+                                                            )}
+                                                        </Text>
+                                                    </Flex>
+                                                </div>
+                                            )
+                                        })}
 
-                                    <Flex gap='md'>
-                                        <Button
-                                            c='blue'
-                                            fw='500'
-                                            px='0'
-                                            variant='transparent'
-                                        >
-                                            Открыть для просмотра
-                                        </Button>
-                                        <Button
-                                            c='pink.7'
-                                            fw='500'
-                                            px='0'
-                                            variant='transparent'
-                                            component={Link}
-                                            href={`/user/horeca/template/edit/${template.id}`}
-                                        >
-                                            Редактировать шаблон
-                                        </Button>
+                                        <Flex gap='md'>
+                                            <Button
+                                                c='blue'
+                                                fw='500'
+                                                px='0'
+                                                variant='transparent'
+                                            >
+                                                Открыть для просмотра
+                                            </Button>
+                                            <Button
+                                                c='pink.7'
+                                                fw='500'
+                                                px='0'
+                                                variant='transparent'
+                                                component={Link}
+                                                href={`/user/horeca/template/edit/${template.id}`}
+                                            >
+                                                Редактировать шаблон
+                                            </Button>
+                                        </Flex>
                                     </Flex>
                                 </Flex>
-                            </Flex>
-                        </Card>
-                    ))}
+                            </Card>
+                        ))
+                    ) : (
+                        <Flex
+                            justify='center'
+                            align='center'
+                            direction='column'
+                        >
+                            <Text size='lg'>
+                                Экономьте свое время! Создайте заявку и
+                                сохраните ее как шаблон.
+                            </Text>
+                            <Text size='md' c='gray'>
+                                Кнопка «Сохранить шаблон» находится слева внизу
+                                формы создания заявки
+                            </Text>
+                        </Flex>
+                    )}
                 </Flex>
             </Flex>
         </>

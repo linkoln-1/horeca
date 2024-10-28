@@ -54,118 +54,29 @@ export function ChatView() {
     const chats = isAssistantPage ? assistantChats : supplierChats
 
     return (
-        <Flex direction='column'>
-            <Flex
-                className='rounded-t-xl'
-                px='md'
-                py='md'
-                align='center'
-                bg='indigo.1'
-            >
-                <Box miw='420px'>
-                    <Text fw='500' size='xl'>
-                        Все сообщения
-                    </Text>
-                    {isAssistantPage && (
-                        <Text size='xl' c='gray.6'>
-                            Номера запросов
-                        </Text>
-                    )}
-                </Box>
-                {isAssistantPage ? (
-                    <Flex w='calc(100% - 420px)'>
-                        <Flex direction='column' justify='space-between'>
-                            <Text fw='500' size='xl' className='chatName'>
-                                Поддержка СФЕРЫ HoReCa
-                            </Text>
-                            <Text c='indigo' size='lg' className='status'>
-                                Онлайн
-                            </Text>
-                        </Flex>
-                    </Flex>
-                ) : (
-                    <Flex w='calc(100% - 420px)'>
-                        <MantineImage
-                            mr='40px'
-                            fit='cover'
-                            w={90}
-                            h={90}
-                            radius='md'
-                            src='/assets/images/bg-5.png'
-                        />
-                        <Flex direction='column' justify='space-between'>
-                            <Text fw='500' size='xl' className='chatName'>
-                                ООО «МЕТРО Кэш энд Керри»
-                            </Text>
-                            <Text c='indigo' size='lg' className='status'>
-                                Онлайн
-                            </Text>
-                        </Flex>
-                    </Flex>
-                )}
-            </Flex>
-
-            <Flex h='calc(100vh - 300px)' mah='100vh'>
-                <Flex
-                    direction='column'
-                    className='overflow-y-auto custom-scrollbar'
-                    miw='420px'
-                    mah='100%'
-                >
-                    {!isAssistantPage && (
-                        <Group
-                            style={{
-                                borderBottom: `1px solid`,
-                            }}
-                            wrap='nowrap'
-                            px='md'
-                            py='md'
-                        >
-                            <MantineImage
-                                mr='27px'
-                                fit='cover'
-                                w={90}
-                                h={90}
-                                radius='md'
-                                src='/assets/images/bg-5.png'
-                            />
-
-                            <Flex direction='column' justify='space-between'>
-                                <Text fw='500' size='xl' className='chatName'>
-                                    Беседа
+        <Flex>
+            {isAssistantPage ? (
+                <Flex direction='column'>
+                    <Flex
+                        className='rounded-t-xl'
+                        px='md'
+                        py='md'
+                        align='center'
+                        bg='indigo.1'
+                    >
+                        {isAssistantPage && (
+                            <Box miw='420px'>
+                                <Text fw='500' size='xl'>
+                                    Все сообщения
                                 </Text>
-                                <Text c='gray.6' size='lg' className='status'>
-                                    Сообщений пока нет
-                                </Text>
-                            </Flex>
-                        </Group>
-                    )}
 
-                    {chats.map((chat, index) => {
-                        return (
-                            <Group
-                                key={index}
-                                onClick={() =>
-                                    handleActiveRequest(chat.requestNumber)
-                                }
-                                c={
-                                    handleCheckActive(chat.requestNumber)
-                                        ? 'white'
-                                        : ''
-                                }
-                                bg={
-                                    handleCheckActive(chat.requestNumber)
-                                        ? 'indigo'
-                                        : ''
-                                }
-                                style={{
-                                    cursor: 'pointer',
-                                    borderBottom: `1px solid`,
-                                }}
-                                wrap='nowrap'
-                                px='lg'
-                                py='lg'
-                            >
+                                <Text size='xl' c='gray.6'>
+                                    Номера запросов
+                                </Text>
+                            </Box>
+                        )}
+                        {isAssistantPage ? (
+                            <Flex w='calc(100% - 420px)'>
                                 <Flex
                                     direction='column'
                                     justify='space-between'
@@ -173,113 +84,268 @@ export function ChatView() {
                                     <Text
                                         fw='500'
                                         size='xl'
-                                        className='request'
+                                        className='chatName'
                                     >
-                                        {isAssistantPage ? '№' : 'Заявка №'}{' '}
-                                        {chat.requestNumber}
+                                        Поддержка СФЕРЫ HoReCa
                                     </Text>
                                     <Text
+                                        c='indigo'
+                                        size='lg'
+                                        className='status'
+                                    >
+                                        Онлайн
+                                    </Text>
+                                </Flex>
+                            </Flex>
+                        ) : (
+                            <Flex w='calc(100% - 420px)'>
+                                <MantineImage
+                                    mr='40px'
+                                    fit='cover'
+                                    w={90}
+                                    h={90}
+                                    radius='md'
+                                    src='/assets/images/bg-5.png'
+                                />
+                                <Flex
+                                    direction='column'
+                                    justify='space-between'
+                                >
+                                    <Text
+                                        fw='500'
+                                        size='xl'
+                                        className='chatName'
+                                    >
+                                        ООО «МЕТРО Кэш энд Керри»
+                                    </Text>
+                                    <Text
+                                        c='indigo'
+                                        size='lg'
+                                        className='status'
+                                    >
+                                        Онлайн
+                                    </Text>
+                                </Flex>
+                            </Flex>
+                        )}
+                    </Flex>
+
+                    <Flex h='calc(100vh - 300px)' mah='100vh'>
+                        <Flex
+                            direction='column'
+                            className='overflow-y-auto custom-scrollbar'
+                            miw='420px'
+                            mah='100%'
+                        >
+                            {!isAssistantPage && (
+                                <Group
+                                    style={{
+                                        borderBottom: `1px solid`,
+                                    }}
+                                    wrap='nowrap'
+                                    px='md'
+                                    py='md'
+                                >
+                                    <MantineImage
+                                        mr='27px'
+                                        fit='cover'
+                                        w={90}
+                                        h={90}
+                                        radius='md'
+                                        src='/assets/images/bg-5.png'
+                                    />
+
+                                    <Flex
+                                        direction='column'
+                                        justify='space-between'
+                                    >
+                                        <Text
+                                            fw='500'
+                                            size='xl'
+                                            className='chatName'
+                                        >
+                                            Беседа
+                                        </Text>
+                                        <Text
+                                            c='gray.6'
+                                            size='lg'
+                                            className='status'
+                                        >
+                                            Сообщений пока нет
+                                        </Text>
+                                    </Flex>
+                                </Group>
+                            )}
+
+                            {chats.map((chat, index) => {
+                                return (
+                                    <Group
+                                        key={index}
+                                        onClick={() =>
+                                            handleActiveRequest(
+                                                chat.requestNumber
+                                            )
+                                        }
                                         c={
                                             handleCheckActive(
                                                 chat.requestNumber
                                             )
                                                 ? 'white'
-                                                : 'gray.6'
+                                                : ''
                                         }
-                                        size='lg'
-                                        className='date'
+                                        bg={
+                                            handleCheckActive(
+                                                chat.requestNumber
+                                            )
+                                                ? 'indigo'
+                                                : ''
+                                        }
+                                        style={{
+                                            cursor: 'pointer',
+                                            borderBottom: `1px solid`,
+                                        }}
+                                        wrap='nowrap'
+                                        px='lg'
+                                        py='lg'
                                     >
-                                        {chat.requestDate}
-                                    </Text>
-                                </Flex>
-                            </Group>
-                        )
-                    })}
-                </Flex>
-
-                <Divider orientation='vertical' mt='md' mb='xs' />
-
-                <Flex pos='relative' direction='column' w='100%' h='100%'>
-                    <Text w='100%' my='md' size='lg' c='gray.6' ta='center'>
-                        30 июня, 2024
-                    </Text>
-
-                    <Flex
-                        direction='column'
-                        px='xl'
-                        flex='1'
-                        mah='100%'
-                        className='overflow-y-auto custom-scrollbar'
-                    >
-                        {messages.map((message, index) => {
-                            if (message.type === 'request') {
-                                return (
-                                    <RequestCardMessage
-                                        key={index}
-                                        message={message}
-                                    />
+                                        <Flex
+                                            direction='column'
+                                            justify='space-between'
+                                        >
+                                            <Text
+                                                fw='500'
+                                                size='xl'
+                                                className='request'
+                                            >
+                                                {isAssistantPage
+                                                    ? '№'
+                                                    : 'Заявка №'}{' '}
+                                                {chat.requestNumber}
+                                            </Text>
+                                            <Text
+                                                c={
+                                                    handleCheckActive(
+                                                        chat.requestNumber
+                                                    )
+                                                        ? 'white'
+                                                        : 'gray.6'
+                                                }
+                                                size='lg'
+                                                className='date'
+                                            >
+                                                {chat.requestDate}
+                                            </Text>
+                                        </Flex>
+                                    </Group>
                                 )
-                            } else if (
-                                message.type === 'message' &&
-                                message.from === 'me' &&
-                                message.text
-                            ) {
-                                return (
-                                    <MessageFromMe
-                                        key={index}
-                                        text={message.text}
-                                    />
-                                )
-                            } else if (
-                                message.type === 'message' &&
-                                message.from !== 'me' &&
-                                message.text
-                            ) {
-                                return (
-                                    <MessageToMe
-                                        key={index}
-                                        text={message.text}
-                                    />
-                                )
-                            }
-                        })}
-                        {!isAssistantPage && <RatingMessage />}
-                    </Flex>
+                            })}
+                        </Flex>
 
-                    <Flex
-                        w='100%'
-                        bg='gray.1'
-                        align='center'
-                        px='md'
-                        py='md'
-                        className='chatBodyMessagesInput'
-                    >
-                        <IconPaperclip
-                            style={{ marginRight: 30 }}
-                            width={36}
-                            height={36}
-                            cursor='pointer'
-                            color='#4299e1'
-                            stroke={2}
-                        />
-                        <Input
-                            value={message}
-                            onChange={e => handleMessage(e)}
-                            size='lg'
-                            placeholder='Напишите сообщение...'
-                            variant='unstyled'
+                        <Divider orientation='vertical' mt='md' mb='xs' />
+
+                        <Flex
+                            pos='relative'
+                            direction='column'
                             w='100%'
-                        />
-                        <Button variant='transparent' disabled={!message}>
-                            <IconSend2
-                                width={36}
-                                height={36}
-                                color={message ? '#5E7EEF' : '#A4A4A4'}
-                            />
-                        </Button>
+                            h='100%'
+                        >
+                            <Text
+                                w='100%'
+                                my='md'
+                                size='lg'
+                                c='gray.6'
+                                ta='center'
+                            >
+                                30 июня, 2024
+                            </Text>
+
+                            <Flex
+                                direction='column'
+                                px='xl'
+                                flex='1'
+                                mah='100%'
+                                className='overflow-y-auto custom-scrollbar'
+                            >
+                                {messages.map((message, index) => {
+                                    if (message.type === 'request') {
+                                        return (
+                                            <RequestCardMessage
+                                                key={index}
+                                                message={message}
+                                            />
+                                        )
+                                    } else if (
+                                        message.type === 'message' &&
+                                        message.from === 'me' &&
+                                        message.text
+                                    ) {
+                                        return (
+                                            <MessageFromMe
+                                                key={index}
+                                                text={message.text}
+                                            />
+                                        )
+                                    } else if (
+                                        message.type === 'message' &&
+                                        message.from !== 'me' &&
+                                        message.text
+                                    ) {
+                                        return (
+                                            <MessageToMe
+                                                key={index}
+                                                text={message.text}
+                                            />
+                                        )
+                                    }
+                                })}
+                                {!isAssistantPage && <RatingMessage />}
+                            </Flex>
+
+                            <Flex
+                                w='100%'
+                                bg='gray.1'
+                                align='center'
+                                px='md'
+                                py='md'
+                                className='chatBodyMessagesInput'
+                            >
+                                <IconPaperclip
+                                    style={{ marginRight: 30 }}
+                                    width={36}
+                                    height={36}
+                                    cursor='pointer'
+                                    color='#4299e1'
+                                    stroke={2}
+                                />
+                                <Input
+                                    value={message}
+                                    onChange={e => handleMessage(e)}
+                                    size='lg'
+                                    placeholder='Напишите сообщение...'
+                                    variant='unstyled'
+                                    w='100%'
+                                />
+                                <Button
+                                    variant='transparent'
+                                    disabled={!message}
+                                >
+                                    <IconSend2
+                                        width={36}
+                                        height={36}
+                                        color={message ? '#5E7EEF' : '#A4A4A4'}
+                                    />
+                                </Button>
+                            </Flex>
+                        </Flex>
                     </Flex>
                 </Flex>
-            </Flex>
+            ) : (
+                <Flex justify='center' align='center' direction='column'>
+                    <Text size='lg'>
+                        Здесь вы можете обратиться в службу заботы
+                    </Text>
+                </Flex>
+            )}
         </Flex>
     )
 }
