@@ -96,7 +96,7 @@ export function ProviderRequests() {
                     // </Grid>
                 )}
 
-                {requests &&
+                {requests ? (
                     requests.map((request: HorecaRequestDto) => (
                         <Paper withBorder p='md' key={request.id}>
                             <Text fw={700}>
@@ -152,7 +152,18 @@ export function ProviderRequests() {
                                 </Text>
                             </Box>
                         </Paper>
-                    ))}
+                    ))
+                ) : (
+                    <Flex justify='center' align='center' direction='column'>
+                        <Text size='lg'>
+                            Здесь вы будете видеть все ваши заявки и их
+                            результат. А пока загрузите товары в каталог
+                        </Text>
+                        <Text size='md' c='gray'>
+                            Это поможет вам выделиться на платформе
+                        </Text>
+                    </Flex>
+                )}
             </Flex>
         </Flex>
     )
