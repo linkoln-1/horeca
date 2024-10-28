@@ -4,6 +4,7 @@ import {
     MantineThemeOverride,
     rem,
     TextInput,
+    NumberInput,
 } from '@mantine/core'
 
 const CONTAINER_SIZES: Record<string, string> = {
@@ -32,6 +33,13 @@ inputs.forEach(x => {
             size: 'md',
         },
     })
+})
+
+defaultInputs['NumberInput'] = NumberInput.extend({
+    defaultProps: {
+        size: 'md',
+        hideControls: true,
+    },
 })
 
 export const theme: MantineThemeOverride = {

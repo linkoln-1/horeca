@@ -87,9 +87,6 @@ export function SupplierManufacturer({
                         Завершить регистрацию
                     </Button>
                 )}
-                <Button variant='default' component={Link} href='/#'>
-                    На главную
-                </Button>
             </Flex>
         </form>
     )

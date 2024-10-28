@@ -10,8 +10,9 @@ import {
     IconLayoutBoardSplit,
     IconLayoutList,
     IconSettings,
-    IconShoppingCart,
     IconTablePlus,
+    IconHeart,
+    IconMail,
 } from '@tabler/icons-react'
 
 type SidebarLinkItem = {
@@ -24,6 +25,7 @@ type SidebarLinkItem = {
     button?: string
     description: string
     subDescription?: string
+    iconRight?: FC
 }
 
 type SidebarDividerItem = {
@@ -51,6 +53,7 @@ export const horecaSidebarData: SidebarItem[] = [
         description: 'История ваших заявок и чат с поставщиками',
         link: '/applications',
         button: 'Перейти к заказам',
+        iconRight: IconMail,
     },
     {
         id: 3,
@@ -59,6 +62,7 @@ export const horecaSidebarData: SidebarItem[] = [
         icon: IconLayout2Filled,
         description: 'Все поставщики находятся в одном месте',
         link: '/favorite/provider',
+        iconRight: IconMail,
     },
     { type: 'divider' },
     {
@@ -87,6 +91,7 @@ export const horecaSidebarData: SidebarItem[] = [
             'Здесь вы можете следить за минимальным остатком и планировать закупки',
         subDescription: 'В разработке',
         link: '/assistant',
+        iconRight: IconMail,
     },
 ]
 
@@ -99,6 +104,7 @@ export const providerSidebarData: SidebarItem[] = [
         description: 'История ваших предложений и чаты с покупателями',
         link: '/requests',
         button: 'Перейти к предложениям',
+        iconRight: IconMail,
     },
     {
         id: 2,
@@ -108,6 +114,7 @@ export const providerSidebarData: SidebarItem[] = [
         description: 'Вы можете откликаться на любые заявки!',
         link: '/products/applications',
         button: 'Перейти к заявкам',
+        iconRight: IconMail,
     },
     {
         id: 3,
@@ -124,9 +131,10 @@ export const providerSidebarData: SidebarItem[] = [
         id: 4,
         type: 'link',
         label: 'Постоянные клиенты',
-        icon: IconShoppingCart,
+        icon: IconHeart,
         description: 'Здесь можно купить рекламу на площадке',
         link: '/advertising/advertisement',
+        iconRight: IconMail,
     },
     {
         id: 5,
@@ -136,6 +144,7 @@ export const providerSidebarData: SidebarItem[] = [
         description: 'У вас пока нет ни одного запроса к нам',
         subDescription: 'В разработке',
         link: '/service',
+        iconRight: IconMail,
     },
     {
         id: 6,

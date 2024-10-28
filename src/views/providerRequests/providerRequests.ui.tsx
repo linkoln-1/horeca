@@ -18,7 +18,7 @@ import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 import { HorecaRequestDto } from '@/shared/lib/horekaApi/Api'
 
 export function ProviderRequests() {
-    const [activeTab, setActiveTab] = useState(applications[0].label)
+    const [activeTab, setActiveTab] = useState(applications[1].label)
     const isMobile = useBreakpoint('sm')
 
     const { data: requests } = providerRequest.useGetAllProviderRequestQuery()
@@ -34,19 +34,20 @@ export function ProviderRequests() {
                     fullWidth
                     onChange={handleTabChange}
                     value={activeTab}
-                    color='blue'
-                    data={[
-                        'Все заявки',
-                        'Текущие заявки',
-                        'Завершённые заявки',
-                    ]}
+                    color='indigo.4'
+                    data={['Текущие заявки', 'Завершённые заявки']}
                     orientation={isMobile ? 'vertical' : 'horizontal'}
                 />
             </Flex>
 
             <Flex gap='sm' direction='column'>
                 {(!requests || requests?.length === 0) && (
-                    <Flex justify='center' direction='column' align='center'>
+                    <Flex
+                        justify='center'
+                        direction='column'
+                        align='center'
+                        h='50vh'
+                    >
                         <Text fw={600} size='xl'>
                             Здесь вы будете видеть все ваши заявки и их
                             результат. А пока загрузите товары в каталог

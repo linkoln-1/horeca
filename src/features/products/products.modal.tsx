@@ -84,7 +84,7 @@ export function ProductsModal() {
     console.log('IMAGE', getImage)
 
     return (
-        <Flex direction='column' gap='lg'>
+        <Flex direction='column' gap='lg' p='md'>
             <Text fw={700} size='xl' className='text-center'>
                 Добавить Новый товар
             </Text>

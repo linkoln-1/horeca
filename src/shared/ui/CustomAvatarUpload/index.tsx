@@ -29,7 +29,12 @@ export function CustomAvatarUpload({
                 type='file'
                 accept='image/*'
             />
-            <Avatar {...props} onClick={onClick} />
+            <Avatar
+                {...props}
+                onClick={onClick}
+                // c='var(--mantine-color-indigo-0)'
+                color='indigo.4'
+            />
         </>
     )
 }

@@ -20,7 +20,7 @@ import { applications } from '@/shared/constants/applications'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 
 export function ApplicationsViews() {
-    const [activeTab, setActiveTab] = useState(applications[0].label)
+    const [activeTab, setActiveTab] = useState(applications[1].label)
     const isMobile = useBreakpoint('sm')
 
     const handleTabChange = (tab: string) => {
@@ -46,9 +46,8 @@ export function ApplicationsViews() {
                             fullWidth
                             onChange={handleTabChange}
                             value={activeTab}
-                            color='blue'
+                            color='indigo.4'
                             data={[
-                                applications[0].label,
                                 applications[1].label,
                                 applications[2].label,
                             ]}
@@ -56,7 +55,7 @@ export function ApplicationsViews() {
                         />
                     </Flex>
                     <Grid>
-                        {requests.data?.map((order, index) => (
+                        {requests.data.map((order, index) => (
                             <Grid.Col
                                 span={{
                                     base: 12,
@@ -80,6 +79,7 @@ export function ApplicationsViews() {
                                             <Badge
                                                 // color={order ? 'green' : 'red'}
                                                 variant='light'
+                                                c='indigo.4'
                                             >
                                                 {/*{order.}*/}
                                                 тут будут статусы

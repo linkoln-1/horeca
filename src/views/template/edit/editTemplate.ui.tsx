@@ -303,7 +303,7 @@ export function EditTemplateUi() {
                         fw='500'
                         size='md'
                         radius='xl'
-                        bg='pink'
+                        bg='#CC2C79'
                     >
                         Отправить заявку
                     </Button>

@@ -27,7 +27,7 @@ export function Header() {
     if (!user) return <Loader />
 
     return (
-        <Paper w='100%' bg='gray.1' p='sm'>
+        <Paper w='100%' bg='var(--mantine-color-indigo-0)' p='sm'>
             <Container>
                 <Flex justify='space-between' align='center'>
                     <Link href={`/user${role({ user })}/applications`}>
@@ -39,27 +39,27 @@ export function Header() {
 
                     {!isMobile && (
                         <Flex gap='sm' align='center'>
-                            <Button
-                                component={Link}
-                                href={'#'}
-                                color='dark'
-                                size='compact-sm'
-                                variant='transparent'
-                            >
-                                Реклама
-                            </Button>
-                            <Button
-                                component={Link}
-                                href={'/help'}
-                                color='dark'
-                                size='compact-sm'
-                                variant='transparent'
-                            >
-                                Помощь
-                            </Button>
+                            {/*<Button*/}
+                            {/*    component={Link}*/}
+                            {/*    href={'#'}*/}
+                            {/*    color='dark'*/}
+                            {/*    size='compact-sm'*/}
+                            {/*    variant='transparent'*/}
+                            {/*>*/}
+                            {/*    Реклама*/}
+                            {/*</Button>*/}
+                            {/*<Button*/}
+                            {/*    component={Link}*/}
+                            {/*    href={'/help'}*/}
+                            {/*    color='dark'*/}
+                            {/*    size='compact-sm'*/}
+                            {/*    variant='transparent'*/}
+                            {/*>*/}
+                            {/*    Помощь*/}
+                            {/*</Button>*/}
 
                             <Button
-                                color='dark'
+                                color='#385191'
                                 size='compact-sm'
                                 variant='transparent'
                                 onClick={logOut}

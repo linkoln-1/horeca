@@ -17,13 +17,13 @@ type FooterProps = PaperProps & {}
 
 export function Footer(props: FooterProps) {
     const isMobile = useBreakpoint('sm')
-    const rightSection = (
+    const RightSection = (
         <div className='rounded-full bg-blue-800 p-0.5'>
             <IconBrandTelegram size={19} color='#fff' />
         </div>
     )
     return (
-        <Paper w='100%' bg='gray.1' {...props}>
+        <Paper w='100%' bg='var(--mantine-color-indigo-0)' {...props}>
             <Container my='md'>
                 <Flex justify='space-between' align='center'>
                     <MantineImage
@@ -33,43 +33,45 @@ export function Footer(props: FooterProps) {
 
                     {!isMobile && (
                         <Flex className='flex-row' gap='md' align='center'>
-                            <Flex className='flex-col' gap='md'>
-                                <Button
-                                    component={Link}
-                                    href={''}
-                                    color='blue.9'
-                                    size='compact-sm'
-                                    variant='transparent'
-                                >
-                                    О платформе
-                                </Button>
-                                <Button
-                                    component={Link}
-                                    href={'/help'}
-                                    color='blue.9'
-                                    size='compact-sm'
-                                    variant='transparent'
-                                >
-                                    Помощь
-                                </Button>
-                            </Flex>
+                            {/*<Flex className='flex-col' gap='md'>*/}
+                            {/*    <Button*/}
+                            {/*        component={Link}*/}
+                            {/*        href={''}*/}
+                            {/*        color='#385191'*/}
+                            {/*        size='compact-sm'*/}
+                            {/*        variant='transparent'*/}
+                            {/*    >*/}
+                            {/*        О платформе*/}
+                            {/*    </Button>*/}
+                            {/*    <Button*/}
+                            {/*        component={Link}*/}
+                            {/*        href={'/help'}*/}
+                            {/*        color='#385191'*/}
+                            {/*        size='compact-sm'*/}
+                            {/*        variant='transparent'*/}
+                            {/*    >*/}
+                            {/*        Помощь*/}
+                            {/*    </Button>*/}
+                            {/*</Flex>*/}
 
-                            <Flex gap='md' className='flex-col'>
+                            <Flex gap='md'>
                                 <Button
                                     component={Link}
                                     href={''}
-                                    color='blue.9'
+                                    color='#385191'
                                     size='compact-sm'
                                     variant='transparent'
+                                    fw={400}
                                 >
                                     Пользовательское соглашение
                                 </Button>
                                 <Button
                                     component={Link}
                                     href={''}
-                                    color='blue.9'
+                                    color='#385191'
                                     size='compact-sm'
                                     variant='transparent'
+                                    fw={400}
                                 >
                                     Политика конфиденциальности
                                 </Button>
@@ -78,40 +80,22 @@ export function Footer(props: FooterProps) {
                     )}
 
                     <Flex className='flex-col gap-y-2' align={'flex-start'}>
-                        <Box className='text-[12px] font-semibold text-[#2F49A6]'>
-                            Свяжитесь с нами
-                        </Box>
                         <Button
                             component={Link}
                             href={''}
-                            color='blue.9'
+                            color='#385191'
                             variant='transparent'
                             className='flex items-start justify-start'
                         >
-                            <MantineImage
-                                src='/assets/icons/telegram.svg'
-                                alt='Horeka profile'
-                            />
+                            <div className='rounded-full bg-blue-800 p-0.5'>
+                                <IconBrandTelegram size={19} color='#fff' />
+                            </div>
                             <Box className='text-[12px]'>Telegram</Box>
                         </Button>
-                        <Button
-                            component={Link}
-                            href={''}
-                            color='blue.9'
-                            size='compact-xs'
-                            variant='transparent'
-                        >
-                            + 7 (9**) ***-**-**
-                        </Button>
-                        <Button
-                            component={Link}
-                            href={''}
-                            color='blue.9'
-                            size='compact-xs'
-                            variant='transparent'
-                        >
-                            sphere.horec@gmail.ru
-                        </Button>
+
+                        <Box className='text-[12px]  text-[#2F49A6]'>
+                            Свяжитесь с нами
+                        </Box>
                     </Flex>
                 </Flex>
             </Container>

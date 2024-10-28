@@ -80,7 +80,11 @@ export function AppLayout({ children }: AppLayoutProps) {
                                     md: 3,
                                 }}
                             >
-                                <Paper bg='gray.1' p='md' radius='md'>
+                                <Paper
+                                    bg='var(--mantine-color-indigo-0)'
+                                    p='md'
+                                    radius='md'
+                                >
                                     <Flex direction='column' gap={24}>
                                         <Flex
                                             gap='md'
@@ -158,7 +162,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
                                             return (
                                                 <Link
-                                                    className={`flex items-center justify-between h-[18px] text-[14px] font-bold ${isActive ? 'text-[var(--mantine-color-blue-7)]' : 'text-[#000000]'} hover:text-[#474747] relative`}
+                                                    className={`flex items-center justify-between h-[18px] text-[14px] font-bold ${isActive ? 'text-[var(--mantine-color-indigo-4)]' : 'text-[#2B2B2B]'} hover:text-[#474747] relative`}
                                                     key={x.label}
                                                     href={`/user${role({ user })}${x.link}`}
                                                 >
@@ -171,6 +175,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                                                         {x.label}
                                                     </Flex>
                                                     {x.badge && <x.badge />}
+                                                    {x.iconRight && (
+                                                        <x.iconRight />
+                                                    )}
                                                 </Link>
                                             )
                                         })}

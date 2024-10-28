@@ -134,9 +134,6 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
                         Завершить регистрацию
                     </Button>
                 )}
-                <Button variant='default' component={Link} href='/#'>
-                    на главную
-                </Button>
             </Flex>
         </form>
     )

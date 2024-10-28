@@ -17,32 +17,33 @@ export function ProductApplicationViews() {
 
     return (
         <Flex direction='column' gap='md'>
-            <Flex justify='end' gap='md' align='center'>
-                <Button
-                    variant='transparent'
-                    component={Link}
-                    href={`/user/${role({ user })}/products/hidden-applications`}
-                >
-                    Скрытые заявик
-                </Button>
-                <Select
-                    data={[
-                        { value: 'new', label: 'Сначала новые' },
-                        { value: 'old', label: 'Сначала старые' },
-                        {
-                            value: 'max-match',
-                            label: 'По наибольшему совпадению',
-                        },
-                        {
-                            value: 'min-match',
-                            label: 'По наименьшему совпадению',
-                        },
-                    ]}
-                    defaultValue='new'
-                />
-            </Flex>
-
             <Flex direction='column' gap='md'>
+                <Flex justify='end' gap='md' align='center'>
+                    <Button
+                        variant='transparent'
+                        c='var(--mantine-color-indigo-4)'
+                        component={Link}
+                        href={`/user/${role({ user })}/products/hidden-applications`}
+                    >
+                        Скрытые заявки
+                    </Button>
+                    <Select
+                        data={[
+                            { value: 'new', label: 'Сначала новые' },
+                            { value: 'old', label: 'Сначала старые' },
+                            {
+                                value: 'max-match',
+                                label: 'По наибольшему совпадению',
+                            },
+                            {
+                                value: 'min-match',
+                                label: 'По наименьшему совпадению',
+                            },
+                        ]}
+                        defaultValue='new'
+                    />
+                </Flex>
+
                 <Paper p='md' withBorder bg='indigo.4'>
                     <Flex justify='space-around'>
                         {[
@@ -60,7 +61,12 @@ export function ProductApplicationViews() {
                 </Paper>
 
                 {!incomingRequests.data && (
-                    <Flex direction='column' justify='center' align='center'>
+                    <Flex
+                        direction='column'
+                        justify='center'
+                        align='center'
+                        h='50vh'
+                    >
                         <Text fw={600} size='xl'>
                             Скоро здесь появятся новые заявки! А пока вы можете
                             заполнить свой каталог
@@ -73,44 +79,46 @@ export function ProductApplicationViews() {
                 )}
 
                 {incomingRequests.data?.map((request: HorecaRequestDto) => (
-                    <Paper p='md' withBorder key={request.id} bg='gray.0'>
-                        <Flex justify='space-around'>
-                            <Flex direction='column' gap='md' w={115}>
-                                <Text size='md'>{request.id}</Text>
-                                <Text size='xs' c='dimmed'>
-                                    {new Date(
-                                        request.createdAt
-                                    ).toLocaleDateString()}
-                                </Text>
-                            </Flex>
+                    <>
+                        <Paper p='md' withBorder key={request.id} bg='gray.0'>
+                            <Flex justify='space-around'>
+                                <Flex direction='column' gap='md' w={115}>
+                                    <Text size='md'>{request.id}</Text>
+                                    <Text size='xs' c='dimmed'>
+                                        {new Date(
+                                            request.createdAt
+                                        ).toLocaleDateString()}
+                                    </Text>
+                                </Flex>
 
-                            <Flex direction='column' gap='xs' w={170}>
-                                <Text size='md'>{request.address}</Text>
-                                <Text size='xs' c='dimmed'>
-                                    до{' '}
-                                    {new Date(
-                                        request.deliveryTime
-                                    ).toLocaleDateString()}
-                                </Text>
-                            </Flex>
+                                <Flex direction='column' gap='xs' w={170}>
+                                    <Text size='md'>{request.address}</Text>
+                                    <Text size='xs' c='dimmed'>
+                                        до{' '}
+                                        {new Date(
+                                            request.deliveryTime
+                                        ).toLocaleDateString()}
+                                    </Text>
+                                </Flex>
 
-                            <Box w={100}>
-                                <Text size='md'>{request.phone}</Text>
-                            </Box>
+                                <Box w={100}>
+                                    <Text size='md'>{request.phone}</Text>
+                                </Box>
 
-                            <Flex w={150}>
-                                <Text size='md'>{request.comment}</Text>
-                            </Flex>
+                                <Flex w={150}>
+                                    <Text size='md'>{request.comment}</Text>
+                                </Flex>
 
-                            <Flex w={150}>
-                                <Text size='md'>
-                                    {new Date(
-                                        request.createdAt
-                                    ).toLocaleDateString()}
-                                </Text>
+                                <Flex w={150}>
+                                    <Text size='md'>
+                                        {new Date(
+                                            request.createdAt
+                                        ).toLocaleDateString()}
+                                    </Text>
+                                </Flex>
                             </Flex>
-                        </Flex>
-                    </Paper>
+                        </Paper>
+                    </>
                 ))}
             </Flex>
         </Flex>

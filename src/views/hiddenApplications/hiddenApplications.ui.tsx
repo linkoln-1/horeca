@@ -24,6 +24,7 @@ export function HiddenApplicationsViews() {
                             `/user/${role({ user })}/products/applications`
                         )
                     }
+                    c='var(--mantine-color-indigo-4)'
                 >
                     <IconChevronLeft />
                     Назад
@@ -48,7 +49,7 @@ export function HiddenApplicationsViews() {
 
                 {hiddenApplications.map((orderGroup, groupIndex) => (
                     <Flex key={groupIndex} direction='column' gap='sm'>
-                        <Text fw='bold' mt='md'>
+                        <Text mt='md' size='sm' c='gray.6'>
                             Размещены {orderGroup.date}
                         </Text>
 
@@ -57,7 +58,7 @@ export function HiddenApplicationsViews() {
                                 p='md'
                                 withBorder
                                 key={itemIndex}
-                                bg='gray.0'
+                                bg='#F5F7FD'
                             >
                                 <Grid justify='space-between' align='center'>
                                     <Grid.Col span={2}>
