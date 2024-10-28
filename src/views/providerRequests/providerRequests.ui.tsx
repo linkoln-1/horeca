@@ -35,7 +35,7 @@ export function ProviderRequests() {
                     onChange={handleTabChange}
                     value={activeTab}
                     color='indigo.4'
-                    data={['Текущие заявки', 'Завершённые заявки']}
+                    data={['В работе', 'Ожидают откликов', 'Завершённые']}
                     orientation={isMobile ? 'vertical' : 'horizontal'}
                 />
             </Flex>

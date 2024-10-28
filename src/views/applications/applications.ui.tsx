@@ -48,8 +48,9 @@ export function ApplicationsViews() {
                             value={activeTab}
                             color='indigo.4'
                             data={[
+                                applications[0].label,
                                 applications[1].label,
-                                applications[2].label,
+                                applications[2].label
                             ]}
                             orientation={isMobile ? 'vertical' : 'horizontal'}
                         />
