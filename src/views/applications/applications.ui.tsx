@@ -34,9 +34,13 @@ export function ApplicationsViews() {
     return (
         <Flex direction='column' gap='md'>
             {!requests.data ? (
-                <Flex justify='center' align='center'>
-                    <Text size='lg' c='gray'>
-                        Сейчас у вас созданных заявок нет
+                <Flex justify='center' align='center' direction='column'>
+                    <Text size='lg'>
+                        Здесь будут отображаться ваши заказы. Начните с создания
+                        заявки, чтобы найти нужных поставщиков
+                    </Text>
+                    <Text size='md' c='gray'>
+                        Нажмите «Создать заявку» в левом меню
                     </Text>
                 </Flex>
             ) : (
