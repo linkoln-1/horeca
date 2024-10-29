@@ -109,7 +109,7 @@ export function ChatView() {
                 <Flex
                     direction='column'
                     className='overflow-y-auto custom-scrollbar'
-                    miw='420px'
+                    miw='300px'
                     mah='100%'
                 >
                     {!isAssistantPage && (
