@@ -55,12 +55,13 @@ export function SignIn() {
                     {...form.getInputProps('password')}
                 />
 
-                <div className='flex justify-center'>
+                <div className='flex justify-center m-auto w-[350px]'>
                     <Button
                         variant='filled'
-                        color='blue'
-                        size='lg'
+                        color='indigo.4'
+                        size='md'
                         type='submit'
+                        fullWidth
                         loading={isPending}
                     >
                         Войти
