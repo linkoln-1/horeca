@@ -1,5 +1,5 @@
 import { ChatView } from '@/views/chat'
 
-export default function HorecaAssistantPage() {
+export default function ProviderAssistantPage() {
     return <ChatView />
 }

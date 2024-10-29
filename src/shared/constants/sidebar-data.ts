@@ -139,20 +139,20 @@ export const providerSidebarData: SidebarItem[] = [
     {
         id: 5,
         type: 'link',
-        label: 'Служба заботы',
-        icon: IconHelpSquareRounded,
-        description: 'У вас пока нет ни одного запроса к нам',
-        subDescription: 'В разработке',
-        link: '/service',
-        iconRight: IconMail,
-    },
-    {
-        id: 6,
-        type: 'link',
         label: 'Настройки профиля',
         icon: IconSettings,
         description:
             'Вы можете изменить условия доставки и категории товара, по которым принимаете заявки',
         link: '/settings/edit',
+    },
+    {
+        id: 6,
+        type: 'link',
+        label: 'Служба заботы',
+        icon: IconHelpSquareRounded,
+        description: 'У вас пока нет ни одного запроса к нам',
+        subDescription: 'В разработке',
+        link: '/assistant',
+        iconRight: IconMail,
     },
 ]
