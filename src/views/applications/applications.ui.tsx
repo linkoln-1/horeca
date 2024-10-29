@@ -20,7 +20,7 @@ import { applications } from '@/shared/constants/applications'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 
 export function ApplicationsViews() {
-    const [activeTab, setActiveTab] = useState(applications[1].label)
+    const [activeTab, setActiveTab] = useState(applications[0].label)
     const isMobile = useBreakpoint('sm')
 
     const handleTabChange = (tab: string) => {
@@ -50,7 +50,7 @@ export function ApplicationsViews() {
                             data={[
                                 applications[0].label,
                                 applications[1].label,
-                                applications[2].label
+                                applications[2].label,
                             ]}
                             orientation={isMobile ? 'vertical' : 'horizontal'}
                         />
