@@ -90,7 +90,7 @@ export function FavoriteProviderViews() {
                                             href='/user/horeca/chat/2'
                                             component={Link}
                                             size='20px'
-                                            className='cursor-pointer'
+                                            className='cursor-pointer font-[400]'
                                             c='indigo'
                                             variant='transparent'
                                         >

@@ -9,7 +9,7 @@ export function ThanksModal() {
                     w='140px'
                     h='140px'
                     radius='md'
-                    src='/assets/images/bg-4.png'
+                    src='/assets/icons/success_bid.svg'
                 />
             </Flex>
         </>

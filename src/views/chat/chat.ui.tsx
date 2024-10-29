@@ -130,30 +130,30 @@ export function ChatView() {
                         )}
                     </Flex>
 
-                    <Flex h='calc(100vh - 300px)' mah='100vh'>
-                        <Flex
-                            direction='column'
-                            className='overflow-y-auto custom-scrollbar'
-                            miw='420px'
-                            mah='100%'
+            <Flex h='calc(100vh - 300px)' mah='100vh'>
+                <Flex
+                    direction='column'
+                    className='overflow-y-auto custom-scrollbar'
+                    miw='300px'
+                    mah='100%'
+                >
+                    {!isAssistantPage && (
+                        <Group
+                            style={{
+                                borderBottom: `1px solid`,
+                            }}
+                            wrap='nowrap'
+                            px='md'
+                            py='md'
                         >
-                            {!isAssistantPage && (
-                                <Group
-                                    style={{
-                                        borderBottom: `1px solid`,
-                                    }}
-                                    wrap='nowrap'
-                                    px='md'
-                                    py='md'
-                                >
-                                    <MantineImage
-                                        mr='27px'
-                                        fit='cover'
-                                        w={90}
-                                        h={90}
-                                        radius='md'
-                                        src='/assets/images/bg-5.png'
-                                    />
+                            <MantineImage
+                                mr='27px'
+                                fit='cover'
+                                w={90}
+                                h={90}
+                                radius='md'
+                                src='/assets/images/bg-5.png'
+                            />
 
                                     <Flex
                                         direction='column'
