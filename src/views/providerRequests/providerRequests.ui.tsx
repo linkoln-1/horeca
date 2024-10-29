@@ -18,7 +18,7 @@ import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 import { HorecaRequestDto } from '@/shared/lib/horekaApi/Api'
 
 export function ProviderRequests() {
-    const [activeTab, setActiveTab] = useState(applications[1].label)
+    const [activeTab, setActiveTab] = useState(applications[0].label)
     const isMobile = useBreakpoint('sm')
 
     const { data: requests } = providerRequest.useGetAllProviderRequestQuery()
