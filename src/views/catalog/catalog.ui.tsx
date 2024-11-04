@@ -34,111 +34,138 @@ export function Catalog() {
 
     return (
         <Flex direction='column' gap='md'>
-            <Flex justify='space-between' align='center'>
-                <Select
-                    data={(user?.profile as ProviderProfileDto)?.categories.map(
-                        x => ({
-                            value: x,
-                            label: CategoryLabels[x as Categories],
-                        })
-                    )}
-                    placeholder='Выберите категорию'
-                />
-
+            {data ? (
                 <Box>
-                    <Button
-                        variant='filled'
-                        size='md'
-                        color='indigo.4'
-                        onClick={handleModal}
-                    >
-                        Добавить новый товар
-                    </Button>
-                </Box>
-            </Flex>
+                    <Flex justify='space-between' align='center'>
+                        <Select
+                            data={(
+                                user?.profile as ProviderProfileDto
+                            )?.categories.map(x => ({
+                                value: x,
+                                label: CategoryLabels[x as Categories],
+                            }))}
+                            placeholder='Выберите категорию'
+                        />
 
-            <Flex direction='column' gap='md'>
-                <Paper p='md' withBorder bg='indigo.4'>
-                    <Grid justify='space-around'>
-                        {[
-                            'Наименование',
-                            'Производитель',
-                            'Характеристики',
-                            'Фасовка',
-                            'Цена (за ед.)',
-                            'Кол-во',
-                            'Фотографии',
-                        ].map((tab, index) => (
-                            <Grid.Col
-                                span={{
-                                    base: 12,
-                                    md: 1,
-                                }}
-                                key={index}
+                        <Box>
+                            <Button
+                                variant='filled'
+                                size='md'
+                                color='indigo.4'
+                                onClick={handleModal}
                             >
-                                <Flex justify='center'>
-                                    <Text size='md' c='gray.0'>
-                                        {tab}
-                                    </Text>
-                                </Flex>
-                            </Grid.Col>
-                        ))}
-                    </Grid>
-                </Paper>
+                                Добавить новый товар
+                            </Button>
+                        </Box>
+                    </Flex>
 
-                {data.data?.map((product, index) => (
-                    <Paper p='md' withBorder key={index} bg='gray.0'>
-                        <Grid justify='space-between'>
-                            <Grid.Col span={{ base: 12, md: 1 }}>
-                                <Flex justify='center'>
-                                    <Text size='md'>{product.name}</Text>
-                                </Flex>
-                            </Grid.Col>
-                            <Grid.Col span={{ base: 12, md: 1 }}>
-                                <Flex justify='center'>
-                                    <Text size='md'>{product.producer}</Text>
-                                </Flex>
-                            </Grid.Col>
-                            <Grid.Col span={{ base: 12, md: 1 }}>
-                                <Flex justify='center' w='fit-content'>
-                                    <Text size='md'>{product.description}</Text>
-                                </Flex>
-                            </Grid.Col>
-                            <Grid.Col span={{ base: 12, md: 1 }}>
-                                <Flex justify='center'>
-                                    <Text size='md'>
-                                        {
-                                            packageTypeLabel[
-                                                product.packagingType as ProductPackagingType
-                                            ]
-                                        }
-                                    </Text>
-                                </Flex>
-                            </Grid.Col>
-                            <Grid.Col span={{ base: 12, md: 1 }}>
-                                <Flex justify='center'>
-                                    <Text size='md'>{product.cost}</Text>
-                                </Flex>
-                            </Grid.Col>
-                            <Grid.Col span={{ base: 12, md: 1 }}>
-                                <Flex justify='center'>
-                                    <Text size='md'>{product.count}</Text>
-                                </Flex>
-                            </Grid.Col>
-                            <Grid.Col span={{ base: 12, md: 1 }}>
-                                <Flex justify='center'>
-                                    {product.images?.map((x, index) => (
-                                        <MantineImage
-                                            key={index}
-                                            src={getImageUrl(`/${x.path}`)}
-                                        />
-                                    ))}
-                                </Flex>
-                            </Grid.Col>
-                        </Grid>
-                    </Paper>
-                ))}
-            </Flex>
+                    <Flex direction='column' gap='md'>
+                        <Paper p='md' withBorder bg='indigo.4'>
+                            <Grid justify='space-around'>
+                                {[
+                                    'Наименование',
+                                    'Производитель',
+                                    'Характеристики',
+                                    'Фасовка',
+                                    'Цена (за ед.)',
+                                    'Кол-во',
+                                    'Фотографии',
+                                ].map((tab, index) => (
+                                    <Grid.Col
+                                        span={{
+                                            base: 12,
+                                            md: 1,
+                                        }}
+                                        key={index}
+                                    >
+                                        <Flex justify='center'>
+                                            <Text size='md' c='gray.0'>
+                                                {tab}
+                                            </Text>
+                                        </Flex>
+                                    </Grid.Col>
+                                ))}
+                            </Grid>
+                        </Paper>
+
+                        {data.data?.map((product, index) => (
+                            <Paper p='md' withBorder key={index} bg='gray.0'>
+                                <Grid justify='space-between'>
+                                    <Grid.Col span={{ base: 12, md: 1 }}>
+                                        <Flex justify='center'>
+                                            <Text size='md'>
+                                                {product.name}
+                                            </Text>
+                                        </Flex>
+                                    </Grid.Col>
+                                    <Grid.Col span={{ base: 12, md: 1 }}>
+                                        <Flex justify='center'>
+                                            <Text size='md'>
+                                                {product.producer}
+                                            </Text>
+                                        </Flex>
+                                    </Grid.Col>
+                                    <Grid.Col span={{ base: 12, md: 1 }}>
+                                        <Flex justify='center' w='fit-content'>
+                                            <Text size='md'>
+                                                {product.description}
+                                            </Text>
+                                        </Flex>
+                                    </Grid.Col>
+                                    <Grid.Col span={{ base: 12, md: 1 }}>
+                                        <Flex justify='center'>
+                                            <Text size='md'>
+                                                {
+                                                    packageTypeLabel[
+                                                        product.packagingType as ProductPackagingType
+                                                    ]
+                                                }
+                                            </Text>
+                                        </Flex>
+                                    </Grid.Col>
+                                    <Grid.Col span={{ base: 12, md: 1 }}>
+                                        <Flex justify='center'>
+                                            <Text size='md'>
+                                                {product.cost}
+                                            </Text>
+                                        </Flex>
+                                    </Grid.Col>
+                                    <Grid.Col span={{ base: 12, md: 1 }}>
+                                        <Flex justify='center'>
+                                            <Text size='md'>
+                                                {product.count}
+                                            </Text>
+                                        </Flex>
+                                    </Grid.Col>
+                                    <Grid.Col span={{ base: 12, md: 1 }}>
+                                        <Flex justify='center'>
+                                            {product.images?.map((x, index) => (
+                                                <MantineImage
+                                                    key={index}
+                                                    src={getImageUrl(
+                                                        `/${x.path}`
+                                                    )}
+                                                />
+                                            ))}
+                                        </Flex>
+                                    </Grid.Col>
+                                </Grid>
+                            </Paper>
+                        ))}
+                    </Flex>
+                </Box>
+            ) : (
+                <Flex justify='center' align='center' direction='column'>
+                    <Text size='lg'>
+                        Заполните каталог, чтобы привлечь внимание к своим
+                        товарам и выделиться на платформе!
+                    </Text>
+                    <Text size='md' c='gray'>
+                        Нажмите на кнопку «Добавить товар» в правом верхнем
+                        углу.
+                    </Text>
+                </Flex>
+            )}
         </Flex>
     )
 }
