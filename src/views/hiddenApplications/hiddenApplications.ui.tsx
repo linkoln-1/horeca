@@ -47,67 +47,98 @@ export function HiddenApplicationsViews() {
                     </Flex>
                 </Paper>
 
-                {hiddenApplications.map((orderGroup, groupIndex) => (
-                    <Flex key={groupIndex} direction='column' gap='sm'>
-                        <Text mt='md' size='sm' c='gray.6'>
-                            Размещены {orderGroup.date}
+                {!hiddenApplications ? (
+                    <Flex
+                        direction='column'
+                        justify='center'
+                        align='center'
+                        h='50vh'
+                    >
+                        <Text fw={600} size='xl'>
+                            Пока заявок нет, но как только появятся — вы сможете
+                            спрятать сюда неинтересные
                         </Text>
-
-                        {orderGroup.items.map((item, itemIndex) => (
-                            <Paper
-                                p='md'
-                                withBorder
-                                key={itemIndex}
-                                bg='#F5F7FD'
-                            >
-                                <Grid justify='space-between' align='center'>
-                                    <Grid.Col span={2}>
-                                        <Flex direction='column' align='center'>
-                                            <Text size='md'>
-                                                {item.orderNumber}
-                                            </Text>
-                                            <Text size='xs' c='dimmed'>
-                                                {orderGroup.date}
-                                            </Text>
-                                        </Flex>
-                                    </Grid.Col>
-
-                                    {/* Адрес и дата доставки */}
-                                    <Grid.Col span={3}>
-                                        <Flex direction='column' align='center'>
-                                            <Text size='md'>
-                                                {item.address}
-                                            </Text>
-                                            <Text size='xs' c='dimmed'>
-                                                до {item.deliveryDate}
-                                            </Text>
-                                        </Flex>
-                                    </Grid.Col>
-
-                                    <Grid.Col span={2}>
-                                        <Flex justify='center'>
-                                            <Text size='md'>
-                                                {item.deliveryMethod}
-                                            </Text>
-                                        </Flex>
-                                    </Grid.Col>
-
-                                    <Grid.Col span={2}>
-                                        <Flex justify='center'>
-                                            <Text size='md'>{item.delay}</Text>
-                                        </Flex>
-                                    </Grid.Col>
-
-                                    <Grid.Col span={2}>
-                                        <Flex justify='center'>
-                                            <Text size='md'>{item.reason}</Text>
-                                        </Flex>
-                                    </Grid.Col>
-                                </Grid>
-                            </Paper>
-                        ))}
+                        <Text c='gray'>
+                            Начните с заполнения своего каталога — просто
+                            нажмите &apos;Мой каталог&apos; в меню слева.
+                        </Text>
                     </Flex>
-                ))}
+                ) : (
+                    hiddenApplications.map((orderGroup, groupIndex) => (
+                        <Flex key={groupIndex} direction='column' gap='sm'>
+                            <Text mt='md' size='sm' c='gray.6'>
+                                Размещены {orderGroup.date}
+                            </Text>
+
+                            {orderGroup.items.map((item, itemIndex) => (
+                                <Paper
+                                    p='md'
+                                    withBorder
+                                    key={itemIndex}
+                                    bg='#F5F7FD'
+                                >
+                                    <Grid
+                                        justify='space-between'
+                                        align='center'
+                                    >
+                                        <Grid.Col span={2}>
+                                            <Flex
+                                                direction='column'
+                                                align='center'
+                                            >
+                                                <Text size='md'>
+                                                    {item.orderNumber}
+                                                </Text>
+                                                <Text size='xs' c='dimmed'>
+                                                    {orderGroup.date}
+                                                </Text>
+                                            </Flex>
+                                        </Grid.Col>
+
+                                        {/* Адрес и дата доставки */}
+                                        <Grid.Col span={3}>
+                                            <Flex
+                                                direction='column'
+                                                align='center'
+                                            >
+                                                <Text size='md'>
+                                                    {item.address}
+                                                </Text>
+                                                <Text size='xs' c='dimmed'>
+                                                    до {item.deliveryDate}
+                                                </Text>
+                                            </Flex>
+                                        </Grid.Col>
+
+                                        <Grid.Col span={2}>
+                                            <Flex justify='center'>
+                                                <Text size='md'>
+                                                    {item.deliveryMethod}
+                                                </Text>
+                                            </Flex>
+                                        </Grid.Col>
+
+                                        <Grid.Col span={2}>
+                                            <Flex justify='center'>
+                                                <Text size='md'>
+                                                    {item.delay}
+                                                </Text>
+                                            </Flex>
+                                        </Grid.Col>
+
+                                        <Grid.Col span={2}>
+                                            <Flex justify='center'>
+                                                <Text size='md'>
+                                                    {item.reason}
+                                                </Text>
+                                            </Flex>
+                                        </Grid.Col>
+                                    </Grid>
+                                </Paper>
+                            ))}
+                        </Flex>
+                    ))
+                )}
             </Flex>
         </Flex>
     )

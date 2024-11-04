@@ -55,7 +55,7 @@ export function ChatView() {
 
     return (
         <Flex>
-            {isAssistantPage ? (
+            {!isAssistantPage ? (
                 <Flex direction='column'>
                     <Flex
                         className='rounded-t-xl'
