@@ -43,7 +43,7 @@ export function SettingsLayout({ children }: { children: ReactNode }) {
                     withItemsBorders
                     onChange={router.push}
                     value={path}
-                    color='blue'
+                    color='indigo.4'
                     data={tabs}
                     orientation={isMobile ? 'vertical' : 'horizontal'}
                     size='md'

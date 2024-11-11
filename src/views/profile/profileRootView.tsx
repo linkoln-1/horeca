@@ -9,19 +9,20 @@ import { roles } from '@/shared/constants'
 
 export function ProfileRootView() {
     const router = useRouter()
-    const { user, accessToken } = useUserStore(state => state)
+    const { user } = useUserStore(state => state)
 
     useEffect(() => {
-        if (
-            user &&
-            accessToken &&
-            user.profile?.profileType === roles[0].role
-        ) {
-            router.push(`/user/provider/requests`)
-        } else {
-            router.push(`/user/horeca/applications`)
+        if (user) {
+            console.log('User data in ProfileRootView:', user)
+            if (user.profile?.profileType === roles[0].role) {
+                console.log('Redirecting to /user/provider/requests')
+                router.replace(`/user/provider/requests`)
+            } else {
+                console.log('Redirecting to /user/horeca/applications')
+                router.replace(`/user/horeca/applications`)
+            }
         }
-    }, [user])
+    }, [user, router])
 
     return null
 }

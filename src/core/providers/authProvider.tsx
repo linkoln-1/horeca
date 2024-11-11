@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { userQueries } from '@/entities/user'
@@ -12,37 +12,53 @@ type AuthProviderProps = {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-    const { user, updateUser, accessToken } = useUserStore(state => state)
+    const { updateUser, accessToken } = useUserStore(state => state)
+    const [isLoading, setIsLoading] = useState(true)
 
     const path = usePathname()
     const router = useRouter()
-    const { data, isLoading } = userQueries.useGetMeQuery()
+    const {
+        data: user,
+        refetch: refetchUser,
+        isFetched,
+    } = userQueries.useGetMeQuery(Boolean(accessToken))
 
     useEffect(() => {
-        if (user) {
-            if (outSidePages.includes(path) && accessToken) {
-                router.push(`/user`)
+        if (!accessToken) {
+            if (!outSidePages.includes(path)) {
+                router.replace('/sign-in')
             }
-        } else {
-            if (!outSidePages.includes(path) && !accessToken) {
-                router.push('/sign-in')
+            setIsLoading(false)
+            return
+        }
+
+        const checkUser = async () => {
+            try {
+                const response = await refetchUser()
+
+                if (response.data) {
+                    updateUser(response.data)
+                    setIsLoading(false)
+                } else {
+                    router.replace('/sign-in')
+                }
+            } catch (error) {
+                router.replace('/sign-in')
             }
         }
-    }, [user, path, accessToken])
+
+        checkUser()
+    }, [accessToken, path, refetchUser, updateUser, router])
 
     useEffect(() => {
-        if (data) {
-            updateUser(data)
+        if (!isLoading && accessToken && user) {
+            if (outSidePages.includes(path)) {
+                router.replace('/user')
+            }
         }
-    }, [data])
+    }, [isLoading, accessToken, user, path, router])
 
-    useEffect(() => {
-        if (!accessToken && !outSidePages.includes(path)) {
-            router.push('/sign-in')
-        }
-    }, [accessToken, path])
-
-    if (isLoading) {
+    if (isLoading || (!isFetched && accessToken)) {
         return <FullPageLoader className='w-screen h-screen' />
     }
 

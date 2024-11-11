@@ -122,13 +122,17 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
             />
             <Flex direction='column' justify='center' mt='xl' gap='lg'>
                 {currentStep < steps.length - 1 ? (
-                    <Button type='submit' disabled={!isFullyFilledStepOne}>
+                    <Button
+                        type='submit'
+                        disabled={!isFullyFilledStepOne}
+                        color='indigo.4'
+                    >
                         Продолжить
                     </Button>
                 ) : (
                     <Button
                         type='submit'
-                        color='blue'
+                        color='indigo.4'
                         disabled={!isFullyFilledStepTwo}
                     >
                         Завершить регистрацию

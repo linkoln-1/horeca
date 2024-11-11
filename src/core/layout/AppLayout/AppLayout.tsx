@@ -4,6 +4,7 @@ import { Footer } from '@/core/layout/AppLayout/Footer'
 import { Header } from '@/core/layout/AppLayout/Header'
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { imageQueries } from '@/entities/uploads'
+import { userQueries } from '@/entities/user'
 import {
     Box,
     Container,
@@ -51,7 +52,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     const { mutateAsync: uploadImage } = imageQueries.useImageUploadMutation()
 
     const roleSidebar =
-        user?.profile.profileType === roles[0].role
+        user?.profile?.profileType === roles[0].role
             ? providerSidebarData
             : horecaSidebarData
 

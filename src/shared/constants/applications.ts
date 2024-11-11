@@ -4,12 +4,15 @@ export const applications = [
     {
         label: 'В работе',
         role: ProfileType.Provider,
+        status: 'ACTIVE',
     },
     {
         label: 'Ожидают откликов',
         role: ProfileType.Horeca,
+        status: 'PENDING',
     },
     {
-        label: "Завершённые"
-    }
+        label: 'Завершённые',
+        status: 'COMPLETED',
+    },
 ]

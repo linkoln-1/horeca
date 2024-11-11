@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { productsQueries } from '@/entities/products'
 import { imageQueries } from '@/entities/uploads'
-import { useGetImageByIdQuery } from '@/entities/uploads/upload.queries'
 import {
     ActionIcon,
     Button,
@@ -30,6 +29,7 @@ import {
     ProductCreateDto,
     ProductPackagingType,
     ProviderProfileDto,
+    UploadDto,
 } from '@/shared/lib/horekaApi/Api'
 import { CustomDropzone } from '@/shared/ui/CustomDropzone'
 
@@ -58,30 +58,33 @@ export function ProductsModal() {
             imageIds: [],
         },
     })
-    const [imageRequestId, setImageRequestId] = useState<number | null>(null)
+    const [imageRequest, setImageRequestId] = useState<UploadDto[]>()
 
     const { mutate: createProduct } = productsQueries.useProductMutation()
     const { mutateAsync: uploadImage } = imageQueries.useImageUploadMutation()
 
     const handleAddMainImage = async (files: File[] | null) => {
         if (files && files.length > 0) {
-            for (const file of files) {
-                try {
-                    const response = await uploadImage({ file: file })
-                    setImageRequestId(response.id)
+            try {
+                const uploadedImageIds = await Promise.all(
+                    files.map(async file => {
+                        const response = await uploadImage({ file })
+                        return response.id
+                    })
+                )
 
-                    form.setValues(prevState => ({
-                        imageIds: [...(prevState.imageIds ?? []), response.id],
-                    }))
-                } catch (e) {
-                    console.log(e)
-                }
+                form.setValues(prevState => ({
+                    ...prevState,
+                    imageIds: [
+                        ...(prevState.imageIds ?? []),
+                        ...uploadedImageIds,
+                    ],
+                }))
+            } catch (e) {
+                console.error(e)
             }
         }
     }
-    const { data: getImage } = useGetImageByIdQuery({ id: imageRequestId ?? 0 })
-
-    console.log('IMAGE', getImage)
 
     return (
         <Flex direction='column' gap='lg' p='md'>

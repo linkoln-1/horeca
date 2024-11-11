@@ -19,7 +19,7 @@ export function SignInView() {
             <Box className='w-full flex flex-col justify-center'>
                 <Box className='flex flex-col justify-center w-[90%] lg:w-2/5 h-full mx-auto gap-5'>
                     <Text ta='center' fw={700} size='xl'>
-                        Войти в Horeca Sphere
+                        Сфера HoReCa
                     </Text>
 
                     <SignIn />

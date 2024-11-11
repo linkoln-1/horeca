@@ -28,7 +28,7 @@ export function Header() {
 
     return (
         <Paper w='100%' bg='var(--mantine-color-indigo-0)' p='sm'>
-            <Container>
+            <Container fluid>
                 <Flex justify='space-between' align='center'>
                     <Link href={`/user${role({ user })}/applications`}>
                         <MantineImage
@@ -39,25 +39,6 @@ export function Header() {
 
                     {!isMobile && (
                         <Flex gap='sm' align='center'>
-                            {/*<Button*/}
-                            {/*    component={Link}*/}
-                            {/*    href={'#'}*/}
-                            {/*    color='dark'*/}
-                            {/*    size='compact-sm'*/}
-                            {/*    variant='transparent'*/}
-                            {/*>*/}
-                            {/*    Реклама*/}
-                            {/*</Button>*/}
-                            {/*<Button*/}
-                            {/*    component={Link}*/}
-                            {/*    href={'/help'}*/}
-                            {/*    color='dark'*/}
-                            {/*    size='compact-sm'*/}
-                            {/*    variant='transparent'*/}
-                            {/*>*/}
-                            {/*    Помощь*/}
-                            {/*</Button>*/}
-
                             <Button
                                 color='#385191'
                                 size='compact-sm'

@@ -24,7 +24,7 @@ export function Footer(props: FooterProps) {
     )
     return (
         <Paper w='100%' bg='var(--mantine-color-indigo-0)' {...props}>
-            <Container my='md'>
+            <Container my='md' fluid>
                 <Flex justify='space-between' align='center'>
                     <MantineImage
                         src='/assets/icons/logo.svg'
@@ -33,27 +33,6 @@ export function Footer(props: FooterProps) {
 
                     {!isMobile && (
                         <Flex className='flex-row' gap='md' align='center'>
-                            {/*<Flex className='flex-col' gap='md'>*/}
-                            {/*    <Button*/}
-                            {/*        component={Link}*/}
-                            {/*        href={''}*/}
-                            {/*        color='#385191'*/}
-                            {/*        size='compact-sm'*/}
-                            {/*        variant='transparent'*/}
-                            {/*    >*/}
-                            {/*        О платформе*/}
-                            {/*    </Button>*/}
-                            {/*    <Button*/}
-                            {/*        component={Link}*/}
-                            {/*        href={'/help'}*/}
-                            {/*        color='#385191'*/}
-                            {/*        size='compact-sm'*/}
-                            {/*        variant='transparent'*/}
-                            {/*    >*/}
-                            {/*        Помощь*/}
-                            {/*    </Button>*/}
-                            {/*</Flex>*/}
-
                             <Flex gap='md'>
                                 <Button
                                     component={Link}

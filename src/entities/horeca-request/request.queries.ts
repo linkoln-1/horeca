@@ -1,13 +1,24 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { api } from '@/shared/lib/horekaApi'
-import { HorecaRequestCreateDto } from '@/shared/lib/horekaApi/Api'
-import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
+import {
+    HorecaRequestCreateDto,
+    HorecaRequestSearchDto,
+} from '@/shared/lib/horekaApi/Api'
+import { useCustomInfiniteQuery } from '@/shared/lib/reactQuery/useCustomInfiniteQuery'
 
-export function useGetRequestQuery() {
-    return useCustomQuery({
-        queryKey: ['horeca-request, horeca'],
-        queryFn: () => api.horecaRequestsControllerFindAll(),
+interface GetRequestQueryParams {
+    offset?: number
+    limit?: number
+    search?: HorecaRequestSearchDto
+    sort?: string
+}
+
+export function useGetRequestQuery(params: GetRequestQueryParams) {
+    console.log(params)
+    return useCustomInfiniteQuery({
+        queryKey: ['horeca-request', params],
+        queryFn: () => api.horecaRequestsControllerFindAll(params),
     })
 }
 

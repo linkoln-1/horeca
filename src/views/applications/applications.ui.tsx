@@ -3,9 +3,11 @@
 import { useState } from 'react'
 
 import { requestQueries } from '../../entities/horeca-request'
+import { handleApplicationsDetailsModals } from '@/views/applications/ui/applicationsDetailsModal'
 import {
     Badge,
     Box,
+    Button,
     Card,
     Divider,
     Flex,
@@ -15,26 +17,75 @@ import {
     Text,
 } from '@mantine/core'
 import { IconMessage } from '@tabler/icons-react'
+import dayjs from 'dayjs'
 
+import { CategoryLabels } from '@/shared/constants'
 import { applications } from '@/shared/constants/applications'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
+import {
+    Categories,
+    HorecaRequestSearchDto,
+    HorecaRequestStatus,
+} from '@/shared/lib/horekaApi/Api'
+
+const limit = 10
+
+const statusMap: Record<string, HorecaRequestStatus> = {
+    'В работе': HorecaRequestStatus.Active,
+    'Ожидают откликов': HorecaRequestStatus.Pending,
+    Завершённые: HorecaRequestStatus.CompletedSuccessfully,
+}
 
 export function ApplicationsViews() {
     const [activeTab, setActiveTab] = useState(applications[0].label)
+    const [activeStatus, setActiveStatus] = useState(
+        statusMap[applications[0].label]
+    )
     const isMobile = useBreakpoint('sm')
+
+    const {
+        data: requests,
+        hasNextPage,
+        fetchNextPage,
+        isFetching,
+    } = requestQueries.useGetRequestQuery({
+        limit: limit,
+        search: JSON.stringify({
+            status: activeStatus,
+        }) as unknown as HorecaRequestSearchDto,
+    })
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab)
+        setActiveStatus(statusMap[tab])
     }
-    const { data: requests } = requestQueries.useGetRequestQuery()
 
-    if (!requests) return <Loader />
-
-    // TODO тут насколько я понял запрос не по типам возвращает данные, после как бэк вернется, нужно проверить
     return (
         <Flex direction='column' gap='md'>
-            {!requests.data ? (
-                <Flex justify='center' align='center' direction='column'>
+            <Flex gap='md' align='center'>
+                <SegmentedControl
+                    fullWidth
+                    onChange={handleTabChange}
+                    value={activeTab}
+                    color='indigo.4'
+                    data={applications.map(app => app.label)}
+                    orientation={isMobile ? 'vertical' : 'horizontal'}
+                />
+            </Flex>
+
+            {!requests && (
+                <Flex justify='center' align='center'>
+                    <Loader />
+                </Flex>
+            )}
+
+            {requests?.length === 0 ? (
+                <Flex
+                    justify='center'
+                    align='center'
+                    direction='column'
+                    h='60vh'
+                >
                     <Text size='lg'>
                         Здесь будут отображаться ваши заказы. Начните с создания
                         заявки, чтобы найти нужных поставщиков
@@ -45,22 +96,8 @@ export function ApplicationsViews() {
                 </Flex>
             ) : (
                 <>
-                    <Flex gap='md' align='center'>
-                        <SegmentedControl
-                            fullWidth
-                            onChange={handleTabChange}
-                            value={activeTab}
-                            color='indigo.4'
-                            data={[
-                                applications[0].label,
-                                applications[1].label,
-                                applications[2].label,
-                            ]}
-                            orientation={isMobile ? 'vertical' : 'horizontal'}
-                        />
-                    </Flex>
                     <Grid>
-                        {requests.data.map((order, index) => (
+                        {requests?.map((order, index) => (
                             <Grid.Col
                                 span={{
                                     base: 12,
@@ -73,8 +110,14 @@ export function ApplicationsViews() {
                                     padding='lg'
                                     radius='lg'
                                     withBorder
+                                    style={{
+                                        cursor: 'pointer',
+                                    }}
+                                    onClick={() =>
+                                        handleApplicationsDetailsModals(order)
+                                    }
                                 >
-                                    <Text fw={500}>№ {order.id}</Text>
+                                    <Text fw={500}>Заявка № {order.id}</Text>
 
                                     <Flex
                                         align='center'
@@ -82,22 +125,33 @@ export function ApplicationsViews() {
                                     >
                                         <Flex align='center' gap='md'>
                                             <Badge
-                                                // color={order ? 'green' : 'red'}
+                                                color={
+                                                    order.status.toLowerCase() ===
+                                                    'active'
+                                                        ? 'green'
+                                                        : order.status.toLowerCase() ===
+                                                            'pending'
+                                                          ? 'yellow'
+                                                          : 'gray'
+                                                }
                                                 variant='light'
-                                                c='indigo.4'
                                             >
-                                                {/*{order.}*/}
-                                                тут будут статусы
+                                                {order.status}
                                             </Badge>
-                                            {order.comment && (
-                                                <Text
-                                                    size='sm'
-                                                    c='blue'
-                                                    style={{ marginBottom: 5 }}
-                                                >
-                                                    {order.comment}{' '}
-                                                </Text>
-                                            )}
+                                            <Box w={300}>
+                                                {order.comment && (
+                                                    <Text
+                                                        size='sm'
+                                                        c='blue'
+                                                        style={{
+                                                            marginBottom: 5,
+                                                        }}
+                                                        truncate='end'
+                                                    >
+                                                        {order.comment}{' '}
+                                                    </Text>
+                                                )}
+                                            </Box>
                                         </Flex>
 
                                         <Box>
@@ -121,30 +175,45 @@ export function ApplicationsViews() {
                                             justify='space-between'
                                             align='center'
                                         >
-                                            {order.items.map((item, index) => (
-                                                <Flex
-                                                    direction='column'
-                                                    gap='md'
-                                                    key={index}
-                                                >
-                                                    <Text size='sm'>
-                                                        Название: {order.name}
-                                                    </Text>
-                                                    <Text size='sm'>
-                                                        Количество:{' '}
-                                                        {item.amount}
-                                                    </Text>
-                                                </Flex>
-                                            ))}
+                                            <Flex
+                                                direction='column'
+                                                gap='md'
+                                                maw={230}
+                                            >
+                                                <Text size='sm'>
+                                                    Название: {order.name}
+                                                </Text>
+                                                <Text size='sm'>
+                                                    Категории:{' '}
+                                                    {Array.from(
+                                                        new Set(
+                                                            order.items.map(
+                                                                item =>
+                                                                    CategoryLabels[
+                                                                        item.category as Categories
+                                                                    ]
+                                                            )
+                                                        )
+                                                    ).join(', ')}
+                                                </Text>
+                                            </Flex>
 
-                                            <Flex direction='column' gap='md'>
+                                            <Flex
+                                                direction='column'
+                                                gap='md'
+                                                maw={200}
+                                            >
                                                 <Text size='sm'>
                                                     Адрес доставки:{' '}
                                                     {order.address}
                                                 </Text>
                                                 <Text size='sm'>
                                                     Дата доставки:{' '}
-                                                    {order.deliveryTime}
+                                                    {dayjs(
+                                                        order.deliveryTime
+                                                    ).format(
+                                                        'YYYY-MM-DD HH:mm'
+                                                    )}
                                                 </Text>
                                             </Flex>
                                         </Flex>
@@ -153,6 +222,16 @@ export function ApplicationsViews() {
                             </Grid.Col>
                         ))}
                     </Grid>
+
+                    {hasNextPage && (
+                        <Button
+                            onClick={() => fetchNextPage()}
+                            loading={isFetching}
+                            bg='indigo.4'
+                        >
+                            Загрузить еще
+                        </Button>
+                    )}
                 </>
             )}
         </Flex>

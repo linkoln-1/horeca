@@ -258,7 +258,7 @@ export function ProductAcceptanceTermsViews() {
                     {...form.getInputProps('profile.info')}
                 />
 
-                <Button type='submit' color='blue' size='large'>
+                <Button type='submit' color='indigo.4' size='large'>
                     Сохранить изменения
                 </Button>
             </form>

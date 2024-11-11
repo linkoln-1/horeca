@@ -149,7 +149,7 @@ export function DeliveryViews() {
 
                 <Button
                     type='submit'
-                    color='blue'
+                    color='indigo.4'
                     size='large'
                     loading={isPending}
                 >

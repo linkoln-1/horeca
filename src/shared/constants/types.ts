@@ -43,3 +43,31 @@ export type HorecaFormValues = {
         } & AddressWithoutAddress)[]
     }
 }
+
+type Product = {
+    name: string
+    amount: number
+    unit: string
+}
+
+type HorecaRequestFormItem = {
+    category: Categories
+    products: Product[]
+}
+
+type HorecaRequestItemCreateDto = {
+    category: string
+    name: string
+    amount: number
+    unit: string
+}
+
+export type HorecaTemplateDto = {
+    items: HorecaRequestItemCreateDto[]
+    address: string
+    deliveryTime: string
+    acceptUntill: string
+    paymentType: string
+    name: string
+    phone: string
+}

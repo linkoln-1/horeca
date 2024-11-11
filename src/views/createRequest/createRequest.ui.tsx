@@ -1,8 +1,10 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { toast } from 'react-toastify'
 
 import { requestQueries } from '../../entities/horeca-request'
+import { templateQueries } from '@/entities/template'
 import { SaveModal } from '@/features/templates/saveModal'
 import { ThanksModal } from '@/features/templates/thanksModal'
 import {
@@ -19,14 +21,17 @@ import {
     Radio,
     Group,
     CheckIcon,
+    Loader,
+    LoadingOverlay,
 } from '@mantine/core'
 import { DateTimePicker, DateInput } from '@mantine/dates'
 import { FileWithPath } from '@mantine/dropzone'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { IconPlus, IconX } from '@tabler/icons-react'
+import dayjs from 'dayjs'
 
-import { CategoryLabels } from '@/shared/constants'
+import { CategoryLabels, HorecaTemplateDto } from '@/shared/constants'
 import { HorecaRequestForm } from '@/shared/constants'
 import { PaymentMethod } from '@/shared/constants/paymentMethod'
 import { Categories, HorecaRequestCreateDto } from '@/shared/lib/horekaApi/Api'
@@ -48,8 +53,8 @@ export function CreateRequestView() {
                 },
             ],
             address: '',
-            deliveryTime: '',
-            acceptUntill: '',
+            deliveryTime: new Date(),
+            acceptUntill: new Date(),
             paymentType: PaymentMethod.Prepayment,
             name: '',
             phone: '',
@@ -61,6 +66,19 @@ export function CreateRequestView() {
     const [images, setImages] = useState<FileWithPath[]>([])
 
     const { mutate: createRequest } = requestQueries.useCreateRequestMutation()
+    const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
+    const { data: templates } = templateQueries.useGetHorecaTemplateQuery()
+    const { data: selectedTemplate, isLoading: selectedTemplateLoading } =
+        templateQueries.useGetByIdHorecaTemplateQuery({
+            id: +selectedTemplateId,
+            enabled: +selectedTemplateId !== 0,
+        })
+
+    const templateOptions =
+        templates?.map(template => ({
+            label: template.name,
+            value: String(template.id),
+        })) || []
 
     const addNewProduct = (index: number) => {
         const newProduct = {
@@ -98,26 +116,86 @@ export function CreateRequestView() {
     }
 
     const handleFormSubmit = (values: HorecaRequestForm) => {
-        const formattedData: HorecaRequestCreateDto = {
-            ...values,
-            items: values.items.flatMap(item =>
-                item.products.map(product => ({
-                    category: item.category,
-                    name: product.name,
-                    amount: product.amount,
-                    unit: product.unit,
-                }))
-            ),
-            deliveryTime: new Date(values.deliveryTime).toISOString(),
-            acceptUntill: new Date(values.acceptUntill).toISOString(),
-            paymentType: values.paymentType,
-            name: values.name,
-            phone: values.phone,
-            comment: values.comment || undefined,
-        }
+        try {
+            const formattedData: HorecaRequestCreateDto = {
+                ...values,
+                items: values.items.flatMap(item =>
+                    item.products.map(product => ({
+                        category: item.category,
+                        name: product.name,
+                        amount: product.amount,
+                        unit: product.unit,
+                    }))
+                ),
+                deliveryTime: new Date(values.deliveryTime).toISOString(),
+                acceptUntill: new Date(values.acceptUntill).toISOString(),
+                paymentType: values.paymentType,
+                name: values.name,
+                phone: values.phone,
+                comment: values.comment || undefined,
+            }
 
-        createRequest(formattedData)
+            createRequest(formattedData)
+
+            toast.success('Заявка успешно создана!')
+
+            handleModal(
+                'thanksTemplateModal',
+                'Спасибо!',
+                'md',
+                <ThanksModal />
+            )
+        } catch (e: any) {
+            toast.error(e.message)
+        }
     }
+
+    const updateFormValuesFromTemplate = () => {
+        if (selectedTemplate) {
+            const content: HorecaTemplateDto =
+                typeof selectedTemplate.content === 'string'
+                    ? JSON.parse(selectedTemplate.content)
+                    : selectedTemplate.content
+
+            const transformedItems = content.items?.map(item => ({
+                category: item.category as Categories,
+                products: [
+                    {
+                        name: item.name,
+                        amount: item.amount,
+                        unit: item.unit,
+                    },
+                ],
+            }))
+
+            console.log(
+                'данные из формы, привезти не позднее: ',
+                dayjs(content.deliveryTime).format('YYYY-MM-DD HH:mm')
+            )
+            console.log(
+                'данные из формы, принимать заявки до: ',
+                dayjs(content.acceptUntill).format('YYYY-MM-DD HH:mm')
+            )
+
+            form.setValues({
+                items: transformedItems || [],
+                address: content.address || '',
+                deliveryTime: new Date(content.deliveryTime),
+                acceptUntill: new Date(content.acceptUntill),
+                paymentType:
+                    (content.paymentType as PaymentMethod) ||
+                    PaymentMethod.Prepayment,
+                name: content.name || '',
+                phone: content.phone || '',
+            })
+        }
+    }
+
+    useEffect(() => {
+        updateFormValuesFromTemplate()
+    }, [selectedTemplate])
+
+    if (!templates) return <Loader />
 
     return (
         <Flex justify='space-between' mt='md' gap='lg'>
@@ -125,15 +203,17 @@ export function CreateRequestView() {
                 <Select
                     label='Шаблоны'
                     placeholder='Новый шаблон'
-                    data={[
-                        'Рыба (красная)',
-                        'Палтус',
-                        'Шоколад темный с орехами 85%',
-                        'Креветка магаданская',
-                    ]}
+                    data={templateOptions}
+                    onChange={value => setSelectedTemplateId(String(value))}
                 />
             </Box>
             <Paper p='md' w='100%' shadow='md' withBorder>
+                <LoadingOverlay
+                    zIndex={1000}
+                    overlayProps={{ blur: 2 }}
+                    visible={selectedTemplateLoading}
+                />
+
                 <form
                     onSubmit={form.onSubmit(handleFormSubmit)}
                     className='flex flex-col gap-5'
@@ -152,9 +232,6 @@ export function CreateRequestView() {
                                                 value,
                                                 label,
                                             }))}
-                                            {...form.getInputProps(
-                                                `items.${categoryIndex}.category`
-                                            )}
                                             {...form.getInputProps(
                                                 `items.${categoryIndex}.category`
                                             )}
@@ -343,12 +420,14 @@ export function CreateRequestView() {
                             valueFormat='DD/MM/YYYY HH:mm:ss'
                             label='Привезите товар не позднее:'
                             placeholder='ДД/ММ/ГГГГ ЧЧ:ММ'
+                            value={form.values.deliveryTime}
                             {...form.getInputProps('deliveryTime')}
                         />
                         <DateInput
                             valueFormat='DD/MM/YY'
                             label='Принимать заявки до:'
                             placeholder='ДД.ММ.ГГ'
+                            value={form.values.acceptUntill}
                             {...form.getInputProps('acceptUntill')}
                         />
                     </Flex>
@@ -396,7 +475,7 @@ export function CreateRequestView() {
                                     'saveTemplateModal',
                                     'Укажите имя для нового шаблона',
                                     'lg',
-                                    <SaveModal />
+                                    <SaveModal forms={form} />
                                 )
                             }
                             c='indigo'
@@ -407,14 +486,6 @@ export function CreateRequestView() {
                             Сохранить шаблон
                         </Button>
                         <Button
-                            onClick={() =>
-                                handleModal(
-                                    'thanksTemplateModal',
-                                    'Спасибо!',
-                                    'md',
-                                    <ThanksModal />
-                                )
-                            }
                             c='white'
                             size='lg'
                             fw='500'

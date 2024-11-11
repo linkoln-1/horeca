@@ -11,14 +11,14 @@ import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
 export function useProviderRequestIncomeQuery() {
     return useCustomQuery({
         queryKey: ['provider', 'request'],
-        queryFn: () => api.providerRequestsControllerFindForProvider(),
+        queryFn: () => api.providerRequestsControllerIncomeHorecaRequests(),
     })
 }
 
 export function useProviderRequestGetStatusMutation() {
     return useMutation({
         mutationFn: (data: HorecaRequestProviderStatusDto) =>
-            api.providerRequestsControllerSetStatus(data),
+            api.providerRequestsControllerSetStatusForIncomeHorecaRequest(data),
     })
 }
 

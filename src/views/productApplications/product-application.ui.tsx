@@ -2,7 +2,16 @@
 
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { providerRequest } from '@/entities/provider-request'
-import { Box, Button, Flex, Loader, Paper, Select, Text } from '@mantine/core'
+import {
+    Box,
+    Button,
+    Flex,
+    Loader,
+    Paper,
+    Select,
+    Text,
+    Image as MantineImage,
+} from '@mantine/core'
 import Link from 'next/link'
 
 import { role } from '@/shared/helpers/getRole'
@@ -121,6 +130,15 @@ export function ProductApplicationViews() {
                                                 request.createdAt
                                             ).toLocaleDateString()}
                                         </Text>
+                                    </Flex>
+
+                                    <Flex>
+                                        {request.images?.map(x => (
+                                            <MantineImage
+                                                key={x.id}
+                                                src={`http://95.163.222.187:3001/${x.path}`}
+                                            />
+                                        ))}
                                     </Flex>
                                 </Flex>
                             </Paper>

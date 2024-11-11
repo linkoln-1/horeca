@@ -12,15 +12,11 @@ export type HorecaRequestFormItem = {
 }
 
 export type HorecaRequestForm = {
-    /** @minItems 1 */
     items: HorecaRequestFormItem[]
-    /** @default [] */
     imageIds?: number[]
     address: string
-    /** @format date-time */
-    deliveryTime: string
-    /** @format date-time */
-    acceptUntill: string
+    deliveryTime: Date
+    acceptUntill: Date
     paymentType: 'Prepayment' | 'Deferment' | 'PaymentUponDelivery'
     name: string
     phone: string

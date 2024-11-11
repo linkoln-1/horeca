@@ -33,7 +33,7 @@ export function useLoginUserMutation() {
     })
 }
 
-export function useGetMeQuery(enabled: boolean = true) {
+export function useGetMeQuery(enabled = true || undefined) {
     return useCustomQuery({
         queryKey: ['user', 'me'],
         queryFn: async () => {
