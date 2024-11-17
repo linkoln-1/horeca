@@ -22,6 +22,7 @@ export function useLoginUserMutation() {
 
     return useMutation({
         mutationFn: api.authorizationControllerLogin,
+
         onSuccess: async ({ data }) => {
             userStore.getState().updateTokens({
                 accessToken: data.accessToken || null,
@@ -33,7 +34,7 @@ export function useLoginUserMutation() {
     })
 }
 
-export function useGetMeQuery(enabled: boolean = true) {
+export function useGetMeQuery(enabled = true || undefined) {
     return useCustomQuery({
         queryKey: ['user', 'me'],
         queryFn: async () => {

@@ -1,5 +1,6 @@
 'use client'
 
+import { favoritesQueries } from '@/entities/favorites'
 import { FavoriteProvidersModal } from '@/features/favoriteProviders/favoriteProviders.modal'
 import {
     Image as MantineImage,
@@ -8,16 +9,37 @@ import {
     Text,
     Stack,
     Button,
+    Loader,
 } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import Link from 'next/link'
 
-import { suppliers } from '@/shared/constants/favoriteProvidersData'
-
 export function FavoriteProviderViews() {
+    const { data: favourites } = favoritesQueries.useGetFavoriteProviderQuery()
+
+    if (!favourites) return <Loader />
+
     return (
         <Flex direction='column' gap='xl' p='md'>
-            {suppliers.map((suplier, index) => {
+            {favourites.data.length === 0 && (
+                <Flex
+                    justify='center'
+                    align='center'
+                    direction='column'
+                    h='50vh'
+                >
+                    <Text size='lg'>
+                        Это список ваших любимых поставщиков. Добавляйте
+                        поставщика в избранные ❤️ после первой успешной сделки.
+                    </Text>
+                    <Text size='md' c='gray'>
+                        Опция появится в чате с поставщиком после завершения
+                        работы по заказу
+                    </Text>
+                </Flex>
+            )}
+
+            {favourites.data.map((suplier, index) => {
                 return (
                     <Flex w='100%' key={index}>
                         <Paper
@@ -34,7 +56,7 @@ export function FavoriteProviderViews() {
                                         w={180}
                                         h={180}
                                         radius='md'
-                                        src={suplier.img}
+                                        // src={suplier.img}
                                     />
 
                                     <Stack py='md' justify='space-between'>
@@ -44,7 +66,8 @@ export function FavoriteProviderViews() {
                                             </Text>
 
                                             <Text display='inline' size='md'>
-                                                {suplier.name}
+                                                тут будет наиаменование
+                                                {/*{suplier.name}*/}
                                             </Text>
                                         </Flex>
                                         <Flex gap='md'>
@@ -53,7 +76,8 @@ export function FavoriteProviderViews() {
                                             </Text>
 
                                             <Text display='inline' size='md'>
-                                                {suplier.rating} / 5
+                                                тут будет рейтинг
+                                                {/*{suplier.rating} / 5*/}
                                             </Text>
                                         </Flex>
                                         <Flex gap='md'>
@@ -61,11 +85,14 @@ export function FavoriteProviderViews() {
                                                 Категории товаров:
                                             </Text>
                                             <Text size='md'>
-                                                {suplier.categories.map(
-                                                    category => {
-                                                        return category + '; '
-                                                    }
-                                                )}
+                                                тут будут категории товаров
+                                                {/*{suplier.categories.map(*/}
+                                                {/*    category => {*/}
+                                                {/*        return (*/}
+                                                {/*            category + '; '*/}
+                                                {/*        )*/}
+                                                {/*    }*/}
+                                                {/*)}*/}
                                             </Text>
                                         </Flex>
                                     </Stack>
@@ -81,7 +108,7 @@ export function FavoriteProviderViews() {
                                         href='/user/horeca/chat/2'
                                         component={Link}
                                         size='20px'
-                                        className='cursor-pointer'
+                                        className='cursor-pointer font-[400]'
                                         c='indigo'
                                         variant='transparent'
                                     >

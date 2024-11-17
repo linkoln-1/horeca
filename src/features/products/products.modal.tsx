@@ -3,27 +3,33 @@ import { useState } from 'react'
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { productsQueries } from '@/entities/products'
 import { imageQueries } from '@/entities/uploads'
-import { useGetImageByIdQuery } from '@/entities/uploads/upload.queries'
 import {
+    ActionIcon,
     Button,
     Flex,
     Grid,
     Group,
     NumberInput,
+    rem,
     Select,
     Text,
     Textarea,
     TextInput,
+    Tooltip,
+    Image as MantineImage,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { IconTrash } from '@tabler/icons-react'
 
 import { CategoryLabels } from '@/shared/constants'
 import { packageTypeLabel } from '@/shared/constants/packageType'
+import { getImageUrl } from '@/shared/helpers'
 import {
     Categories,
     ProductCreateDto,
     ProductPackagingType,
     ProviderProfileDto,
+    UploadDto,
 } from '@/shared/lib/horekaApi/Api'
 import { CustomDropzone } from '@/shared/ui/CustomDropzone'
 
@@ -52,29 +58,36 @@ export function ProductsModal() {
             imageIds: [],
         },
     })
-    const [id, setId] = useState<number>(0)
+    const [imageRequest, setImageRequestId] = useState<UploadDto[]>()
 
     const { mutate: createProduct } = productsQueries.useProductMutation()
     const { mutateAsync: uploadImage } = imageQueries.useImageUploadMutation()
 
     const handleAddMainImage = async (files: File[] | null) => {
         if (files && files.length > 0) {
-            for (const file of files) {
-                const response = await uploadImage({ file: file })
-
-                if (response) {
-                    setId(response.id)
-                }
+            try {
+                const uploadedImageIds = await Promise.all(
+                    files.map(async file => {
+                        const response = await uploadImage({ file })
+                        return response.id
+                    })
+                )
 
                 form.setValues(prevState => ({
-                    imageIds: [...(prevState.imageIds ?? []), response.id],
+                    ...prevState,
+                    imageIds: [
+                        ...(prevState.imageIds ?? []),
+                        ...uploadedImageIds,
+                    ],
                 }))
+            } catch (e) {
+                console.error(e)
             }
         }
     }
 
     return (
-        <Flex direction='column' gap='lg'>
+        <Flex direction='column' gap='lg' p='md'>
             <Text fw={700} size='xl' className='text-center'>
                 Добавить Новый товар
             </Text>
@@ -158,61 +171,59 @@ export function ProductsModal() {
                 </Group>
 
                 {/*TODO оставлено пока поправиться загрузка картинок на бэке (после загрузки картинки должно выдавать ссылку на картинкку*/}
-                {/*<Grid>*/}
-                {/*    {form.values.portfolio.map((item, index) => (*/}
-                {/*        <Grid.Col*/}
-                {/*            key={index}*/}
-                {/*            span={{*/}
-                {/*                base: 12,*/}
-                {/*                md: 6,*/}
-                {/*                lg: 3,*/}
-                {/*            }}*/}
-                {/*            pos='relative'*/}
-                {/*        >*/}
-                {/*            <Tooltip label='Remove image'>*/}
-                {/*                <ActionIcon*/}
-                {/*                    onClick={() => removeImage(item.id)}*/}
-                {/*                    color='gray'*/}
-                {/*                    pos='absolute'*/}
-                {/*                    right={rem(8 + 10)}*/}
-                {/*                    top={rem(8 + 10)}*/}
-                {/*                >*/}
-                {/*                    <IconTrash size={20} />*/}
-                {/*                </ActionIcon>*/}
-                {/*            </Tooltip>*/}
-                {/*            <MantineImage*/}
-                {/*                radius='md'*/}
-                {/*                src={getImageUrl(item.url)}*/}
-                {/*                alt='portfolio'*/}
-                {/*                className='aspect-square'*/}
-                {/*            />*/}
-                {/*        </Grid.Col>*/}
-                {/*    ))}*/}
+                <Grid>
+                    {form.values.imageIds.map((item, index) => (
+                        <Grid.Col
+                            key={index}
+                            span={{
+                                base: 12,
+                                md: 6,
+                                lg: 3,
+                            }}
+                            pos='relative'
+                        >
+                            <Tooltip label='Remove image'>
+                                <ActionIcon
+                                    // onClick={() => removeImage(item.id)}
+                                    color='gray'
+                                    pos='absolute'
+                                    right={rem(8 + 10)}
+                                    top={rem(8 + 10)}
+                                >
+                                    <IconTrash size={20} />
+                                </ActionIcon>
+                            </Tooltip>
+                            <MantineImage
+                                radius='md'
+                                src={''}
+                                alt='portfolio'
+                                className='aspect-square'
+                            />
+                        </Grid.Col>
+                    ))}
 
-                {/*    {form.values.portfolio.length < 30 && (*/}
-                {/*        <Grid.Col*/}
-                {/*            span={{*/}
-                {/*                base: 12,*/}
-                {/*                md: 6,*/}
-                {/*                lg: 3,*/}
-                {/*            }}*/}
-                {/*        >*/}
-                {/*            <Flex direction='column' gap='xs'>*/}
-                {/*                <CustomDropzone*/}
-                {/*                    onDrop={handleAddMainImage}*/}
-                {/*                    accept={allowedFormats}*/}
-                {/*                    className='aspect-square'*/}
-                {/*                />*/}
-                {/*            </Flex>*/}
-                {/*        </Grid.Col>*/}
-                {/*    )}*/}
-                {/*</Grid>*/}
+                    {form.values.imageIds.length < 30 && (
+                        <Grid.Col
+                            span={{
+                                base: 12,
+                            }}
+                        >
+                            <Flex direction='column' gap='xs' w='100%'>
+                                <CustomDropzone
+                                    onDrop={handleAddMainImage}
+                                    accept={allowedFormats}
+                                    className='aspect-square w-5/6 h-[200px] mx-auto'
+                                />
+                            </Flex>
+                        </Grid.Col>
+                    )}
+                </Grid>
 
-                <CustomDropzone
-                    onDrop={handleAddMainImage}
-                    accept={allowedFormats}
-                    className='aspect-square w-5/6 h-[200px] mx-auto'
-                />
+                {/*<CustomDropzone*/}
+                {/*    onDrop={handleAddMainImage}*/}
+                {/*    accept={allowedFormats}*/}
+                {/*    className='aspect-square w-5/6 h-[200px] mx-auto'*/}
+                {/*/>*/}
 
                 <Group justify='center' mt='md'>
                     <Button variant='default'>Предпросмотр</Button>

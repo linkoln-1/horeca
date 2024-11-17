@@ -4,6 +4,8 @@ import {
     MantineThemeOverride,
     rem,
     TextInput,
+    NumberInput,
+    Checkbox,
 } from '@mantine/core'
 
 const CONTAINER_SIZES: Record<string, string> = {
@@ -32,6 +34,24 @@ inputs.forEach(x => {
             size: 'md',
         },
     })
+})
+
+defaultInputs['NumberInput'] = NumberInput.extend({
+    defaultProps: {
+        size: 'md',
+        hideControls: true,
+    },
+})
+
+defaultInputs['Checkbox'] = Checkbox.extend({
+    styles: theme => ({
+        input: {
+            borderRadius: theme.radius.sm, // Устанавливаем более мелкое скругление
+        },
+    }),
+    defaultProps: {
+        size: 'sm',
+    },
 })
 
 export const theme: MantineThemeOverride = {

@@ -28,7 +28,7 @@ export function RegistrationProgress({
 
                     let color
                     if (isCurrentStep) {
-                        color = 'blue'
+                        color = 'indigo.4'
                     } else if (isCompletedStep) {
                         color = 'green'
                     } else {

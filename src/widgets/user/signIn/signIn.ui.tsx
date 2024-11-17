@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { useUserStore } from '@/core/providers/userStoreContext'
 import { userQueries } from '@/entities/user'
 import {
     Button,
@@ -10,6 +11,7 @@ import {
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconAt } from '@tabler/icons-react'
+import { jwtDecode } from 'jwt-decode'
 
 export function SignIn() {
     const form = useForm({
@@ -55,12 +57,13 @@ export function SignIn() {
                     {...form.getInputProps('password')}
                 />
 
-                <div className='flex justify-center'>
+                <div className='flex justify-center m-auto w-[350px]'>
                     <Button
                         variant='filled'
-                        color='blue'
-                        size='lg'
+                        color='indigo.4'
+                        size='md'
                         type='submit'
+                        fullWidth
                         loading={isPending}
                     >
                         Войти

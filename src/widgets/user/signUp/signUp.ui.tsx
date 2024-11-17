@@ -31,7 +31,7 @@ export function SignUp({ nextStep, currentStep }: SignUpProps) {
                 onChange={handleTabChange}
                 value={activeTab}
                 disabled={currentStep > 0}
-                color='blue'
+                color='indigo.4'
                 data={[roles[0].label, roles[1].label]}
                 orientation={isMobile ? 'vertical' : 'horizontal'}
             />

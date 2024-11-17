@@ -15,10 +15,15 @@ import {
     Text,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { jwtDecode } from 'jwt-decode'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import { sidebarData } from '@/shared/constants'
+import {
+    horecaSidebarData,
+    providerSidebarData,
+    roles,
+} from '@/shared/constants'
 import { getImageUrl } from '@/shared/helpers'
 import { role } from '@/shared/helpers/getRole'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
@@ -36,6 +41,10 @@ type profileProps = {
     avatar?: Image
 }
 
+type DecodeType = {
+    role: string
+}
+
 export function AppLayout({ children }: AppLayoutProps) {
     const form = useForm<profileProps>({
         initialValues: {},
@@ -43,8 +52,15 @@ export function AppLayout({ children }: AppLayoutProps) {
     const isMobile = useBreakpoint('sm')
     const path = usePathname()
 
-    const user = useUserStore(state => state.user)
+    const { user, accessToken } = useUserStore(state => state)
     const { mutateAsync: uploadImage } = imageQueries.useImageUploadMutation()
+
+    const decode: '' | null | DecodeType = accessToken && jwtDecode(accessToken)
+
+    const roleSidebar =
+        user?.profile?.profileType === roles[0].role
+            ? providerSidebarData
+            : horecaSidebarData
 
     const handleAvatarChange = async (payload: File | null) => {
         if (payload) {
@@ -54,120 +70,134 @@ export function AppLayout({ children }: AppLayoutProps) {
         }
     }
 
-    if (!user) return <Loader />
-
     return (
         <Box className='min-h-screen flex flex-col'>
             <Header />
             <Box style={{ flexGrow: 1 }}>
                 <Container>
                     <Grid mt='md' justify='space-between'>
-                        {!isMobile && (
-                            <Grid.Col
-                                span={{
-                                    base: 0,
-                                    xs: 0,
-                                    sm: 'content',
-                                    md: 3,
-                                }}
-                            >
-                                <Paper bg='gray.1' p='md' radius='md'>
-                                    <Flex direction='column' gap={24}>
-                                        <Flex
-                                            gap='md'
-                                            align='center'
-                                            direction='column'
-                                        >
-                                            <Box w={150} h={150}>
-                                                <CustomAvatarUpload
-                                                    onChange={
-                                                        handleAvatarChange
-                                                    }
-                                                    src={
-                                                        form.values.avatar
-                                                            ? getImageUrl(
-                                                                  form.values
-                                                                      .avatar
-                                                                      .url
-                                                              )
-                                                            : undefined
-                                                    }
-                                                    size='100%'
-                                                    color='blue'
-                                                    className='aspect-square cursor-pointer'
-                                                />
-                                            </Box>
-                                            <Box>
-                                                <Flex
-                                                    direction='column'
-                                                    gap='lg'
-                                                >
-                                                    {[user].map(item => (
-                                                        <Flex
-                                                            key={
-                                                                item && item.id
-                                                            }
-                                                            direction='column'
-                                                            gap='md'
-                                                            justify='center'
-                                                            align='center'
-                                                        >
-                                                            <Text
-                                                                size='xl'
-                                                                fw={700}
-                                                            >
-                                                                {item &&
-                                                                    item.name}
-                                                            </Text>
-
-                                                            <Text>
-                                                                email:{' '}
-                                                                {item &&
-                                                                    item.email}
-                                                            </Text>
-                                                        </Flex>
-                                                    ))}
-                                                </Flex>
-                                            </Box>
-                                        </Flex>
-
-                                        <Divider color='#A0AAC8' />
-
-                                        {sidebarData.map((x, index) => {
-                                            if (x.type === 'divider') {
-                                                return (
-                                                    <Divider
-                                                        color='#A0AAC8'
-                                                        key={index}
+                        {!isMobile &&
+                            decode &&
+                            decode.role !== roles[2].role && (
+                                <Grid.Col
+                                    span={{
+                                        base: 0,
+                                        xs: 0,
+                                        sm: 'content',
+                                        md: 3,
+                                    }}
+                                >
+                                    <Paper
+                                        bg='var(--mantine-color-indigo-0)'
+                                        p='md'
+                                        radius='md'
+                                    >
+                                        <Flex direction='column' gap={24}>
+                                            <Flex
+                                                gap='md'
+                                                align='center'
+                                                direction='column'
+                                            >
+                                                <Box w={150} h={150}>
+                                                    <CustomAvatarUpload
+                                                        onChange={
+                                                            handleAvatarChange
+                                                        }
+                                                        src={
+                                                            form.values.avatar
+                                                                ? getImageUrl(
+                                                                      form
+                                                                          .values
+                                                                          .avatar
+                                                                          .url
+                                                                  )
+                                                                : undefined
+                                                        }
+                                                        size='100%'
+                                                        color='blue'
+                                                        className='aspect-square cursor-pointer'
                                                     />
-                                                )
-                                            }
-
-                                            const isActive =
-                                                path ===
-                                                `/user${role({ user })}${x.link}`
-
-                                            return (
-                                                <Link
-                                                    className={`flex items-center justify-between h-[18px] text-[14px] font-bold ${isActive ? 'text-[var(--mantine-color-blue-7)]' : 'text-[#000000]'} hover:text-[#474747] relative`}
-                                                    key={x.label}
-                                                    href={`/user${role({ user })}${x.link}`}
-                                                >
+                                                </Box>
+                                                <Box>
                                                     <Flex
-                                                        gap={20}
-                                                        align='center'
+                                                        direction='column'
+                                                        gap='lg'
                                                     >
-                                                        <x.icon />
-                                                        {x.label}
+                                                        {[user].map(item => (
+                                                            <Flex
+                                                                key={
+                                                                    item &&
+                                                                    item.id
+                                                                }
+                                                                direction='column'
+                                                                gap='md'
+                                                                justify='center'
+                                                                align='center'
+                                                            >
+                                                                <Text
+                                                                    size='xl'
+                                                                    fw={700}
+                                                                >
+                                                                    {item &&
+                                                                        item.name}
+                                                                </Text>
+
+                                                                <Text>
+                                                                    email:{' '}
+                                                                    {item &&
+                                                                        item.email}
+                                                                </Text>
+                                                            </Flex>
+                                                        ))}
                                                     </Flex>
-                                                    {x.badge && <x.badge />}
-                                                </Link>
-                                            )
-                                        })}
-                                    </Flex>
-                                </Paper>
-                            </Grid.Col>
-                        )}
+                                                </Box>
+                                            </Flex>
+
+                                            <Divider color='#A0AAC8' />
+
+                                            {roleSidebar &&
+                                                user &&
+                                                roleSidebar.map((x, index) => {
+                                                    if (x.type === 'divider') {
+                                                        return (
+                                                            <Divider
+                                                                color='#A0AAC8'
+                                                                key={index}
+                                                            />
+                                                        )
+                                                    }
+
+                                                    const isActive =
+                                                        path ===
+                                                        `/user${role({ user })}${x.link}`
+
+                                                    return (
+                                                        <Link
+                                                            className={`flex items-center justify-between h-[18px] text-[14px] font-bold ${isActive ? 'text-[var(--mantine-color-indigo-4)]' : 'text-[#2B2B2B]'} hover:text-[#474747] relative`}
+                                                            key={x.label}
+                                                            href={`/user${role({ user })}${x.link}`}
+                                                        >
+                                                            <Flex
+                                                                gap={20}
+                                                                align='center'
+                                                                pos='relative'
+                                                            >
+                                                                <x.icon />
+                                                                {x.label}
+                                                            </Flex>
+                                                            {x.badge && (
+                                                                <x.badge />
+                                                            )}
+                                                            {x.iconRight && (
+                                                                <x.iconRight />
+                                                            )}
+                                                        </Link>
+                                                    )
+                                                })}
+                                        </Flex>
+                                    </Paper>
+                                </Grid.Col>
+                            )}
                         <Grid.Col
                             span={{
                                 base: 12,
@@ -175,7 +205,6 @@ export function AppLayout({ children }: AppLayoutProps) {
                                 sm: isMobile ? 12 : 'auto',
                                 md: isMobile ? 12 : 9,
                             }}
-                            mt='md'
                         >
                             {children}
                         </Grid.Col>

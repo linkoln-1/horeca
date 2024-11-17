@@ -3,7 +3,12 @@
 import { ReactNode } from 'react'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
-import { Grid, SegmentedControl, SegmentedControlItem } from '@mantine/core'
+import {
+    Flex,
+    Grid,
+    SegmentedControl,
+    SegmentedControlItem,
+} from '@mantine/core'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { roles } from '@/shared/constants'
@@ -32,32 +37,28 @@ export function SettingsLayout({ children }: { children: ReactNode }) {
     }
 
     return (
-        <Grid justify='space-between'>
-            <Grid.Col
-                span={{
-                    base: 12,
-                    md: 4,
-                }}
-            >
+        <Flex direction='column' gap='md'>
+            <Flex w='100%'>
                 <SegmentedControl
                     withItemsBorders
                     onChange={router.push}
                     value={path}
-                    color='blue'
+                    color='indigo.4'
                     data={tabs}
-                    orientation={!isMobile ? 'vertical' : 'horizontal'}
+                    orientation={isMobile ? 'vertical' : 'horizontal'}
                     size='md'
                 />
-            </Grid.Col>
+            </Flex>
 
-            <Grid.Col
-                span={{
-                    base: 12,
-                    md: 7,
-                }}
-            >
-                {children}
-            </Grid.Col>
-        </Grid>
+            <Grid>
+                <Grid.Col
+                    span={{
+                        base: 12,
+                    }}
+                >
+                    {children}
+                </Grid.Col>
+            </Grid>
+        </Flex>
     )
 }

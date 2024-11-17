@@ -4,8 +4,8 @@ import {
     Container,
     Flex,
     Image as MantineImage,
-    Loader,
     Paper,
+    useCombobox,
 } from '@mantine/core'
 import Link from 'next/link'
 
@@ -14,17 +14,17 @@ import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 
 export function Header() {
     const isMobile = useBreakpoint('sm')
-    const user = useUserStore(state => state.user)
-
+    const { user } = useUserStore(state => state)
+    const combobox = useCombobox({
+        onDropdownClose: () => combobox.resetSelectedOption(),
+    })
     const { clearTokens: logOut } = useUserStore(state => state)
 
-    if (!user) return <Loader />
-
     return (
-        <Paper w='100%' bg='gray.1' p='sm'>
-            <Container>
+        <Paper w='100%' bg='var(--mantine-color-indigo-0)' p='sm'>
+            <Container fluid>
                 <Flex justify='space-between' align='center'>
-                    <Link href={`/user${role({ user })}/applications`}>
+                    <Link href={`/user${user && role({ user })}/applications`}>
                         <MantineImage
                             src='/assets/icons/logo.svg'
                             alt='Horeka logo'
@@ -32,18 +32,9 @@ export function Header() {
                     </Link>
 
                     {!isMobile && (
-                        <Flex gap='md' align='center'>
+                        <Flex gap='sm' align='center'>
                             <Button
-                                component={Link}
-                                href={'/help'}
-                                color='dark'
-                                size='compact-sm'
-                                variant='transparent'
-                            >
-                                Помощь
-                            </Button>
-                            <Button
-                                color='dark'
+                                color='#385191'
                                 size='compact-sm'
                                 variant='transparent'
                                 onClick={logOut}

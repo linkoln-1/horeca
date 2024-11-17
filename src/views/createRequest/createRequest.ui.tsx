@@ -1,8 +1,10 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { toast } from 'react-toastify'
 
-import { useUserStore } from '@/core/providers/userStoreContext'
+import { requestQueries } from '../../entities/horeca-request'
+import { templateQueries } from '@/entities/template'
 import { SaveModal } from '@/features/templates/saveModal'
 import { ThanksModal } from '@/features/templates/thanksModal'
 import {
@@ -19,87 +21,181 @@ import {
     Radio,
     Group,
     CheckIcon,
+    Loader,
+    LoadingOverlay,
 } from '@mantine/core'
 import { DateTimePicker, DateInput } from '@mantine/dates'
 import { FileWithPath } from '@mantine/dropzone'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { IconPlus, IconX } from '@tabler/icons-react'
+import dayjs from 'dayjs'
 
-import { CategoryLabels } from '@/shared/constants'
+import { CategoryLabels, HorecaTemplateDto } from '@/shared/constants'
+import { HorecaRequestForm } from '@/shared/constants'
 import { PaymentMethod } from '@/shared/constants/paymentMethod'
-import {
-    Categories,
-    HorecaProfileDto,
-    HorecaRequestCreateDto,
-} from '@/shared/lib/horekaApi/Api'
+import { Categories, HorecaRequestCreateDto } from '@/shared/lib/horekaApi/Api'
 import { CustomDropzone } from '@/shared/ui/CustomDropzone'
 
 export function CreateRequestView() {
-    const user = useUserStore(state => state.user)
-
-    const [showCategory, setShowCategory] = useState(true)
-    const dropzone = useRef<() => void>(null)
-    const [images, setImages] = useState<FileWithPath[]>([])
-
-    const form = useForm<HorecaRequestCreateDto>({
+    const form = useForm<HorecaRequestForm>({
         initialValues: {
             items: [
                 {
-                    name: '',
-                    amount: 0,
-                    unit: '',
-                    category: [''] as unknown as Categories,
+                    category: CategoryLabels.alcoholicDrinks as Categories,
+                    products: [
+                        {
+                            name: '',
+                            amount: 0,
+                            unit: '',
+                        },
+                    ],
                 },
             ],
             address: '',
-            deliveryTime: '',
-            acceptUntill: '',
+            deliveryTime: new Date(),
+            acceptUntill: new Date(),
             paymentType: PaymentMethod.Prepayment,
             name: '',
             phone: '',
         },
     })
 
-    const addNewProduct = () => {
+    const [showCategory, setShowCategory] = useState(true)
+    const dropzone = useRef<() => void>(null)
+    const [images, setImages] = useState<FileWithPath[]>([])
+
+    const { mutate: createRequest } = requestQueries.useCreateRequestMutation()
+    const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
+    const { data: templates } = templateQueries.useGetHorecaTemplateQuery()
+    const { data: selectedTemplate, isLoading: selectedTemplateLoading } =
+        templateQueries.useGetByIdHorecaTemplateQuery({
+            id: +selectedTemplateId,
+            enabled: +selectedTemplateId !== 0,
+        })
+
+    const templateOptions =
+        templates?.map(template => ({
+            label: template.name,
+            value: String(template.id),
+        })) || []
+
+    const addNewProduct = (index: number) => {
         const newProduct = {
             name: '',
             amount: 0,
             unit: '',
         }
-        form.insertListItem('items', newProduct)
+        form.insertListItem(`items.${index}.products`, newProduct)
     }
 
     const addNewCategory = () => {
         const newCategory = {
-            name: '',
-            amount: 0,
-            unit: '',
             category: '',
+            products: [
+                {
+                    name: '',
+                    amount: 0,
+                    unit: '',
+                },
+            ],
         }
         form.insertListItem('items', newCategory)
     }
 
-    const removeProduct = (productIndex: number) => {
-        form.removeListItem('items', productIndex)
+    const removeCategory = (categoryIndex: number) => {
+        form.removeListItem('items', categoryIndex)
+    }
+
+    const removeProduct = (categoryIndex: number, productIndex: number) => {
+        form.removeListItem(`items.${categoryIndex}.products`, productIndex)
     }
 
     const handleImages = (files: FileWithPath[]) => {
         setImages(files)
     }
 
-    const handleFormSubmit = (values: HorecaRequestCreateDto) => {
-        const formattedData = {
-            ...values,
-            items: values.items.map(item => ({
-                name: item.name,
-                amount: item.amount,
-                unit: item.unit,
-                category: item.category || null,
-            })),
+    const handleFormSubmit = (values: HorecaRequestForm) => {
+        try {
+            const formattedData: HorecaRequestCreateDto = {
+                ...values,
+                items: values.items.flatMap(item =>
+                    item.products.map(product => ({
+                        category: item.category,
+                        name: product.name,
+                        amount: product.amount,
+                        unit: product.unit,
+                    }))
+                ),
+                deliveryTime: new Date(values.deliveryTime).toISOString(),
+                acceptUntill: new Date(values.acceptUntill).toISOString(),
+                paymentType: values.paymentType,
+                name: values.name,
+                phone: values.phone,
+                comment: values.comment || undefined,
+            }
+
+            createRequest(formattedData)
+
+            toast.success('Заявка успешно создана!')
+
+            handleModal(
+                'thanksTemplateModal',
+                'Спасибо!',
+                'md',
+                <ThanksModal />
+            )
+        } catch (e: any) {
+            toast.error(e.message)
         }
-        console.log('Отправка данных: ', formattedData)
     }
+
+    const updateFormValuesFromTemplate = () => {
+        if (selectedTemplate) {
+            const content: HorecaTemplateDto =
+                typeof selectedTemplate.content === 'string'
+                    ? JSON.parse(selectedTemplate.content)
+                    : selectedTemplate.content
+
+            const transformedItems = content.items?.map(item => ({
+                category: item.category as Categories,
+                products: [
+                    {
+                        name: item.name,
+                        amount: item.amount,
+                        unit: item.unit,
+                    },
+                ],
+            }))
+
+            console.log(
+                'данные из формы, привезти не позднее: ',
+                dayjs(content.deliveryTime).format('YYYY-MM-DD HH:mm')
+            )
+            console.log(
+                'данные из формы, принимать заявки до: ',
+                dayjs(content.acceptUntill).format('YYYY-MM-DD HH:mm')
+            )
+
+            form.setValues({
+                items: transformedItems || [],
+                address: content.address || '',
+                deliveryTime: new Date(content.deliveryTime),
+                acceptUntill: new Date(content.acceptUntill),
+                paymentType:
+                    (content.paymentType as PaymentMethod) ||
+                    PaymentMethod.Prepayment,
+                name: content.name || '',
+                phone: content.phone || '',
+            })
+        }
+    }
+
+    useEffect(() => {
+        updateFormValuesFromTemplate()
+    }, [selectedTemplate])
+
+    if (!templates) return <Loader />
 
     return (
         <Flex justify='space-between' mt='md' gap='lg'>
@@ -107,69 +203,113 @@ export function CreateRequestView() {
                 <Select
                     label='Шаблоны'
                     placeholder='Новый шаблон'
-                    data={[
-                        'Рыба (красная)',
-                        'Палтус',
-                        'Шоколад темный с орехами 85%',
-                        'Креветка магаданская',
-                    ]}
+                    data={templateOptions}
+                    onChange={value => setSelectedTemplateId(String(value))}
                 />
             </Box>
             <Paper p='md' w='100%' shadow='md' withBorder>
+                <LoadingOverlay
+                    zIndex={1000}
+                    overlayProps={{ blur: 2 }}
+                    visible={selectedTemplateLoading}
+                />
+
                 <form
                     onSubmit={form.onSubmit(handleFormSubmit)}
                     className='flex flex-col gap-5'
                 >
-                    {form.values.items.map((item, index) => {
+                    {form.values.items.map((item, categoryIndex) => {
                         return (
-                            <Box key={index}>
-                                {showCategory && (
-                                    <Select
-                                        label='Категория'
-                                        placeholder='Выберите категорию'
-                                        data={(
-                                            user?.profile as HorecaProfileDto
-                                        )?.categories?.map(x => ({
-                                            value: x,
-                                            label: CategoryLabels[
-                                                x as Categories
-                                            ],
-                                        }))}
-                                        {...form.getInputProps(
-                                            `items.${index}.category`
-                                        )}
-                                        mb='md'
-                                    />
-                                )}
-
-                                <Flex mb='md' justify='space-between' gap='5px'>
-                                    <TextInput
-                                        label='Название товара'
-                                        {...form.getInputProps(
-                                            `items.${index}.name`
-                                        )}
-                                    />
-                                    <TextInput
-                                        type='number'
-                                        label='Кол-во'
-                                        {...form.getInputProps(
-                                            `items.${index}.amount`
-                                        )}
-                                    />
-                                    <TextInput
-                                        label='Ед. изм.'
-                                        {...form.getInputProps(
-                                            `items.${index}.unit`
-                                        )}
-                                    />
-
-                                    {index > 0 && (
-                                        <IconX
-                                            cursor='pointer'
-                                            onClick={() => removeProduct(index)}
+                            <Box key={categoryIndex}>
+                                <Box pos='relative'>
+                                    {showCategory && (
+                                        <Select
+                                            label='Категория'
+                                            placeholder='Выберите категорию'
+                                            data={Object.entries(
+                                                CategoryLabels
+                                            ).map(([value, label]) => ({
+                                                value,
+                                                label,
+                                            }))}
+                                            {...form.getInputProps(
+                                                `items.${categoryIndex}.category`
+                                            )}
+                                            mb='md'
                                         />
                                     )}
-                                </Flex>
+                                    {categoryIndex > 0 && (
+                                        <Button
+                                            size='md'
+                                            className='absolute right-0 -top-4'
+                                            c='red'
+                                            onClick={() =>
+                                                removeCategory(categoryIndex)
+                                            }
+                                            variant='transparent'
+                                            rightSection={<IconX color='red' />}
+                                        >
+                                            Удалить категорию
+                                        </Button>
+                                    )}
+                                </Box>
+                                {item.products.map((product, productIndex) => {
+                                    return (
+                                        <Flex
+                                            pos='relative'
+                                            key={productIndex}
+                                            mb='md'
+                                            justify='space-between'
+                                            gap='5px'
+                                        >
+                                            <TextInput
+                                                label='Название товара'
+                                                {...form.getInputProps(
+                                                    `items.${categoryIndex}.products.${productIndex}.name`
+                                                )}
+                                            />
+                                            <TextInput
+                                                type='number'
+                                                label='Кол-во'
+                                                {...form.getInputProps(
+                                                    `items.${categoryIndex}.products.${productIndex}.amount`
+                                                )}
+                                            />
+                                            <TextInput
+                                                label='Ед. изм.'
+                                                {...form.getInputProps(
+                                                    `items.${categoryIndex}.products.${productIndex}.unit`
+                                                )}
+                                            />
+
+                                            {productIndex > 0 && (
+                                                <IconX
+                                                    color='red'
+                                                    className='absolute right-0'
+                                                    cursor='pointer'
+                                                    onClick={() =>
+                                                        removeProduct(
+                                                            categoryIndex,
+                                                            productIndex
+                                                        )
+                                                    }
+                                                />
+                                            )}
+                                        </Flex>
+                                    )
+                                })}
+
+                                <Button
+                                    onClick={() => addNewProduct(categoryIndex)}
+                                    variant='transparent'
+                                >
+                                    <Flex gap='sm' c='indigo'>
+                                        <IconPlus />
+                                        <Text size='lg'>
+                                            Добавить новый товар
+                                        </Text>
+                                    </Flex>
+                                </Button>
                             </Box>
                         )
                     })}
@@ -180,13 +320,6 @@ export function CreateRequestView() {
                         align='flex-start'
                         direction='column'
                     >
-                        <Button onClick={addNewProduct} variant='transparent'>
-                            <Flex gap='sm' c='indigo'>
-                                <IconPlus />
-                                <Text size='lg'>Добавить новый товар</Text>
-                            </Flex>
-                        </Button>
-
                         <Button onClick={addNewCategory} variant='transparent'>
                             <Flex gap='sm' c='indigo'>
                                 <IconPlus />
@@ -287,12 +420,14 @@ export function CreateRequestView() {
                             valueFormat='DD/MM/YYYY HH:mm:ss'
                             label='Привезите товар не позднее:'
                             placeholder='ДД/ММ/ГГГГ ЧЧ:ММ'
+                            value={form.values.deliveryTime}
                             {...form.getInputProps('deliveryTime')}
                         />
                         <DateInput
                             valueFormat='DD/MM/YY'
                             label='Принимать заявки до:'
                             placeholder='ДД.ММ.ГГ'
+                            value={form.values.acceptUntill}
                             {...form.getInputProps('acceptUntill')}
                         />
                     </Flex>
@@ -340,7 +475,7 @@ export function CreateRequestView() {
                                     'saveTemplateModal',
                                     'Укажите имя для нового шаблона',
                                     'lg',
-                                    <SaveModal />
+                                    <SaveModal forms={form} />
                                 )
                             }
                             c='indigo'
@@ -351,18 +486,11 @@ export function CreateRequestView() {
                             Сохранить шаблон
                         </Button>
                         <Button
-                            onClick={() =>
-                                handleModal(
-                                    'thanksTemplateModal',
-                                    'Спасибо!',
-                                    'md',
-                                    <ThanksModal />
-                                )
-                            }
                             c='white'
                             size='lg'
                             fw='500'
                             bg='pink.5'
+                            type='submit'
                         >
                             Отправить заявку
                         </Button>

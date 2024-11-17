@@ -2,14 +2,17 @@ import { ProfileType } from '@/shared/lib/horekaApi/Api'
 
 export const applications = [
     {
-        label: 'Все заявки',
+        label: 'В работе',
         role: ProfileType.Provider,
+        status: 'ACTIVE',
     },
     {
-        label: 'Текущие заявки',
+        label: 'Ожидают откликов',
         role: ProfileType.Horeca,
+        status: 'PENDING',
     },
     {
-        label: "Завершённые заявки"
-    }
+        label: 'Завершённые',
+        status: 'COMPLETED',
+    },
 ]

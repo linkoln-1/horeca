@@ -124,3 +124,30 @@ export const assistantChats: chatRequest[] = [
         requestDate: '30.06.2024',
     },
 ]
+
+export const adminChats = [
+    { id: 1, name: 'ООО "АЛФАВИТ"', request: '766797' },
+    { id: 2, name: 'ООО "АЗБУКА ВКУСА"', request: '766797' },
+    { id: 3, name: 'ИП Григорян А.В.', request: '766797' },
+]
+
+export const adminMessages = [
+    {
+        id: 1,
+        text: 'Добрый день! У меня проблема с доступом к личному кабинету',
+        sender: 'client',
+        time: '15:32',
+    },
+    {
+        id: 2,
+        text: 'Добрый день! Уточните, пожалуйста, ваши паспортные данные. Мы направим Вам ссылку для восстановления доступа.',
+        sender: 'support',
+        time: '15:32',
+    },
+    {
+        id: 3,
+        text: 'Спасибо! Сейчас отправлю. Можно ли будет поменять пароль?',
+        sender: 'client',
+        time: '15:32',
+    },
+]
