@@ -22,6 +22,7 @@ export function useLoginUserMutation() {
 
     return useMutation({
         mutationFn: api.authorizationControllerLogin,
+
         onSuccess: async ({ data }) => {
             userStore.getState().updateTokens({
                 accessToken: data.accessToken || null,

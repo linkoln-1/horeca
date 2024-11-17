@@ -9,4 +9,8 @@ export const roles = [
         label: 'Общепит',
         role: ProfileType.Horeca,
     },
+    {
+        label: 'Админ',
+        role: 'Admin',
+    },
 ]

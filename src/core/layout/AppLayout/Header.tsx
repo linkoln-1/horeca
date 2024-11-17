@@ -4,13 +4,9 @@ import {
     Container,
     Flex,
     Image as MantineImage,
-    Loader,
     Paper,
     useCombobox,
-    Menu,
 } from '@mantine/core'
-import { IconUserCircle } from '@tabler/icons-react'
-import { IconSquareRoundedChevronDown } from '@tabler/icons-react'
 import Link from 'next/link'
 
 import { role } from '@/shared/helpers/getRole'
@@ -18,19 +14,17 @@ import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 
 export function Header() {
     const isMobile = useBreakpoint('sm')
-    const user = useUserStore(state => state.user)
+    const { user } = useUserStore(state => state)
     const combobox = useCombobox({
         onDropdownClose: () => combobox.resetSelectedOption(),
     })
     const { clearTokens: logOut } = useUserStore(state => state)
 
-    if (!user) return <Loader />
-
     return (
         <Paper w='100%' bg='var(--mantine-color-indigo-0)' p='sm'>
             <Container fluid>
                 <Flex justify='space-between' align='center'>
-                    <Link href={`/user${role({ user })}/applications`}>
+                    <Link href={`/user${user && role({ user })}/applications`}>
                         <MantineImage
                             src='/assets/icons/logo.svg'
                             alt='Horeka logo'
