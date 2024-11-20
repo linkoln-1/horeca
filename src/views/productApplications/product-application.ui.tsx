@@ -22,11 +22,9 @@ export function ProductApplicationViews() {
     const { data: incomingRequests } =
         providerRequest.useProviderRequestIncomeQuery()
 
-    if (!user || !incomingRequests) return <Loader />
-
     return (
         <Flex direction='column' gap='md'>
-            {incomingRequests ? (
+            {incomingRequests && user && (
                 <Flex direction='column' gap='md'>
                     <Flex justify='end' gap='md' align='center'>
                         <Button
@@ -69,24 +67,6 @@ export function ProductApplicationViews() {
                             ))}
                         </Flex>
                     </Paper>
-
-                    {!incomingRequests.data && (
-                        <Flex
-                            direction='column'
-                            justify='center'
-                            align='center'
-                            h='50vh'
-                        >
-                            <Text fw={600} size='xl'>
-                                Скоро здесь появятся новые заявки! А пока вы
-                                можете заполнить свой каталог
-                            </Text>
-                            <Text c='gray'>
-                                Перейдите к заполнению каталога в левом меню,
-                                нажав на раздел «Мой каталог»
-                            </Text>
-                        </Flex>
-                    )}
 
                     {incomingRequests.data?.map((request: HorecaRequestDto) => (
                         <>
@@ -145,18 +125,26 @@ export function ProductApplicationViews() {
                         </>
                     ))}
                 </Flex>
-            ) : (
-                <Flex justify='center' align='center' direction='column'>
-                    <Text size='lg'>
-                        Скоро здесь появятся новые заявки! А пока вы можете
-                        заполнить свой каталог
-                    </Text>
-                    <Text size='md' c='gray'>
-                        Перейдите к заполнению каталога в левом меню, нажав на
-                        раздел «Мой каталог»
-                    </Text>
-                </Flex>
             )}
+
+            {(incomingRequests && incomingRequests.data?.length === 0) ||
+                (!incomingRequests?.data && (
+                    <Flex
+                        direction='column'
+                        justify='center'
+                        align='center'
+                        h='50vh'
+                    >
+                        <Text fw={600} size='xl'>
+                            Скоро здесь появятся новые заявки! А пока вы можете
+                            заполнить свой каталог
+                        </Text>
+                        <Text c='gray'>
+                            Перейдите к заполнению каталога в левом меню, нажав
+                            на раздел «Мой каталог»
+                        </Text>
+                    </Flex>
+                ))}
         </Flex>
     )
 }

@@ -1,12 +1,10 @@
 import { userQueries } from '@/entities/user'
-import { SignUpStepOne } from '@/features/signUpSupplierSteps'
-import { SignUpStepTwo } from '@/features/signUpSupplierSteps'
+import { SignUpStepOne, SignUpStepTwo } from '@/features/signUpSupplierSteps'
 import { Button, Flex } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import Link from 'next/link'
 
 import { FormValues } from '@/shared/constants'
-import { roles } from '@/shared/constants/roles'
+import { ProfileType } from '@/shared/lib/horekaApi/Api'
 
 type SupplierManufacturerProps = {
     nextStep: () => void
@@ -27,7 +25,7 @@ export function SupplierManufacturer({
             GDPRApproved: false,
             phone: '',
             profile: {
-                profileType: roles[0].role,
+                profileType: ProfileType.Provider,
                 deliveryMethods: [],
                 categories: [],
                 minOrderAmount: 0,
