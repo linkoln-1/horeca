@@ -13,6 +13,7 @@ import {
     Select,
     Loader,
     Image as MantineImage,
+    Table,
 } from '@mantine/core'
 import { modals } from '@mantine/modals'
 
@@ -25,17 +26,20 @@ import {
     ProviderProfileDto,
 } from '@/shared/lib/horekaApi/Api'
 
+const limit = 10
+
 export function Catalog() {
     const user = useUserStore(state => state.user)
 
-    const { data } = productsQueries.useGetProductsInfiniteQuery()
-
-    if (!data) return <Loader />
+    const { data, hasNextPage, isFetching, fetchNextPage } =
+        productsQueries.useGetProductsInfiniteQuery({
+            limit,
+        })
 
     return (
         <Flex direction='column' gap='md'>
             {data ? (
-                <Box>
+                <Flex direction='column' gap='lg'>
                     <Flex justify='space-between' align='center'>
                         <Select
                             data={(
@@ -60,8 +64,8 @@ export function Catalog() {
                     </Flex>
 
                     <Flex direction='column' gap='md'>
-                        <Paper p='md' withBorder bg='indigo.4'>
-                            <Grid justify='space-around'>
+                        <Table>
+                            <Table.Thead bg='indigo.4'>
                                 {[
                                     'Наименование',
                                     'Производитель',
@@ -71,74 +75,44 @@ export function Catalog() {
                                     'Кол-во',
                                     'Фотографии',
                                 ].map((tab, index) => (
-                                    <Grid.Col
-                                        span={{
-                                            base: 12,
-                                            md: 1,
-                                        }}
-                                        key={index}
-                                    >
-                                        <Flex justify='center'>
-                                            <Text size='md' c='gray.0'>
-                                                {tab}
-                                            </Text>
-                                        </Flex>
-                                    </Grid.Col>
+                                    <Table.Th key={index} c='#FFF' p='md'>
+                                        {tab}
+                                    </Table.Th>
                                 ))}
-                            </Grid>
-                        </Paper>
+                            </Table.Thead>
 
-                        {data.data?.map((product, index) => (
-                            <Paper p='md' withBorder key={index} bg='gray.0'>
-                                <Grid justify='space-between'>
-                                    <Grid.Col span={{ base: 12, md: 1 }}>
-                                        <Flex justify='center'>
-                                            <Text size='md'>
-                                                {product.name}
-                                            </Text>
-                                        </Flex>
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 1 }}>
-                                        <Flex justify='center'>
-                                            <Text size='md'>
-                                                {product.producer}
-                                            </Text>
-                                        </Flex>
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 1 }}>
-                                        <Flex justify='center' w='fit-content'>
-                                            <Text size='md'>
-                                                {product.description}
-                                            </Text>
-                                        </Flex>
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 1 }}>
-                                        <Flex justify='center'>
-                                            <Text size='md'>
-                                                {
-                                                    packageTypeLabel[
-                                                        product.packagingType as ProductPackagingType
-                                                    ]
-                                                }
-                                            </Text>
-                                        </Flex>
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 1 }}>
-                                        <Flex justify='center'>
-                                            <Text size='md'>
-                                                {product.cost}
-                                            </Text>
-                                        </Flex>
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 1 }}>
-                                        <Flex justify='center'>
-                                            <Text size='md'>
-                                                {product.count}
-                                            </Text>
-                                        </Flex>
-                                    </Grid.Col>
-                                    <Grid.Col span={{ base: 12, md: 1 }}>
-                                        <Flex justify='center'>
+                            <Table.Tbody>
+                                {data?.map((product, index) => (
+                                    <Table.Tr key={index}>
+                                        <Table.Td align='center' p='md'>
+                                            {product.name}
+                                        </Table.Td>
+
+                                        <Table.Td align='center' p='md'>
+                                            {product.producer}
+                                        </Table.Td>
+
+                                        <Table.Td align='center' p='md'>
+                                            {product.description}
+                                        </Table.Td>
+
+                                        <Table.Td align='center' p='md'>
+                                            {
+                                                packageTypeLabel[
+                                                    product.packagingType as ProductPackagingType
+                                                ]
+                                            }
+                                        </Table.Td>
+
+                                        <Table.Td align='center' p='md'>
+                                            {product.cost}
+                                        </Table.Td>
+
+                                        <Table.Td align='center' p='md'>
+                                            {product.count}
+                                        </Table.Td>
+
+                                        <Table.Td align='center' p='md'>
                                             {product.images?.map((x, index) => (
                                                 <MantineImage
                                                     key={index}
@@ -147,13 +121,26 @@ export function Catalog() {
                                                     )}
                                                 />
                                             ))}
-                                        </Flex>
-                                    </Grid.Col>
-                                </Grid>
-                            </Paper>
-                        ))}
+                                        </Table.Td>
+                                    </Table.Tr>
+                                ))}
+                            </Table.Tbody>
+                        </Table>
                     </Flex>
-                </Box>
+
+                    {hasNextPage && (
+                        <Flex maw={200} w='100%' className='mx-auto'>
+                            <Button
+                                fullWidth
+                                onClick={() => fetchNextPage()}
+                                loading={isFetching}
+                                bg='indigo.4'
+                            >
+                                Загрузить еще
+                            </Button>
+                        </Flex>
+                    )}
+                </Flex>
             ) : (
                 <Flex justify='center' align='center' direction='column'>
                     <Text size='lg'>

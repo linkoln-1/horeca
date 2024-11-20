@@ -38,7 +38,7 @@ export function SignUpStepOne({ form }: StepOneProps) {
                 {...form.getInputProps('email')}
             />
 
-            <Flex gap='md' align='center'>
+            <Flex gap='md'>
                 <PasswordInput
                     label='Придумайте пароль'
                     placeholder='Введите пароль'

@@ -37,7 +37,7 @@ export function SignUpStepTwo({ form }: StepTwoProps) {
         <>
             <NumberInput
                 label='Контактный номер для связи с покупателем'
-                placeholder='Номер мобильного телефона'
+                placeholder='Номер мобильного телефона (Пример: 79635929876)'
                 {...form.getInputProps('phone')}
             />
 

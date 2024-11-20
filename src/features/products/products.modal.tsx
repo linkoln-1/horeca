@@ -17,6 +17,7 @@ import {
     TextInput,
     Tooltip,
     Image as MantineImage,
+    MultiSelect,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconTrash } from '@tabler/icons-react'
@@ -42,10 +43,15 @@ export function ProductsModal() {
         x => CategoryLabels[x as Categories]
     )
 
-    const packageTypes = Object.values(ProductPackagingType).map(x => ({
-        value: x,
-        label: packageTypeLabel[x as ProductPackagingType],
-    }))
+    const packageTypes = Object.values(ProductPackagingType)
+        .filter(value => typeof value === 'string')
+        .map(x => ({
+            value: x.trim(),
+            label:
+                packageTypeLabel[x as ProductPackagingType]?.trim() ||
+                'Не указано',
+        }))
+
     const form = useForm<ProductCreateDto>({
         initialValues: {
             category: categories as unknown as Categories,
@@ -54,7 +60,7 @@ export function ProductsModal() {
             producer: '',
             cost: 0,
             count: 0,
-            packagingType: packageTypes as unknown as ProductPackagingType,
+            packagingType: [] as unknown as ProductPackagingType,
             imageIds: [],
         },
     })
@@ -150,12 +156,14 @@ export function ProductsModal() {
                 />
 
                 <Group grow>
-                    <Select
+                    <MultiSelect
                         label='Фасовка'
                         placeholder='Выберите фасовку'
                         data={packageTypes}
                         {...form.getInputProps('packagingType')}
+                        searchable
                     />
+
                     <NumberInput
                         label='Цена (за ед.)'
                         placeholder='Введите цену'
@@ -172,35 +180,35 @@ export function ProductsModal() {
 
                 {/*TODO оставлено пока поправиться загрузка картинок на бэке (после загрузки картинки должно выдавать ссылку на картинкку*/}
                 <Grid>
-                    {form.values.imageIds.map((item, index) => (
-                        <Grid.Col
-                            key={index}
-                            span={{
-                                base: 12,
-                                md: 6,
-                                lg: 3,
-                            }}
-                            pos='relative'
-                        >
-                            <Tooltip label='Remove image'>
-                                <ActionIcon
-                                    // onClick={() => removeImage(item.id)}
-                                    color='gray'
-                                    pos='absolute'
-                                    right={rem(8 + 10)}
-                                    top={rem(8 + 10)}
-                                >
-                                    <IconTrash size={20} />
-                                </ActionIcon>
-                            </Tooltip>
-                            <MantineImage
-                                radius='md'
-                                src={''}
-                                alt='portfolio'
-                                className='aspect-square'
-                            />
-                        </Grid.Col>
-                    ))}
+                    {/*{form.values.imageIds.map((item, index) => (*/}
+                    {/*    <Grid.Col*/}
+                    {/*        key={index}*/}
+                    {/*        span={{*/}
+                    {/*            base: 12,*/}
+                    {/*            md: 6,*/}
+                    {/*            lg: 3,*/}
+                    {/*        }}*/}
+                    {/*        pos='relative'*/}
+                    {/*    >*/}
+                    {/*        <Tooltip label='Удалить картинку'>*/}
+                    {/*            <ActionIcon*/}
+                    {/*                // onClick={() => removeImage(item.id)}*/}
+                    {/*                color='gray'*/}
+                    {/*                pos='absolute'*/}
+                    {/*                right={rem(8 + 10)}*/}
+                    {/*                top={rem(8 + 10)}*/}
+                    {/*            >*/}
+                    {/*                <IconTrash size={20} />*/}
+                    {/*            </ActionIcon>*/}
+                    {/*        </Tooltip>*/}
+                    {/*        <MantineImage*/}
+                    {/*            radius='md'*/}
+                    {/*            src={''}*/}
+                    {/*            alt='portfolio'*/}
+                    {/*            className='aspect-square'*/}
+                    {/*        />*/}
+                    {/*    </Grid.Col>*/}
+                    {/*))}*/}
 
                     {form.values.imageIds.length < 30 && (
                         <Grid.Col
@@ -219,15 +227,11 @@ export function ProductsModal() {
                     )}
                 </Grid>
 
-                {/*<CustomDropzone*/}
-                {/*    onDrop={handleAddMainImage}*/}
-                {/*    accept={allowedFormats}*/}
-                {/*    className='aspect-square w-5/6 h-[200px] mx-auto'*/}
-                {/*/>*/}
-
                 <Group justify='center' mt='md'>
                     <Button variant='default'>Предпросмотр</Button>
-                    <Button type='submit'>Опубликовать товар</Button>
+                    <Button type='submit' color='indigo.4'>
+                        Опубликовать товар
+                    </Button>
                 </Group>
             </form>
         </Flex>

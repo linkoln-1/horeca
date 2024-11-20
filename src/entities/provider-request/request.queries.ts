@@ -3,10 +3,19 @@ import { useMutation } from '@tanstack/react-query'
 import { api } from '@/shared/lib/horekaApi'
 import {
     HorecaRequestProviderStatusDto,
+    HorecaRequestSearchDto,
     ProviderRequestCreateDto,
+    ProviderRequestSearchDto,
 } from '@/shared/lib/horekaApi/Api'
 import { useCustomInfiniteQuery } from '@/shared/lib/reactQuery/useCustomInfiniteQuery'
 import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
+
+interface GetRequestQueryParams {
+    offset?: number
+    limit?: number
+    search?: ProviderRequestSearchDto
+    sort?: string
+}
 
 export function useProviderRequestIncomeQuery() {
     return useCustomQuery({
@@ -29,9 +38,9 @@ export function useProviderRequestMutation() {
     })
 }
 
-export function useGetAllProviderRequestQuery() {
+export function useGetAllProviderRequestQuery(params: GetRequestQueryParams) {
     return useCustomInfiniteQuery({
-        queryKey: ['provider', 'all', 'request'],
-        queryFn: () => api.providerRequestsControllerFindAll(),
+        queryKey: ['request', params],
+        queryFn: () => api.providerRequestsControllerFindAll(params),
     })
 }

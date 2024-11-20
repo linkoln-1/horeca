@@ -1,8 +1,20 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { api } from '@/shared/lib/horekaApi'
-import { ProductUpdateDto } from '@/shared/lib/horekaApi/Api'
+import {
+    HorecaRequestSearchDto,
+    ProductSearchDto,
+    ProductUpdateDto,
+} from '@/shared/lib/horekaApi/Api'
+import { useCustomInfiniteQuery } from '@/shared/lib/reactQuery/useCustomInfiniteQuery'
 import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
+
+interface GetRequestQueryParams {
+    offset?: number
+    limit?: number
+    search?: ProductSearchDto
+    sort?: string
+}
 
 export function useProductMutation() {
     const queryClient = useQueryClient()
@@ -15,10 +27,10 @@ export function useProductMutation() {
     })
 }
 
-export function useGetProductsInfiniteQuery() {
-    return useCustomQuery({
-        queryKey: ['product'],
-        queryFn: () => api.productsControllerFindAll(),
+export function useGetProductsInfiniteQuery(params: GetRequestQueryParams) {
+    return useCustomInfiniteQuery({
+        queryKey: ['product', params],
+        queryFn: () => api.productsControllerFindAll(params),
     })
 }
 

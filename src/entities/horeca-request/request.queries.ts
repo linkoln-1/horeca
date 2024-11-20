@@ -15,7 +15,6 @@ interface GetRequestQueryParams {
 }
 
 export function useGetRequestQuery(params: GetRequestQueryParams) {
-    console.log(params)
     return useCustomInfiniteQuery({
         queryKey: ['horeca-request', params],
         queryFn: () => api.horecaRequestsControllerFindAll(params),

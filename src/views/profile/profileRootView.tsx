@@ -20,20 +20,12 @@ export function ProfileRootView() {
     useEffect(() => {
         if (user) {
             if (user.profile?.profileType === roles[0].role) {
-                router.replace(`/user/provider/requests`)
+                router.replace(`/user/provider/products/applications`)
             } else {
                 router.replace(`/user/horeca/applications`)
             }
         }
     }, [user, router])
-
-    // useEffect(() => {
-    //     if (accessToken) {
-    //         if (decode && decode.role === roles[2].role) {
-    //             router.replace(`/user/admin`)
-    //         }
-    //     }
-    // }, [accessToken, decode])
 
     return null
 }
