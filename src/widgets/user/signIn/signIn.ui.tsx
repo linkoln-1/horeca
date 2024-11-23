@@ -1,6 +1,6 @@
 import React from 'react'
+import { toast } from 'react-toastify'
 
-import { useUserStore } from '@/core/providers/userStoreContext'
 import { userQueries } from '@/entities/user'
 import {
     Button,
@@ -11,7 +11,6 @@ import {
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconAt } from '@tabler/icons-react'
-import { jwtDecode } from 'jwt-decode'
 
 export function SignIn() {
     const form = useForm({
@@ -29,13 +28,17 @@ export function SignIn() {
     const { mutateAsync: signInUser, isPending } =
         userQueries.useLoginUserMutation()
 
+    const handleSubmit = async () => {
+        try {
+            await signInUser(form.values).then(form.reset)
+            toast.success('Вы успешно авторизовались!')
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
     return (
-        <form
-            onSubmit={form.onSubmit(async values => {
-                signInUser(values).then(form.reset)
-            })}
-            className='relative'
-        >
+        <form onSubmit={form.onSubmit(handleSubmit)} className='relative'>
             <LoadingOverlay
                 zIndex={1000}
                 overlayProps={{ blur: 2 }}

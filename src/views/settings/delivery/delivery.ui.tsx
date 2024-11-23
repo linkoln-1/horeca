@@ -1,22 +1,24 @@
 'use client'
 
 import { useEffect } from 'react'
+import { toast } from 'react-toastify'
 
 import { userQueries } from '@/entities/user'
 import {
     Button,
     Checkbox,
     Flex,
+    LoadingOverlay,
     MultiSelect,
     NumberInput,
     Text,
-    Title,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 
-import { CategoryLabels } from '@/shared/constants'
+import { CategoryLabels, errors } from '@/shared/constants'
 import {
     Categories,
+    DeliveryMethods,
     ProfileType,
     ProviderProfileDto,
     UpdateUserDto,
@@ -52,7 +54,7 @@ export function DeliveryViews() {
         initialValues: {
             categories: [],
             minOrderAmount: 0,
-            deliveryMethods: [],
+            deliveryMethods: [] as DeliveryMethods[],
         },
         validate: {
             categories: value =>
@@ -61,7 +63,7 @@ export function DeliveryViews() {
     })
 
     const { data } = userQueries.useGetMeQuery()
-    const { mutate: updateUser, isPending } =
+    const { mutateAsync: updateUser, isPending } =
         userQueries.useUpdateUserMutation()
 
     useEffect(() => {
@@ -79,30 +81,49 @@ export function DeliveryViews() {
         }
     }, [data])
 
+    const handleSubmit = async () => {
+        if (form.validate().hasErrors) {
+            return
+        }
+
+        try {
+            if (data && (data.profile as ProviderProfileDto)) {
+                const updateUserDto: UpdateUserDto = {
+                    profile: {
+                        ...form.values,
+                        profileType: data.profile
+                            .profileType as ProfileType.Provider,
+                        categories: form.values.categories.map(
+                            x => x.value as Categories
+                        ),
+                    },
+                }
+
+                await updateUser(updateUserDto)
+                toast.success('Данные успешно обновлены!')
+            }
+        } catch (e: any) {
+            const errorKey = e?.error?.error
+            const errorMessage =
+                errorKey in errors
+                    ? errors[errorKey as keyof typeof errors]
+                    : 'Неизвестная ошибка. Попробуйте ещё раз.'
+
+            toast.error(errorMessage)
+        }
+    }
+
     return (
         <Page>
-            <Title>Категория товара №1</Title>
+            <LoadingOverlay
+                zIndex={1000}
+                overlayProps={{ blur: 2 }}
+                visible={isPending}
+            />
 
             <form
                 className='flex flex-col gap-7'
-                onSubmit={form.onSubmit(async values => {
-                    if (form.validate().hasErrors) {
-                        return
-                    }
-                    if (data && (data.profile as ProviderProfileDto)) {
-                        const updateUserDto: UpdateUserDto = {
-                            profile: {
-                                ...values,
-                                profileType: data.profile
-                                    .profileType as ProfileType.Provider,
-                                categories: values.categories.map(
-                                    x => x.value as Categories
-                                ),
-                            },
-                        }
-                        updateUser(updateUserDto)
-                    }
-                })}
+                onSubmit={form.onSubmit(handleSubmit)}
             >
                 <MultiSelect
                     label='Категория товара'
@@ -142,6 +163,12 @@ export function DeliveryViews() {
                     <Checkbox
                         label='Доставка в день заказа'
                         {...form.getInputProps('sameDayDelivery', {
+                            type: 'checkbox',
+                        })}
+                    />
+                    <Checkbox
+                        label='Выходные/праздничные дни'
+                        {...form.getInputProps('weekends', {
                             type: 'checkbox',
                         })}
                     />

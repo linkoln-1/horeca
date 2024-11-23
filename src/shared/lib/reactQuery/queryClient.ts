@@ -18,6 +18,7 @@ export const queryClient = new QueryClient({
                 if (error && BackendError.isBackendError(error)) {
                     if (errors[error.errorMessage!].length) {
                         toast.error(errors[error.errorMessage!])
+                        console.log(errors[error.errorMessage!])
                     }
                 }
             },

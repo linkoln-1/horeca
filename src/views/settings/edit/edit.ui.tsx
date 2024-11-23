@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { toast } from 'react-toastify'
 
 import { userQueries } from '@/entities/user'
 import {
@@ -13,6 +14,7 @@ import {
 import { useForm } from '@mantine/form'
 import { IconLock } from '@tabler/icons-react'
 
+import { errors } from '@/shared/constants'
 import { UpdateUserDto } from '@/shared/lib/horekaApi/Api'
 import { Page } from '@/shared/ui/Page'
 
@@ -32,7 +34,7 @@ export function EditViews() {
         },
     })
 
-    const { mutate: updateUser, isPending } =
+    const { mutateAsync: updateUser, isPending } =
         userQueries.useUpdateUserMutation()
     const { data } = userQueries.useGetMeQuery()
 
@@ -51,13 +53,23 @@ export function EditViews() {
             return
         }
 
-        updateUser(values)
+        try {
+            await updateUser(values)
+            toast.success('Данные успешно обновлены!')
+        } catch (e: any) {
+            const errorKey = e?.error?.error
+
+            const errorMessage =
+                errorKey in errors
+                    ? errors[errorKey as keyof typeof errors]
+                    : 'Неизвестная ошибка. Попробуйте ещё раз.'
+
+            toast.error(errorMessage)
+        }
     }
 
     return (
         <Page>
-            <Title>Общая информация</Title>
-
             <LoadingOverlay
                 zIndex={1000}
                 overlayProps={{ blur: 2 }}

@@ -31,7 +31,7 @@ import { modals } from '@mantine/modals'
 import { IconPlus, IconX } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 
-import { CategoryLabels, HorecaTemplateDto } from '@/shared/constants'
+import { CategoryLabels, errors, HorecaTemplateDto } from '@/shared/constants'
 import { HorecaRequestForm } from '@/shared/constants'
 import { PaymentMethod } from '@/shared/constants/paymentMethod'
 import { Categories, HorecaRequestCreateDto } from '@/shared/lib/horekaApi/Api'
@@ -65,7 +65,8 @@ export function CreateRequestView() {
     const dropzone = useRef<() => void>(null)
     const [images, setImages] = useState<FileWithPath[]>([])
 
-    const { mutate: createRequest } = requestQueries.useCreateRequestMutation()
+    const { mutateAsync: createRequest } =
+        requestQueries.useCreateRequestMutation()
     const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
     const { data: templates } = templateQueries.useGetHorecaTemplateQuery()
     const { data: selectedTemplate, isLoading: selectedTemplateLoading } =
@@ -115,7 +116,7 @@ export function CreateRequestView() {
         setImages(files)
     }
 
-    const handleFormSubmit = (values: HorecaRequestForm) => {
+    const handleFormSubmit = async (values: HorecaRequestForm) => {
         try {
             const formattedData: HorecaRequestCreateDto = {
                 ...values,
@@ -135,18 +136,20 @@ export function CreateRequestView() {
                 comment: values.comment || undefined,
             }
 
-            createRequest(formattedData)
+            await createRequest(formattedData)
 
             toast.success('Заявка успешно создана!')
 
-            handleModal(
-                'thanksTemplateModal',
-                'Спасибо!',
-                'md',
-                <ThanksModal />
-            )
+            handleModal('thanksTemplateModal', '', 'md', <ThanksModal />)
         } catch (e: any) {
-            toast.error(e.message)
+            const errorKey = e?.error?.error
+
+            const errorMessage =
+                errorKey in errors
+                    ? errors[errorKey as keyof typeof errors]
+                    : 'Неизвестная ошибка. Попробуйте ещё раз.'
+
+            toast.error(errorMessage)
         }
     }
 
@@ -167,15 +170,6 @@ export function CreateRequestView() {
                     },
                 ],
             }))
-
-            console.log(
-                'данные из формы, привезти не позднее: ',
-                dayjs(content.deliveryTime).format('YYYY-MM-DD HH:mm')
-            )
-            console.log(
-                'данные из формы, принимать заявки до: ',
-                dayjs(content.acceptUntill).format('YYYY-MM-DD HH:mm')
-            )
 
             form.setValues({
                 items: transformedItems || [],

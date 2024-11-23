@@ -32,6 +32,8 @@ export function SettingsLayout({ children }: { children: ReactNode }) {
     ]
 
     if (user?.profile.profileType === roles[1].role) {
+        tabs[0].label = 'Общая информация'
+
         tabs[1].label = 'Об условиях приемки товара'
         tabs[1].value = `/user/${user && user.profile.profileType.toLowerCase()}/settings/product-acceptance-terms`
     }
@@ -41,8 +43,11 @@ export function SettingsLayout({ children }: { children: ReactNode }) {
             <Flex w='100%'>
                 <SegmentedControl
                     withItemsBorders
-                    onChange={router.push}
-                    value={path}
+                    onChange={value => value && router.push(value)}
+                    value={
+                        tabs.find(tab => tab.value === path)?.value ||
+                        tabs[0]?.value
+                    }
                     color='indigo.4'
                     data={tabs}
                     orientation={isMobile ? 'vertical' : 'horizontal'}

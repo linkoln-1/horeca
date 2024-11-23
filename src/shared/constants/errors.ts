@@ -1,15 +1,26 @@
 import { ErrorDto } from '@/shared/lib/horekaApi/Api'
 
 export const errors: Record<NonNullable<ErrorDto['errorMessage']>, string> = {
-    AUTH_FAIL: 'Authentication failed',
-    PASSWORD_CHANGE_ERROR: 'Password change failed',
-    GDPR_IS_NOT_APPROVED: 'GDPR is not approved',
-    USER_ALREADY_EXISTS: 'User already exists',
-    MAIL_IS_BUSY: 'Mail is busy. Please try different Email.',
-    USER_DOES_NOT_EXISTS: 'User does not exist',
-    ITEM_NOT_FOUND: 'Item is not found',
-    UPLOAD_NOT_FOUND: 'Upload is not found',
-    ACTIVATION_LINK_ERROR: 'Activation link error',
-    INVALID_QUERY_STRING: '',
-    FORBIDDEN_ACTION: '',
+    PASSWORD_CHANGE_ERROR:
+        'Не удалось изменить пароль. Попробуйте ещё раз или обратитесь в службу поддержки.',
+    AUTH_FAIL:
+        'Ошибка авторизации. Проверьте корректность введённых данных или зарегистрируйтесь, если у вас ещё нет аккаунта.',
+    GDPR_IS_NOT_APPROVED:
+        'Вы не подтвердили согласие с правилами использования. Пожалуйста, подтвердите согласие.',
+    MAIL_IS_BUSY:
+        'Этот адрес электронной почты уже занят. Попробуйте другой или восстановите доступ.',
+    USER_ALREADY_EXISTS:
+        'Пользователь с таким логином уже существует. Попробуйте войти или восстановить пароль.',
+    UPLOAD_NOT_FOUND:
+        'Запрашиваемые данные не найдены. Проверьте правильность запроса.',
+    INVALID_QUERY_STRING: 'Некорректный запрос. Проверьте введённые параметры.',
+    FORBIDDEN_ACTION:
+        'Действие запрещено. У вас нет прав для выполнения этой операции.',
+    USER_DOES_NOT_EXISTS:
+        'Пользователь с указанными данными не найден. Проверьте введённые данные.',
+    ACTIVATION_LINK_ERROR:
+        'Ошибка активации. Ссылка недействительна или срок её действия истёк.',
+    ITEM_NOT_FOUND: 'Запрашиваемый элемент не найден. Возможно, он был удалён.',
+    TEMPLATE_DOES_NOT_EXISTS:
+        'Шаблон не найден. Убедитесь в правильности запроса.',
 }

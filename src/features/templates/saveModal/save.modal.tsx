@@ -1,10 +1,16 @@
 import React from 'react'
+import { toast } from 'react-toastify'
 
 import { templateQueries } from '@/entities/template'
 import { TextInput, Button, Flex } from '@mantine/core'
 import { useForm, UseFormReturnType } from '@mantine/form'
+import dayjs from 'dayjs'
 
-import { HorecaRequestForm, HorecaRequestFormItem } from '@/shared/constants'
+import {
+    errors,
+    HorecaRequestForm,
+    HorecaRequestFormItem,
+} from '@/shared/constants'
 import {
     HorecaRequestCreateDto,
     HorecaRequestItemCreateDto,
@@ -27,33 +33,49 @@ export function SaveModal({ forms }: SaveModalProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        const items: HorecaRequestItemCreateDto[] = forms.values.items
-            .map((item: HorecaRequestFormItem) =>
-                item.products.map(product => ({
-                    category: item.category,
-                    name: product.name,
-                    amount: product.amount,
-                    unit: product.unit,
-                }))
-            )
-            .flat()
+        try {
+            const items: HorecaRequestItemCreateDto[] = forms.values.items
+                .map((item: HorecaRequestFormItem) =>
+                    item.products.map(product => ({
+                        category: item.category,
+                        name: product.name,
+                        amount: product.amount,
+                        unit: product.unit,
+                    }))
+                )
+                .flat()
 
-        const contentData: HorecaRequestCreateDto = {
-            items,
-            address: forms.values.address,
-            deliveryTime: forms.values.deliveryTime,
-            acceptUntill: forms.values.acceptUntill,
-            paymentType: forms.values.paymentType,
-            name: forms.values.name,
-            phone: forms.values.phone,
+            const contentData: HorecaRequestCreateDto = {
+                items,
+                address: forms.values.address,
+                deliveryTime: dayjs(forms.values.deliveryTime).format(
+                    'YYYY-MM-DD'
+                ),
+                acceptUntill: dayjs(forms.values.acceptUntill).format(
+                    'YYYY-MM-DD'
+                ),
+                paymentType: forms.values.paymentType,
+                name: forms.values.name,
+                phone: forms.values.phone,
+            }
+
+            await createTemplate({
+                data: {
+                    name: form.values.name,
+                    content: contentData,
+                },
+            })
+            toast.success('Шаблон успешно сохранен!')
+        } catch (e: any) {
+            const errorKey = e?.error?.error
+
+            const errorMessage =
+                errorKey in errors
+                    ? errors[errorKey as keyof typeof errors]
+                    : 'Неизвестная ошибка. Попробуйте ещё раз.'
+
+            toast.error(errorMessage)
         }
-
-        await createTemplate({
-            data: {
-                name: form.values.name,
-                content: contentData,
-            },
-        })
     }
 
     return (

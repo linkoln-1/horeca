@@ -55,10 +55,6 @@ export function useUpdateUserMutation() {
         mutationFn: api.usersControllerUpdate,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ['user', 'me'] })
-            toast.success('Your account successfully updated.')
-        },
-        onError: error => {
-            toast.error(`Error updating user: ${error.name}`)
         },
     })
 }

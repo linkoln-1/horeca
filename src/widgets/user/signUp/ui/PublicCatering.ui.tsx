@@ -1,15 +1,17 @@
+import { toast } from 'react-toastify'
+
 import { userQueries } from '@/entities/user'
 import { HorecaStepOne, HorecaStepTwo } from '@/features/signUpHorecaSteps'
 import { Button, Flex, LoadingOverlay } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import Link from 'next/link'
 
-import { HorecaFormValues, roles } from '@/shared/constants'
+import { errors, HorecaFormValues } from '@/shared/constants'
 import {
     validateAddresses,
     validateEmail,
     validatePhone,
 } from '@/shared/helpers/validateMantineForm'
+import { ProfileType } from '@/shared/lib/horekaApi/Api'
 
 type PublicCateringProps = {
     nextStep: () => void
@@ -28,7 +30,7 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
             GDPRApproved: false,
             phone: '',
             profile: {
-                profileType: roles[1].role,
+                profileType: ProfileType.Horeca,
                 info: '',
                 addresses: [
                     {
@@ -101,16 +103,28 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
     const steps = [HorecaStepOne, HorecaStepTwo]
     const CurrentStepComponent = steps[currentStep]
 
+    const handleSubmit = async () => {
+        try {
+            if (currentStep === 1) {
+                await signUpUser(form.values)
+                toast.success('Вы успешно зарегистрировались!')
+            } else {
+                nextStep()
+            }
+        } catch (e: any) {
+            const errorKey = e?.error?.error
+
+            const errorMessage =
+                errorKey in errors
+                    ? errors[errorKey as keyof typeof errors]
+                    : 'Неизвестная ошибка. Попробуйте ещё раз.'
+
+            toast.error(errorMessage)
+        }
+    }
+
     return (
-        <form
-            onSubmit={form.onSubmit(async values => {
-                if (currentStep === 1) {
-                    await signUpUser(values)
-                } else {
-                    nextStep()
-                }
-            })}
-        >
+        <form onSubmit={form.onSubmit(handleSubmit)}>
             <Flex direction='column' gap='xl'>
                 <CurrentStepComponent form={form} />
             </Flex>

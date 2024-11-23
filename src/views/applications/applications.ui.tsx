@@ -41,6 +41,14 @@ export function ApplicationsViews() {
     const [activeStatus, setActiveStatus] = useState(
         statusMap[applications[0].label]
     )
+
+    const getLabelByStatus = (status: string): string => {
+        const application = applications.find(
+            app => app.status.toLowerCase() === status.toLowerCase()
+        )
+        return application ? application.label : 'Неизвестный статус'
+    }
+
     const isMobile = useBreakpoint('sm')
 
     const {
@@ -135,10 +143,11 @@ export function ApplicationsViews() {
                                                           : 'gray'
                                                 }
                                                 variant='light'
+                                                w={150}
                                             >
-                                                {order.status}
+                                                {getLabelByStatus(order.status)}
                                             </Badge>
-                                            <Box w={300}>
+                                            <Box>
                                                 {order.comment && (
                                                     <Text
                                                         size='sm'

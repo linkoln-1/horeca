@@ -1,16 +1,23 @@
+import { toast } from 'react-toastify'
+
 import { userQueries } from '@/entities/user'
 import { SignUpStepOne, SignUpStepTwo } from '@/features/signUpSupplierSteps'
 import { Button, Flex } from '@mantine/core'
 import { useForm } from '@mantine/form'
 
-import { FormValues } from '@/shared/constants'
-import { ProfileType } from '@/shared/lib/horekaApi/Api'
+import { errors, FormValues } from '@/shared/constants'
+import { ErrorDto, ProfileType } from '@/shared/lib/horekaApi/Api'
 
 type SupplierManufacturerProps = {
     nextStep: () => void
     currentStep: number
 }
 
+type ErrorType = {
+    error: ErrorDto['error']
+    message: ErrorDto['message']
+    statusCode: ErrorDto['statusCode']
+}
 export function SupplierManufacturer({
     nextStep,
     currentStep,
@@ -44,7 +51,7 @@ export function SupplierManufacturer({
         },
     })
 
-    const { mutateAsync: signUpUser, isPending } =
+    const { mutateAsync: signUpUser, error } =
         userQueries.useRegisterUserMutation()
 
     const isFullyFilledStepOne = form.isValid()
@@ -58,16 +65,28 @@ export function SupplierManufacturer({
 
     const CurrentStepComponent = steps[currentStep]
 
+    const handleSubmit = async () => {
+        try {
+            if (currentStep === steps.length - 1) {
+                await signUpUser(form.values)
+                toast.success('Вы успешно зарегистрировались!')
+            } else {
+                nextStep()
+            }
+        } catch (e: any) {
+            const errorKey = e?.error?.error
+
+            const errorMessage =
+                errorKey in errors
+                    ? errors[errorKey as keyof typeof errors]
+                    : 'Неизвестная ошибка. Попробуйте ещё раз.'
+
+            toast.error(errorMessage)
+        }
+    }
+
     return (
-        <form
-            onSubmit={form.onSubmit(async () => {
-                if (currentStep === steps.length - 1) {
-                    await signUpUser(form.values)
-                } else {
-                    nextStep()
-                }
-            })}
-        >
+        <form onSubmit={form.onSubmit(handleSubmit)}>
             <Flex direction='column' gap='xl'>
                 <CurrentStepComponent form={form} />
             </Flex>

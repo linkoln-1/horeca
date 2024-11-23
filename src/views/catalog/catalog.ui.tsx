@@ -36,9 +36,17 @@ export function Catalog() {
             limit,
         })
 
+    if (!data) {
+        return (
+            <Flex justify='center' align='center' h='50vh'>
+                <Loader size='xl' />
+            </Flex>
+        )
+    }
+
     return (
         <Flex direction='column' gap='md'>
-            {data ? (
+            {data && data.length > 0 && (
                 <Flex direction='column' gap='lg'>
                     <Flex justify='space-between' align='center'>
                         <Select
@@ -93,7 +101,9 @@ export function Catalog() {
                                         </Table.Td>
 
                                         <Table.Td align='center' p='md'>
-                                            {product.description}
+                                            {product.description === 'beer'
+                                                ? 'Пиво'
+                                                : product.description}
                                         </Table.Td>
 
                                         <Table.Td align='center' p='md'>
@@ -141,8 +151,15 @@ export function Catalog() {
                         </Flex>
                     )}
                 </Flex>
-            ) : (
-                <Flex justify='center' align='center' direction='column'>
+            )}
+
+            {data && data.length === 0 && (
+                <Flex
+                    justify='center'
+                    align='center'
+                    direction='column'
+                    h='50vh'
+                >
                     <Text size='lg'>
                         Заполните каталог, чтобы привлечь внимание к своим
                         товарам и выделиться на платформе!
