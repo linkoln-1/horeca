@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { toast } from 'react-toastify'
 
 import { userQueries } from '@/entities/user'
 import {
@@ -8,6 +9,7 @@ import {
     Button,
     Checkbox,
     Group,
+    LoadingOverlay,
     Textarea,
     TextInput,
     Title,
@@ -16,7 +18,7 @@ import { TimeInput } from '@mantine/dates'
 import { useForm } from '@mantine/form'
 import { IconPlus } from '@tabler/icons-react'
 
-import { HorecaFormValues, roles } from '@/shared/constants'
+import { errors, HorecaFormValues, roles } from '@/shared/constants'
 import { Address, ProfileType, Weekday } from '@/shared/lib/horekaApi/Api'
 import { Page } from '@/shared/ui/Page'
 
@@ -41,7 +43,7 @@ export function ProductAcceptanceTermsViews() {
     const form = useForm<ProductAcceptanceTermsProps>({
         initialValues: {
             profile: {
-                profileType: roles[1].role,
+                profileType: ProfileType.Horeca,
                 info: '',
                 addresses: [
                     {
@@ -68,7 +70,7 @@ export function ProductAcceptanceTermsViews() {
     })
 
     const { data } = userQueries.useGetMeQuery()
-    const { mutate: updateUser, isPending } =
+    const { mutateAsync: updateUser, isPending } =
         userQueries.useUpdateUserMutation()
 
     const addNewAddress = () => {
@@ -147,17 +149,33 @@ export function ProductAcceptanceTermsViews() {
         }
     }, [data])
 
-    const handleSubmit = (values: ProductAcceptanceTermsProps) => {
+    const handleSubmit = async (values: ProductAcceptanceTermsProps) => {
         if (form.validate().hasErrors) {
             return
         }
 
-        updateUser(values)
+        try {
+            await updateUser(values)
+            toast.success('Данные успешно обновлены!')
+        } catch (e: any) {
+            const errorKey = e?.error?.error
+
+            const errorMessage =
+                errorKey in errors
+                    ? errors[errorKey as keyof typeof errors]
+                    : 'Неизвестная ошибка. Попробуйте ещё раз.'
+
+            toast.error(errorMessage)
+        }
     }
 
     return (
         <Page>
-            <Title>Об условиях приемки товара</Title>
+            <LoadingOverlay
+                zIndex={1000}
+                overlayProps={{ blur: 2 }}
+                visible={isPending}
+            />
 
             <form
                 className='flex flex-col gap-6'
@@ -247,7 +265,11 @@ export function ProductAcceptanceTermsViews() {
                 ))}
 
                 <Box className='flex justify-center'>
-                    <Button onClick={addNewAddress} leftSection={<IconPlus />}>
+                    <Button
+                        onClick={addNewAddress}
+                        leftSection={<IconPlus />}
+                        color='indigo.4'
+                    >
                         Добавить еще адрес
                     </Button>
                 </Box>

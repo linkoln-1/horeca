@@ -147,6 +147,7 @@ export function HorecaStepTwo({ form }: StepProps) {
                     onClick={addNewAddress}
                     leftSection={<IconPlus />}
                     variant='transparent'
+                    c='indigo.4'
                 >
                     Добавить еще адрес
                 </Button>
