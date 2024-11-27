@@ -1,5 +1,7 @@
 'use client'
 
+import React from 'react'
+
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { providerRequest } from '@/entities/provider-request'
 import {
@@ -11,16 +13,30 @@ import {
     Select,
     Text,
     Image as MantineImage,
+    Table,
 } from '@mantine/core'
 import Link from 'next/link'
 
+import { packageTypeLabel } from '@/shared/constants/packageType'
+import {
+    PaymentMethod,
+    PaymentMethodLabels,
+} from '@/shared/constants/paymentMethod'
+import { getImageUrl } from '@/shared/helpers'
 import { role } from '@/shared/helpers/getRole'
-import { HorecaRequestDto } from '@/shared/lib/horekaApi/Api'
+import { groupRequestsByDate } from '@/shared/helpers/groupRequestsByDate'
+import {
+    HorecaRequestDto,
+    ProductPackagingType,
+} from '@/shared/lib/horekaApi/Api'
 
 export function ProductApplicationViews() {
     const user = useUserStore(state => state.user)
     const { data: incomingRequests } =
         providerRequest.useProviderRequestIncomeQuery()
+
+    const groupedRequests =
+        incomingRequests && groupRequestsByDate(incomingRequests.data || [])
 
     return (
         <Flex direction='column' gap='md'>
@@ -52,78 +68,120 @@ export function ProductApplicationViews() {
                         />
                     </Flex>
 
-                    <Paper p='md' withBorder bg='indigo.4'>
-                        <Flex justify='space-around'>
+                    <Table withRowBorders withColumnBorders>
+                        <Table.Thead bg='indigo.4'>
                             {[
                                 '№ Заявки',
                                 'Адрес и дата доставки',
-                                'Телефон',
-                                'Комментарий',
-                                'Дата создания',
+                                'Способ доставки',
+                                'Отсрочка',
+                                'Ваши действия по заявке',
                             ].map((tab, index) => (
-                                <Text size='md' c='gray.0' key={index}>
+                                <Table.Th key={index} c='#FFF' p='md'>
                                     {tab}
-                                </Text>
+                                </Table.Th>
                             ))}
-                        </Flex>
-                    </Paper>
+                        </Table.Thead>
 
-                    {incomingRequests.data?.map((request: HorecaRequestDto) => (
-                        <>
-                            <Paper
-                                p='md'
-                                withBorder
-                                key={request.id}
-                                bg='gray.0'
-                            >
-                                <Flex justify='space-around'>
-                                    <Flex direction='column' gap='md' w={115}>
-                                        <Text size='md'>{request.id}</Text>
-                                        <Text size='xs' c='dimmed'>
-                                            {new Date(
-                                                request.createdAt
-                                            ).toLocaleDateString()}
-                                        </Text>
-                                    </Flex>
+                        {groupedRequests &&
+                            Object.entries(groupedRequests).map(
+                                ([date, requests]) => (
+                                    <React.Fragment key={date}>
+                                        <Table.Tbody>
+                                            <Table.Tr>
+                                                <Table.Td
+                                                    colSpan={5}
+                                                    align='left'
+                                                    p='md'
+                                                >
+                                                    <Text
+                                                        size='sm'
+                                                        c='#909090'
+                                                    >{`Размещены: ${date}`}</Text>
+                                                </Table.Td>
+                                            </Table.Tr>
 
-                                    <Flex direction='column' gap='xs' w={170}>
-                                        <Text size='md'>{request.address}</Text>
-                                        <Text size='xs' c='dimmed'>
-                                            до{' '}
-                                            {new Date(
-                                                request.deliveryTime
-                                            ).toLocaleDateString()}
-                                        </Text>
-                                    </Flex>
-
-                                    <Box w={100}>
-                                        <Text size='md'>{request.phone}</Text>
-                                    </Box>
-
-                                    <Flex w={150}>
-                                        <Text size='md'>{request.comment}</Text>
-                                    </Flex>
-
-                                    <Flex w={150}>
-                                        <Text size='md'>
-                                            {new Date(
-                                                request.createdAt
-                                            ).toLocaleDateString()}
-                                        </Text>
-                                    </Flex>
-
-                                    <Flex>
-                                        {request.images?.map(x => (
-                                            <MantineImage
-                                                key={x.id}
-                                                src={`http://95.163.222.187:3001/${x.path}`}
-                                            />
-                                        ))}
-                                    </Flex>
-                                </Flex>
-                            </Paper>
-                        </>
-                    ))}
+                                            {requests.map(request => (
+                                                <Table.Tr
+                                                    key={request.id}
+                                                    bg='#F5F7FD'
+                                                >
+                                                    <Table.Td
+                                                        align='center'
+                                                        p='md'
+                                                    >
+                                                        {request.id}
+                                                    </Table.Td>
+                                                    <Table.Td
+                                                        align='center'
+                                                        p='md'
+                                                    >
+                                                        <Text size='sm'>
+                                                            до{' '}
+                                                            {new Date(
+                                                                request.deliveryTime
+                                                            ).toLocaleDateString()}
+                                                        </Text>
+                                                        <Text size='sm'>
+                                                            {request.address}
+                                                        </Text>
+                                                    </Table.Td>
+                                                    <Table.Td
+                                                        align='center'
+                                                        p='md'
+                                                    >
+                                                        способ доставки
+                                                    </Table.Td>
+                                                    <Table.Td
+                                                        align='center'
+                                                        p='md'
+                                                    >
+                                                        {
+                                                            PaymentMethodLabels[
+                                                                request.paymentType as unknown as PaymentMethod
+                                                            ]
+                                                        }
+                                                    </Table.Td>
+                                                    <Table.Td
+                                                        align='center'
+                                                        p='md'
+                                                    >
+                                                        <Flex
+                                                            direction='column'
+                                                            gap='md'
+                                                        >
+                                                            <Button
+                                                                p={0}
+                                                                variant='transparent'
+                                                                c='indigo.4'
+                                                            >
+                                                                Просмотреть
+                                                                заявку
+                                                            </Button>
+                                                            <Button
+                                                                p={0}
+                                                                variant='transparent'
+                                                                disabled
+                                                                c='gray'
+                                                            >
+                                                                Скрыть заявку
+                                                            </Button>
+                                                            <Button
+                                                                p={0}
+                                                                variant='transparent'
+                                                                c='#CC2C79'
+                                                            >
+                                                                Пожаловаться
+                                                            </Button>
+                                                        </Flex>
+                                                    </Table.Td>
+                                                </Table.Tr>
+                                            ))}
+                                        </Table.Tbody>
+                                    </React.Fragment>
+                                )
+                            )}
+                    </Table>
                 </Flex>
             )}
 

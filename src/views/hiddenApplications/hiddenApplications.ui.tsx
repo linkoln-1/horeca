@@ -1,11 +1,17 @@
 'use client'
 
+import React from 'react'
+
 import { useUserStore } from '@/core/providers/userStoreContext'
-import { Flex, Grid, Paper, Text, Button, Loader } from '@mantine/core'
+import { Flex, Grid, Paper, Text, Button, Loader, Table } from '@mantine/core'
 import { IconChevronLeft } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 
 import { hiddenApplications } from '@/shared/constants'
+import {
+    PaymentMethod,
+    PaymentMethodLabels,
+} from '@/shared/constants/paymentMethod'
 import { role } from '@/shared/helpers/getRole'
 
 export function HiddenApplicationsViews() {
@@ -31,22 +37,6 @@ export function HiddenApplicationsViews() {
                 </Button>
             </Flex>
             <Flex direction='column' gap='md'>
-                <Paper p='md' withBorder bg='indigo.4'>
-                    <Flex justify='space-around'>
-                        {[
-                            '№ Скрытой заявки',
-                            'Адрес и дата доставки',
-                            'Способ доставки',
-                            'Отсрочка',
-                            'Почему скрыта',
-                        ].map((tab, index) => (
-                            <Text size='md' c='gray.0' key={index}>
-                                {tab}
-                            </Text>
-                        ))}
-                    </Flex>
-                </Paper>
-
                 {!hiddenApplications ? (
                     <Flex
                         direction='column'
@@ -64,80 +54,65 @@ export function HiddenApplicationsViews() {
                         </Text>
                     </Flex>
                 ) : (
-                    hiddenApplications.map((orderGroup, groupIndex) => (
-                        <Flex key={groupIndex} direction='column' gap='sm'>
-                            <Text mt='md' size='sm' c='gray.6'>
-                                Размещены {orderGroup.date}
-                            </Text>
-
-                            {orderGroup.items.map((item, itemIndex) => (
-                                <Paper
-                                    p='md'
-                                    withBorder
-                                    key={itemIndex}
-                                    bg='#F5F7FD'
-                                >
-                                    <Grid
-                                        justify='space-between'
-                                        align='center'
-                                    >
-                                        <Grid.Col span={2}>
-                                            <Flex
-                                                direction='column'
-                                                align='center'
-                                            >
-                                                <Text size='md'>
-                                                    {item.orderNumber}
-                                                </Text>
-                                                <Text size='xs' c='dimmed'>
-                                                    {orderGroup.date}
-                                                </Text>
-                                            </Flex>
-                                        </Grid.Col>
-
-                                        {/* Адрес и дата доставки */}
-                                        <Grid.Col span={3}>
-                                            <Flex
-                                                direction='column'
-                                                align='center'
-                                            >
-                                                <Text size='md'>
-                                                    {item.address}
-                                                </Text>
-                                                <Text size='xs' c='dimmed'>
-                                                    до {item.deliveryDate}
-                                                </Text>
-                                            </Flex>
-                                        </Grid.Col>
-
-                                        <Grid.Col span={2}>
-                                            <Flex justify='center'>
-                                                <Text size='md'>
-                                                    {item.deliveryMethod}
-                                                </Text>
-                                            </Flex>
-                                        </Grid.Col>
-
-                                        <Grid.Col span={2}>
-                                            <Flex justify='center'>
-                                                <Text size='md'>
-                                                    {item.delay}
-                                                </Text>
-                                            </Flex>
-                                        </Grid.Col>
-
-                                        <Grid.Col span={2}>
-                                            <Flex justify='center'>
-                                                <Text size='md'>
-                                                    {item.reason}
-                                                </Text>
-                                            </Flex>
-                                        </Grid.Col>
-                                    </Grid>
-                                </Paper>
+                    <Table withRowBorders withColumnBorders>
+                        <Table.Thead bg='indigo.4'>
+                            {[
+                                '№ Скрытой заявки',
+                                'Адрес и дата доставки',
+                                'Способ доставки',
+                                'Отсрочка',
+                                'Почему скрыта',
+                            ].map((tab, index) => (
+                                <Table.Th key={index} c='#FFF' p='md'>
+                                    {tab}
+                                </Table.Th>
                             ))}
-                        </Flex>
-                    ))
+                        </Table.Thead>
+
+                        {hiddenApplications.map((orderGroup, groupIndex) => (
+                            <React.Fragment key={groupIndex}>
+                                <Table.Tbody>
+                                    <Table.Tr>
+                                        <Table.Td
+                                            colSpan={5}
+                                            align='left'
+                                            p='md'
+                                        >
+                                            <Text
+                                                size='sm'
+                                                c='#909090'
+                                            >{`Размещены: ${orderGroup.date}`}</Text>
+                                        </Table.Td>
+                                    </Table.Tr>
+
+                                    {orderGroup.items.map(request => (
+                                        <Table.Tr key={request.id} bg='#F5F7FD'>
+                                            <Table.Td align='center' p='md'>
+                                                {request.orderNumber}
+                                            </Table.Td>
+                                            <Table.Td align='center' p='md'>
+                                                <Text size='sm'>
+                                                    до {request.deliveryDate}
+                                                </Text>
+                                                <Text size='sm'>
+                                                    {request.address}
+                                                </Text>
+                                            </Table.Td>
+                                            <Table.Td align='center' p='md'>
+                                                {request.deliveryMethod}
+                                            </Table.Td>
+                                            <Table.Td align='center' p='md'>
+                                                {request.delay}
+                                            </Table.Td>
+                                            <Table.Td align='center' p='md'>
+                                                {request.reason}
+                                            </Table.Td>
+                                        </Table.Tr>
+                                    ))}
+                                </Table.Tbody>
+                            </React.Fragment>
+                        ))}
+                    </Table>
                 )}
             </Flex>
         </Flex>

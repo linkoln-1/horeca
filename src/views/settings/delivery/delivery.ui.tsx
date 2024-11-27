@@ -16,9 +16,11 @@ import {
 import { useForm } from '@mantine/form'
 
 import { CategoryLabels, errors } from '@/shared/constants'
+import { packageTypeLabel } from '@/shared/constants/packageType'
 import {
     Categories,
     DeliveryMethods,
+    ProductPackagingType,
     ProfileType,
     ProviderProfileDto,
     UpdateUserDto,
@@ -48,6 +50,13 @@ function transformCategories(
         label: categoryLabels[x as Categories],
     }))
 }
+
+const categoryOptions = Object.values(Categories)
+    .filter(value => typeof value === 'string')
+    .map(x => ({
+        value: x.trim(),
+        label: CategoryLabels[x as Categories]?.trim() || 'Не указано',
+    }))
 
 export function DeliveryViews() {
     const form = useForm<DeliveryFormType>({
@@ -128,7 +137,7 @@ export function DeliveryViews() {
                 <MultiSelect
                     label='Категория товара'
                     placeholder='Выберите категорию'
-                    data={form.values.categories}
+                    data={categoryOptions}
                     value={form.values.categories.map(c => c.value)}
                     onChange={value => {
                         const transformedValue = value.map(v => ({
@@ -138,6 +147,7 @@ export function DeliveryViews() {
                         form.setFieldValue('categories', transformedValue)
                         form.validateField('categories')
                     }}
+                    searchable
                 />
 
                 <NumberInput

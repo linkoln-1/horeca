@@ -69,7 +69,7 @@ export function HorecaStepTwo({ form }: StepProps) {
             <TextInput
                 required
                 label='Контактный номер для связи с поставщиком'
-                placeholder='Номер мобильного телефона'
+                placeholder='Номер мобильного телефона. Пример: (79887653452)'
                 type='tel'
                 {...form.getInputProps('phone')}
             />
