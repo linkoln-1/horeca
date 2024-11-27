@@ -49,7 +49,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     const form = useForm<profileProps>({
         initialValues: {},
     })
-    const isMobile = useBreakpoint('sm')
+    const isMobile = useBreakpoint('md')
     const path = usePathname()
 
     const { user, accessToken } = useUserStore(state => state)
@@ -71,147 +71,129 @@ export function AppLayout({ children }: AppLayoutProps) {
     }
 
     return (
-        <Box className='min-h-screen flex flex-col'>
-            <Header />
-            <Box style={{ flexGrow: 1 }}>
-                <Container>
-                    <Grid mt='md' justify='space-between'>
-                        {!isMobile &&
-                            decode &&
-                            decode.role !== roles[2].role && (
-                                <Grid.Col
-                                    span={{
-                                        base: 0,
-                                        xs: 0,
-                                        sm: 'content',
-                                        md: 3,
-                                    }}
-                                >
-                                    <Paper
-                                        bg='var(--mantine-color-indigo-0)'
-                                        p='md'
-                                        radius='md'
-                                    >
-                                        <Flex direction='column' gap={24}>
-                                            <Flex
-                                                gap='md'
-                                                align='center'
-                                                direction='column'
-                                            >
-                                                <Box w={150} h={150}>
-                                                    <CustomAvatarUpload
-                                                        onChange={
-                                                            handleAvatarChange
-                                                        }
-                                                        src={
-                                                            form.values.avatar
-                                                                ? getImageUrl(
-                                                                      form
-                                                                          .values
-                                                                          .avatar
-                                                                          .url
-                                                                  )
-                                                                : undefined
-                                                        }
-                                                        size='100%'
-                                                        color='blue'
-                                                        className='aspect-square cursor-pointer'
-                                                    />
-                                                </Box>
-                                                <Box>
-                                                    <Flex
-                                                        direction='column'
-                                                        gap='lg'
-                                                    >
-                                                        {[user].map(item => (
-                                                            <Flex
-                                                                key={
-                                                                    item &&
-                                                                    item.id
-                                                                }
-                                                                direction='column'
-                                                                gap='md'
-                                                                justify='center'
-                                                                align='center'
-                                                            >
-                                                                <Text
-                                                                    size='xl'
-                                                                    fw={700}
-                                                                >
-                                                                    {item &&
-                                                                        item.name}
-                                                                </Text>
+        <Container className='min-h-screen flex flex-col justify-between' fluid>
+            <Grid>
+                <Grid.Col span={12}>
+                    <Header />
+                </Grid.Col>
 
-                                                                <Text>
-                                                                    email:{' '}
-                                                                    {item &&
-                                                                        item.email}
-                                                                </Text>
-                                                            </Flex>
-                                                        ))}
-                                                    </Flex>
-                                                </Box>
-                                            </Flex>
-
-                                            <Divider color='#A0AAC8' />
-
-                                            {roleSidebar &&
-                                                user &&
-                                                roleSidebar.map((x, index) => {
-                                                    if (x.type === 'divider') {
-                                                        return (
-                                                            <Divider
-                                                                color='#A0AAC8'
-                                                                key={index}
-                                                            />
-                                                        )
-                                                    }
-
-                                                    const isActive =
-                                                        path ===
-                                                        `/user${role({ user })}${x.link}`
-
-                                                    return (
-                                                        <Link
-                                                            className={`flex items-center justify-between h-[18px] text-[14px] font-bold ${isActive ? 'text-[var(--mantine-color-indigo-4)]' : 'text-[#2B2B2B]'} hover:text-[#474747] relative`}
-                                                            key={x.label}
-                                                            href={`/user${role({ user })}${x.link}`}
-                                                        >
-                                                            <Flex
-                                                                gap={20}
-                                                                align='center'
-                                                                pos='relative'
-                                                            >
-                                                                <x.icon />
-                                                                {x.label}
-                                                            </Flex>
-                                                            {x.badge && (
-                                                                <x.badge />
-                                                            )}
-                                                            {x.iconRight && (
-                                                                <x.iconRight />
-                                                            )}
-                                                        </Link>
-                                                    )
-                                                })}
-                                        </Flex>
-                                    </Paper>
-                                </Grid.Col>
-                            )}
-                        <Grid.Col
-                            span={{
-                                base: 12,
-                                xs: 12,
-                                sm: isMobile ? 12 : 'auto',
-                                md: isMobile ? 12 : 9,
-                            }}
+                {!isMobile && decode && decode.role !== roles[2].role && (
+                    <Grid.Col
+                        span={{
+                            base: 0,
+                            xs: 0,
+                            sm: 'content',
+                            md: 2,
+                        }}
+                        h='calc(100vh - 140px)'
+                        pos='sticky'
+                        top={20}
+                    >
+                        <Paper
+                            bg='var(--mantine-color-indigo-0)'
+                            p='md'
+                            radius='md'
+                            h='100%'
                         >
-                            {children}
-                        </Grid.Col>
-                    </Grid>
-                </Container>
-            </Box>
+                            <Flex direction='column' gap={24}>
+                                <Flex
+                                    gap='md'
+                                    align='center'
+                                    direction='column'
+                                >
+                                    <Box w={150} h={150}>
+                                        <CustomAvatarUpload
+                                            onChange={handleAvatarChange}
+                                            src={
+                                                form.values.avatar
+                                                    ? getImageUrl(
+                                                          form.values.avatar.url
+                                                      )
+                                                    : undefined
+                                            }
+                                            size='100%'
+                                            color='blue'
+                                            className='aspect-square cursor-pointer'
+                                        />
+                                    </Box>
+                                    <Box>
+                                        <Flex direction='column' gap='lg'>
+                                            {[user].map(item => (
+                                                <Flex
+                                                    key={item && item.id}
+                                                    direction='column'
+                                                    gap='md'
+                                                    justify='center'
+                                                    align='center'
+                                                >
+                                                    <Text size='xl' fw={700}>
+                                                        {item && item.name}
+                                                    </Text>
+
+                                                    <Text>
+                                                        email:{' '}
+                                                        {item && item.email}
+                                                    </Text>
+                                                </Flex>
+                                            ))}
+                                        </Flex>
+                                    </Box>
+                                </Flex>
+
+                                <Divider color='#A0AAC8' />
+
+                                {roleSidebar &&
+                                    user &&
+                                    roleSidebar.map((x, index) => {
+                                        if (x.type === 'divider') {
+                                            return (
+                                                <Divider
+                                                    color='#A0AAC8'
+                                                    key={index}
+                                                />
+                                            )
+                                        }
+
+                                        const isActive =
+                                            path ===
+                                            `/user${role({ user })}${x.link}`
+
+                                        return (
+                                            <Link
+                                                className={`flex items-center justify-between h-[18px] text-[14px] font-bold ${isActive ? 'text-[var(--mantine-color-indigo-4)]' : 'text-[#2B2B2B]'} hover:text-[#474747] relative`}
+                                                key={x.label}
+                                                href={`/user${role({ user })}${x.link}`}
+                                            >
+                                                <Flex
+                                                    gap={20}
+                                                    align='center'
+                                                    pos='relative'
+                                                >
+                                                    <x.icon />
+                                                    {x.label}
+                                                </Flex>
+                                                {x.badge && <x.badge />}
+                                                {x.iconRight && <x.iconRight />}
+                                            </Link>
+                                        )
+                                    })}
+                            </Flex>
+                        </Paper>
+                    </Grid.Col>
+                )}
+
+                <Grid.Col
+                    span={{
+                        base: 12,
+                        xs: 12,
+                        sm: isMobile ? 12 : 10,
+                        md: isMobile ? 12 : 10,
+                    }}
+                >
+                    {children}
+                </Grid.Col>
+            </Grid>
             <Footer my='md' />
-        </Box>
+        </Container>
     )
 }
