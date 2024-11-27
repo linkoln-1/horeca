@@ -74,19 +74,21 @@ export function Catalog() {
                     <Flex direction='column' gap='md'>
                         <Table>
                             <Table.Thead bg='indigo.4'>
-                                {[
-                                    'Наименование',
-                                    'Производитель',
-                                    'Характеристики',
-                                    'Фасовка',
-                                    'Цена (за ед.)',
-                                    'Кол-во',
-                                    'Фотографии',
-                                ].map((tab, index) => (
-                                    <Table.Th key={index} c='#FFF' p='md'>
-                                        {tab}
-                                    </Table.Th>
-                                ))}
+                                <Table.Tr>
+                                    {[
+                                        'Наименование',
+                                        'Производитель',
+                                        'Характеристики',
+                                        'Фасовка',
+                                        'Цена (за ед.)',
+                                        'Кол-во',
+                                        'Фотографии',
+                                    ].map((tab, index) => (
+                                        <Table.Th key={index} c='#FFF' p='md'>
+                                            <Flex justify='center'>{tab}</Flex>
+                                        </Table.Th>
+                                    ))}
+                                </Table.Tr>
                             </Table.Thead>
 
                             <Table.Tbody>

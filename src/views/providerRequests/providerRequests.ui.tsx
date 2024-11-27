@@ -41,6 +41,13 @@ const statusMap: Record<string, ProviderRequestStatus> = {
     Завершённые: ProviderRequestStatus.Finished,
 }
 
+const getLabelByStatus = (status: string): string => {
+    const application = applications.find(
+        app => app.status.toLowerCase() === status.toLowerCase()
+    )
+    return application ? application.label : 'Неизвестный статус'
+}
+
 export function ProviderRequests() {
     const [activeTab, setActiveTab] = useState(applications[0].label)
     const [activeStatus, setActiveStatus] = useState(
@@ -149,9 +156,9 @@ export function ProviderRequests() {
                                                     }
                                                     variant='light'
                                                 >
-                                                    {
+                                                    {getLabelByStatus(
                                                         order.status as unknown as ProviderRequestStatus
-                                                    }
+                                                    )}
                                                 </Badge>
                                                 <Box w={300}>
                                                     {order.comment && (
@@ -240,13 +247,15 @@ export function ProviderRequests() {
                         </Grid>
 
                         {hasNextPage && (
-                            <Button
-                                onClick={() => fetchNextPage()}
-                                loading={isFetching}
-                                bg='indigo.4'
-                            >
-                                Загрузить еще
-                            </Button>
+                            <Flex justify='center'>
+                                <Button
+                                    onClick={() => fetchNextPage()}
+                                    loading={isFetching}
+                                    bg='indigo.4'
+                                >
+                                    Загрузить еще
+                                </Button>
+                            </Flex>
                         )}
                     </>
                 )}

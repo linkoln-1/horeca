@@ -56,17 +56,19 @@ export function HiddenApplicationsViews() {
                 ) : (
                     <Table withRowBorders withColumnBorders>
                         <Table.Thead bg='indigo.4'>
-                            {[
-                                '№ Скрытой заявки',
-                                'Адрес и дата доставки',
-                                'Способ доставки',
-                                'Отсрочка',
-                                'Почему скрыта',
-                            ].map((tab, index) => (
-                                <Table.Th key={index} c='#FFF' p='md'>
-                                    {tab}
-                                </Table.Th>
-                            ))}
+                            <Table.Tr>
+                                {[
+                                    '№ Скрытой заявки',
+                                    'Адрес и дата доставки',
+                                    'Способ доставки',
+                                    'Отсрочка',
+                                    'Почему скрыта',
+                                ].map((tab, index) => (
+                                    <Table.Th key={index} c='#FFF' p='md'>
+                                        <Flex justify='center'>{tab}</Flex>
+                                    </Table.Th>
+                                ))}
+                            </Table.Tr>
                         </Table.Thead>
 
                         {hiddenApplications.map((orderGroup, groupIndex) => (

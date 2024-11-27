@@ -233,13 +233,15 @@ export function ApplicationsViews() {
                     </Grid>
 
                     {hasNextPage && (
-                        <Button
-                            onClick={() => fetchNextPage()}
-                            loading={isFetching}
-                            bg='indigo.4'
-                        >
-                            Загрузить еще
-                        </Button>
+                        <Flex justify='center'>
+                            <Button
+                                onClick={() => fetchNextPage()}
+                                loading={isFetching}
+                                bg='indigo.4'
+                            >
+                                Загрузить еще
+                            </Button>
+                        </Flex>
                     )}
                 </>
             )}

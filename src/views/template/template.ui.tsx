@@ -10,6 +10,7 @@ import {
     Grid,
     List,
     Loader,
+    Paper,
     Text,
 } from '@mantine/core'
 import dayjs from 'dayjs'
@@ -20,23 +21,31 @@ import { Categories } from '@/shared/lib/horekaApi/Api'
 
 import '@/styles/template.scss'
 
+const LIMIT = 5
+
 export function TemplateApplicationViews() {
-    const { data: templates } = templateQueries.useGetHorecaTemplateQuery()
+    const {
+        data: templates,
+        hasNextPage,
+        fetchNextPage,
+        isFetching,
+    } = templateQueries.useGetHorecaTemplateQuery({
+        limit: LIMIT,
+    })
 
     if (!templates) return <Loader />
 
     return (
         <>
             <Grid>
-                <Grid.Col span={3}>
+                <Grid.Col span={2}>
                     <Flex direction='column' gap='md'>
-                        <Box>
+                        <Paper withBorder>
                             <List>
                                 {templates.map(x => (
                                     <List.Item
                                         py='sm'
-                                        mb='sm'
-                                        className='sidebar border-b'
+                                        className='sidebar overflow-y-auto border-b'
                                         key={x.id}
                                     >
                                         <Text size='md' fw={500}>
@@ -45,19 +54,11 @@ export function TemplateApplicationViews() {
                                     </List.Item>
                                 ))}
                             </List>
-                        </Box>
-
-                        <Text fw={500} size='md'>
-                            Категории товаров
-                        </Text>
-                        {/* Здесь можно добавить чекбоксы с категориями */}
-                        <Button bg='indigo' radius='lg'>
-                            Применить
-                        </Button>
+                        </Paper>
                     </Flex>
                 </Grid.Col>
 
-                <Grid.Col span={9}>
+                <Grid.Col span={6}>
                     {templates.length === 0 && (
                         <Flex
                             justify='center'
@@ -89,6 +90,7 @@ export function TemplateApplicationViews() {
                                 p={0}
                                 withBorder
                                 w='100%'
+                                mb='md'
                             >
                                 <Flex gap='md'>
                                     <Flex
@@ -112,36 +114,42 @@ export function TemplateApplicationViews() {
                                         </Text>
                                     </Flex>
 
-                                    <Flex direction='column' gap='md' p='md'>
-                                        {content.items.map((item, index) => (
-                                            <Flex
-                                                direction='column'
-                                                gap='md'
-                                                key={index}
-                                            >
-                                                <Flex direction='column'>
-                                                    <Text c='gray.5'>
-                                                        Категория товаров:
-                                                    </Text>
-                                                    <Text>
-                                                        {
-                                                            CategoryLabels[
-                                                                item.category as Categories
-                                                            ]
-                                                        }
-                                                    </Text>
+                                    <Flex
+                                        direction='column'
+                                        gap='md'
+                                        p='md'
+                                        w='100%'
+                                    >
+                                        {content.items &&
+                                            content.items.map((item, index) => (
+                                                <Flex
+                                                    direction='column'
+                                                    gap='md'
+                                                    key={index}
+                                                >
+                                                    <Flex direction='column'>
+                                                        <Text c='gray.5'>
+                                                            Категория товаров:
+                                                        </Text>
+                                                        <Text>
+                                                            {
+                                                                CategoryLabels[
+                                                                    item.category as Categories
+                                                                ]
+                                                            }
+                                                        </Text>
+                                                    </Flex>
+                                                    <Flex direction='column'>
+                                                        <Text c='gray.5'>
+                                                            Наименование:
+                                                        </Text>
+                                                        <Text>{item.name}</Text>
+                                                    </Flex>
+                                                    <Divider orientation='horizontal' />
                                                 </Flex>
-                                                <Flex direction='column'>
-                                                    <Text c='gray.5'>
-                                                        Наименование:
-                                                    </Text>
-                                                    <Text>{item.name}</Text>
-                                                </Flex>
-                                                <Divider orientation='horizontal' />
-                                            </Flex>
-                                        ))}
+                                            ))}
 
-                                        <Flex gap='md'>
+                                        <Flex justify='space-between'>
                                             <Button
                                                 c='blue'
                                                 fw='500'
@@ -166,6 +174,19 @@ export function TemplateApplicationViews() {
                             </Card>
                         )
                     })}
+
+                    {hasNextPage && (
+                        <Flex maw={200} w='100%' className='mx-auto'>
+                            <Button
+                                fullWidth
+                                onClick={() => fetchNextPage()}
+                                loading={isFetching}
+                                bg='indigo.4'
+                            >
+                                Загрузить еще
+                            </Button>
+                        </Flex>
+                    )}
                 </Grid.Col>
             </Grid>
         </>

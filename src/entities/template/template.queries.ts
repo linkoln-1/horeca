@@ -8,10 +8,17 @@ import {
 import { useCustomInfiniteQuery } from '@/shared/lib/reactQuery/useCustomInfiniteQuery'
 import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
 
-export function useGetHorecaTemplateQuery() {
+type QueryType = {
+    offset?: number
+    limit?: number
+    search?: string
+    sort?: string
+}
+
+export function useGetHorecaTemplateQuery(query?: QueryType) {
     return useCustomInfiniteQuery({
         queryKey: ['template'],
-        queryFn: () => api.horecaRequestsTemplateControllerFindAll(),
+        queryFn: () => api.horecaRequestsTemplateControllerFindAll(query),
     })
 }
 

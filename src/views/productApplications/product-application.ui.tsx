@@ -70,17 +70,19 @@ export function ProductApplicationViews() {
 
                     <Table withRowBorders withColumnBorders>
                         <Table.Thead bg='indigo.4'>
-                            {[
-                                '№ Заявки',
-                                'Адрес и дата доставки',
-                                'Способ доставки',
-                                'Отсрочка',
-                                'Ваши действия по заявке',
-                            ].map((tab, index) => (
-                                <Table.Th key={index} c='#FFF' p='md'>
-                                    {tab}
-                                </Table.Th>
-                            ))}
+                            <Table.Tr>
+                                {[
+                                    '№ Заявки',
+                                    'Адрес и дата доставки',
+                                    'Способ доставки',
+                                    'Отсрочка',
+                                    'Ваши действия по заявке',
+                                ].map((tab, index) => (
+                                    <Table.Th key={index} c='#FFF' p='md'>
+                                        <Flex justify='center'>{tab}</Flex>
+                                    </Table.Th>
+                                ))}
+                            </Table.Tr>
                         </Table.Thead>
 
                         {groupedRequests &&
@@ -148,7 +150,7 @@ export function ProductApplicationViews() {
                                                     >
                                                         <Flex
                                                             direction='column'
-                                                            gap='md'
+                                                            align='center'
                                                         >
                                                             <Button
                                                                 p={0}
@@ -161,8 +163,9 @@ export function ProductApplicationViews() {
                                                             <Button
                                                                 p={0}
                                                                 variant='transparent'
-                                                                disabled
                                                                 c='gray'
+                                                                disabled
+                                                                bg='transparent'
                                                             >
                                                                 Скрыть заявку
                                                             </Button>
