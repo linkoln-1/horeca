@@ -39,7 +39,8 @@ export function TemplateApplicationViews() {
         <>
             <Grid>
                 <Grid.Col span={2}>
-                    <Flex direction='column' gap='md'>
+                    <Flex direction='column' gap='sm'>
+                        <Text>Шаблоны</Text>
                         <Paper withBorder>
                             <List>
                                 {templates.map(x => (

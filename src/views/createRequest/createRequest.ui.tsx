@@ -23,6 +23,7 @@ import {
     CheckIcon,
     Loader,
     LoadingOverlay,
+    Container,
 } from '@mantine/core'
 import { DateTimePicker, DateInput } from '@mantine/dates'
 import { FileWithPath } from '@mantine/dropzone'
@@ -192,8 +193,8 @@ export function CreateRequestView() {
     if (!templates) return <Loader />
 
     return (
-        <Flex justify='space-between' mt='md' gap='lg'>
-            <Box miw='250px'>
+        <Flex mt='md' gap='lg'>
+            <Box miw='300px'>
                 <Select
                     label='Шаблоны'
                     placeholder='Новый шаблон'
@@ -201,7 +202,7 @@ export function CreateRequestView() {
                     onChange={value => setSelectedTemplateId(String(value))}
                 />
             </Box>
-            <Paper p='md' w='100%' shadow='md' withBorder>
+            <Paper p='md' w='100%' shadow='md' withBorder maw='70%'>
                 <LoadingOverlay
                     zIndex={1000}
                     overlayProps={{ blur: 2 }}

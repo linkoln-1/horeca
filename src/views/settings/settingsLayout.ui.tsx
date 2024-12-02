@@ -59,6 +59,7 @@ export function SettingsLayout({ children }: { children: ReactNode }) {
                 <Grid.Col
                     span={{
                         base: 12,
+                        md: 8,
                     }}
                 >
                     {children}

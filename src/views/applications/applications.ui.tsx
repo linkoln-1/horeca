@@ -109,7 +109,7 @@ export function ApplicationsViews() {
                             <Grid.Col
                                 span={{
                                     base: 12,
-                                    md: 6,
+                                    md: 4,
                                 }}
                                 key={index}
                             >
