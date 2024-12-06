@@ -45,6 +45,8 @@ type formType = Omit<
     'createdAt' | 'updatedAt' | 'id' | 'userId'
 >
 
+type CategoryType = { name: string; content: HorecaTemplateDto }
+
 export function EditTemplateUi({ id }: { id: string }) {
     const form = useForm<formType>({
         initialValues: {
@@ -61,48 +63,116 @@ export function EditTemplateUi({ id }: { id: string }) {
 
     const dropzone = useRef<() => void>(null)
     const [images, setImages] = useState<FileWithPath[]>([])
-    const [categories, setCategories] = useState<string[]>(['Готовые блюда'])
+    const [categories, setCategories] = useState<CategoryType[]>([])
     const [items, setItems] = useState<
-        { name: string; amount: number | undefined; unit: string }[]
+        {
+            name: string
+            amount: number | undefined
+            unit: string
+            category: string
+        }[]
     >([])
 
     useEffect(() => {
-        if (templates) {
-            const content: HorecaTemplateDto =
-                typeof templates.content === 'string'
-                    ? JSON.parse(templates.content)
-                    : templates.content
-            setItems(
-                content.items?.map(item => ({
-                    name: item.name || '',
-                    amount: item.amount || 0,
-                    unit: item.unit || 'шт.',
-                })) || []
-            )
+        const fetchTemplate = async () => {
+            if (templates) {
+                const content: HorecaTemplateDto =
+                    typeof templates.content === 'string'
+                        ? JSON.parse(templates.content)
+                        : templates.content
 
-            form.setValues({
-                name: content.name,
-                content: content,
-            })
+                setItems(
+                    content.items?.map(x => ({
+                        name: x.name,
+                        amount: x.amount,
+                        unit: x.unit,
+                        category: x.category,
+                    }))
+                )
+
+                form.setValues({
+                    name: content.name,
+                    content,
+                })
+            }
         }
+
+        fetchTemplate()
     }, [templates])
 
     const handleImages = (files: FileWithPath[]) => {
         setImages(files)
     }
 
-    const handleAddCategory = () => {
-        const newCategory = `Категория ${categories.length + 1}`
-        setCategories([...categories, newCategory])
+    const handleAddItem = () => {
+        setCategories(prev => [
+            ...prev,
+            {
+                name: '',
+                content: {
+                    items: [{ name: '', amount: 0, unit: '', category: '' }],
+                    address: '',
+                    deliveryTime: '',
+                    acceptUntill: '',
+                    paymentType: '',
+                    name: '',
+                    phone: '',
+                },
+            },
+        ])
     }
 
-    const handleAddItem = () => {
-        setItems([...items, { name: '', amount: undefined, unit: '' }])
+    const handleDeleteCategory = (index: number) => {
+        setCategories(prev => prev.filter((_, i) => i !== index))
     }
+
+    const handleDeleteCategoryModal = (index: number) => {
+        modals.open({
+            centered: true,
+            modalId: 'deleteCategory',
+            radius: 'lg',
+            size: 'lg',
+            children: (
+                <DeleteCategoryModal
+                    handleDeleteCategory={() => handleDeleteCategory(index)}
+                />
+            ),
+        })
+    }
+
+    const handleCategoryChange = (
+        index: number,
+        updatedCategory: CategoryType
+    ) => {
+        setCategories(prev =>
+            prev.map((category, i) =>
+                i === index ? updatedCategory : category
+            )
+        )
+    }
+
     const categoriesOption: HorecaTemplateDto =
         typeof form.values.content === 'string'
             ? JSON.parse(form.values.content)
             : form.values.content
+
+    const handleAddCategory = () => {
+        setCategories(prev => [
+            ...prev,
+            {
+                name: '',
+                content: {
+                    items: [{ name: '', amount: 0, unit: '', category: '' }],
+                    address: '',
+                    deliveryTime: '',
+                    acceptUntill: '',
+                    paymentType: '',
+                    name: '',
+                    phone: '',
+                } as HorecaTemplateDto,
+            },
+        ])
+    }
 
     return (
         <Box>
@@ -138,19 +208,6 @@ export function EditTemplateUi({ id }: { id: string }) {
                                         })
                                     }}
                                 />
-
-                                <Button
-                                    leftSection={<IconTrash />}
-                                    pl='0'
-                                    mb='lg'
-                                    variant='transparent'
-                                    c='pink.7'
-                                    fw='500'
-                                    size='md'
-                                    onClick={handleDeleteCategoryModal}
-                                >
-                                    Удалить всю категорию
-                                </Button>
                             </Flex>
                             <Flex direction='column'>
                                 {items.map((item, index) => (
@@ -195,37 +252,225 @@ export function EditTemplateUi({ id }: { id: string }) {
                                                 setItems(newItems)
                                             }}
                                         />
-                                        <Button
-                                            c='red'
-                                            top='-10px'
-                                            right='-20px'
-                                            pos='absolute'
-                                            variant='transparent'
-                                            onClick={() => {
-                                                const newItems = items.filter(
-                                                    (_, i) => i !== index
-                                                )
-                                                setItems(newItems)
-                                            }}
-                                        >
-                                            <IconX />
-                                        </Button>
                                     </Flex>
                                 ))}
-                                <Button
-                                    leftSection={<IconPlus />}
-                                    mb='lg'
-                                    w='fit-content'
-                                    variant='transparent'
-                                    fw='500'
-                                    size='md'
-                                    onClick={handleAddItem}
-                                >
-                                    Добавить еще один товар
-                                </Button>
                             </Flex>
                         </Flex>
                         <Divider />
+
+                        {categories.map((category, categoryIndex) => (
+                            <Flex
+                                gap='lg'
+                                justify='space-between'
+                                key={categoryIndex}
+                                mt='md'
+                            >
+                                <Flex direction='column' gap='xl'>
+                                    <Select
+                                        miw={300}
+                                        placeholder='Выберите категорию'
+                                        label='Категория товаров'
+                                        data={categoryOptions}
+                                        value={category.name}
+                                        onChange={value =>
+                                            handleCategoryChange(
+                                                categoryIndex,
+                                                {
+                                                    ...category,
+                                                    name: value || '',
+                                                }
+                                            )
+                                        }
+                                    />
+
+                                    <Button
+                                        leftSection={<IconTrash />}
+                                        pl='0'
+                                        mb='lg'
+                                        variant='transparent'
+                                        c='pink.7'
+                                        fw='500'
+                                        size='md'
+                                        onClick={() =>
+                                            handleDeleteCategoryModal(
+                                                categoryIndex
+                                            )
+                                        }
+                                    >
+                                        Удалить всю категорию
+                                    </Button>
+                                </Flex>
+
+                                <Flex direction='column' gap='xl'>
+                                    {category.content.items.map(
+                                        (item, index) => (
+                                            <Flex
+                                                key={index}
+                                                mb='xl'
+                                                gap='md'
+                                                w='100%'
+                                                pos='relative'
+                                                justify='space-between'
+                                            >
+                                                <TextInput
+                                                    w='280px'
+                                                    placeholder='Например: Горький шоколад'
+                                                    label='Наименование'
+                                                    value={item.name}
+                                                    onChange={e => {
+                                                        const updatedContent = {
+                                                            ...category.content,
+                                                            items: category.content.items.map(
+                                                                (it, idx) =>
+                                                                    idx ===
+                                                                    index
+                                                                        ? {
+                                                                              ...it,
+                                                                              name: e
+                                                                                  .target
+                                                                                  .value,
+                                                                          }
+                                                                        : it
+                                                            ),
+                                                        }
+
+                                                        handleCategoryChange(
+                                                            categoryIndex,
+                                                            {
+                                                                ...category,
+                                                                content:
+                                                                    updatedContent,
+                                                            }
+                                                        )
+                                                    }}
+                                                />
+                                                <NumberInput
+                                                    placeholder='456'
+                                                    label='Кол-во'
+                                                    value={item.amount}
+                                                    onChange={value => {
+                                                        const updatedContent = {
+                                                            ...category.content,
+                                                            items: category.content.items.map(
+                                                                (it, idx) =>
+                                                                    idx ===
+                                                                    index
+                                                                        ? {
+                                                                              ...it,
+                                                                              amount: +value,
+                                                                          }
+                                                                        : it
+                                                            ),
+                                                        }
+
+                                                        handleCategoryChange(
+                                                            categoryIndex,
+                                                            {
+                                                                ...category,
+                                                                content:
+                                                                    updatedContent,
+                                                            }
+                                                        )
+                                                    }}
+                                                />
+                                                <TextInput
+                                                    placeholder='штук'
+                                                    label='Ед. измерения'
+                                                    value={item.unit}
+                                                    onChange={e => {
+                                                        const updatedContent = {
+                                                            ...category.content,
+                                                            items: category.content.items.map(
+                                                                (it, idx) =>
+                                                                    idx ===
+                                                                    index
+                                                                        ? {
+                                                                              ...it,
+                                                                              unit: e
+                                                                                  .target
+                                                                                  .value,
+                                                                          }
+                                                                        : it
+                                                            ),
+                                                        }
+
+                                                        handleCategoryChange(
+                                                            categoryIndex,
+                                                            {
+                                                                ...category,
+                                                                content:
+                                                                    updatedContent,
+                                                            }
+                                                        )
+                                                    }}
+                                                />
+
+                                                <Button
+                                                    top='-10px'
+                                                    right='-20px'
+                                                    pos='absolute'
+                                                    c='red'
+                                                    variant='transparent'
+                                                    onClick={() => {
+                                                        const updatedContent = {
+                                                            ...category.content,
+                                                            items: category.content.items.filter(
+                                                                (_, idx) =>
+                                                                    idx !==
+                                                                    index
+                                                            ),
+                                                        }
+
+                                                        handleCategoryChange(
+                                                            categoryIndex,
+                                                            {
+                                                                ...category,
+                                                                content:
+                                                                    updatedContent,
+                                                            }
+                                                        )
+                                                    }}
+                                                    rightSection={<IconX />}
+                                                />
+                                            </Flex>
+                                        )
+                                    )}
+                                    <Button
+                                        leftSection={<IconPlus />}
+                                        w='fit-content'
+                                        variant='transparent'
+                                        fw='500'
+                                        size='md'
+                                        onClick={() => {
+                                            const updatedItems = [
+                                                ...(category.content.items ||
+                                                    []),
+                                                {
+                                                    name: '',
+                                                    amount: 0,
+                                                    unit: '',
+                                                    category: '',
+                                                },
+                                            ]
+
+                                            handleCategoryChange(
+                                                categoryIndex,
+                                                {
+                                                    ...category,
+                                                    content: {
+                                                        ...category.content,
+                                                        items: updatedItems,
+                                                    },
+                                                }
+                                            )
+                                        }}
+                                    >
+                                        Добавить товар в категорию
+                                    </Button>
+                                </Flex>
+                            </Flex>
+                        ))}
+
                         <Flex justify='flex-end'>
                             <Button
                                 my='xl'
@@ -426,16 +671,6 @@ export function EditTemplateUi({ id }: { id: string }) {
             )}
         </Box>
     )
-}
-
-const handleDeleteCategoryModal = () => {
-    modals.open({
-        centered: true,
-        modalId: 'deleteCategory',
-        radius: 'lg',
-        size: 'lg',
-        children: <DeleteCategoryModal />,
-    })
 }
 
 const handleSendRequestModal = () => {
