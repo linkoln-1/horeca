@@ -1,6 +1,8 @@
 'use client'
 
 import { templateQueries } from '@/entities/template'
+import { ApplicationsDetailsModals } from '@/views/applications/ui/applicationsDetailsModal'
+import { ViewTemplateModal } from '@/views/template/ui'
 import {
     Button,
     Card,
@@ -12,6 +14,7 @@ import {
     Paper,
     Text,
 } from '@mantine/core'
+import { modals } from '@mantine/modals'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 
@@ -155,6 +158,20 @@ export function TemplateApplicationViews() {
                                                 fw='500'
                                                 px='0'
                                                 variant='transparent'
+                                                onClick={() => {
+                                                    modals.open({
+                                                        modalId:
+                                                            'view-template-modal',
+                                                        children: (
+                                                            <ViewTemplateModal
+                                                                id={template.id}
+                                                            />
+                                                        ),
+                                                        centered: true,
+                                                        size: 1050,
+                                                        radius: 'lg',
+                                                    })
+                                                }}
                                             >
                                                 Открыть для просмотра
                                             </Button>
