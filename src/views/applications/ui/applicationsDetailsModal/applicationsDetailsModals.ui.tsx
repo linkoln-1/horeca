@@ -1,162 +1,303 @@
+import React, { useEffect, useState } from 'react'
+
+import { requestQueries } from '@/entities/horeca-request'
 import {
     Flex,
-    Text,
-    Divider,
     Paper,
     Image as MantineImage,
+    Box,
+    Select,
+    LoadingOverlay,
+    TextInput,
+    Textarea,
+    Autocomplete,
+    Radio,
+    Group,
+    CheckIcon,
 } from '@mantine/core'
+import { DateInput, DateTimePicker } from '@mantine/dates'
+import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
-import dayjs from 'dayjs'
 
-import { CategoryLabels } from '@/shared/constants'
-import {
-    PaymentMethod,
-    PaymentMethodLabels,
-} from '@/shared/constants/paymentMethod'
+import { CategoryLabels, HorecaRequestForm } from '@/shared/constants'
+import { PaymentMethod } from '@/shared/constants/paymentMethod'
 import { getImageUrl } from '@/shared/helpers'
-import { Categories, HorecaRequestDto } from '@/shared/lib/horekaApi/Api'
+import {
+    Categories,
+    HorecaRequestWithProviderRequestDto,
+    UploadDto,
+} from '@/shared/lib/horekaApi/Api'
 
-export function ApplicationsDetailsModals({
-    order,
-}: {
-    order: HorecaRequestDto
-}) {
+export function ApplicationsDetailsModals({ id }: { id: number }) {
+    const form = useForm<HorecaRequestForm>({
+        initialValues: {
+            items: [
+                {
+                    category: CategoryLabels.alcoholicDrinks as Categories,
+                    products: [
+                        {
+                            name: '',
+                            amount: 0,
+                            unit: '',
+                        },
+                    ],
+                },
+            ],
+            address: '',
+            deliveryTime: new Date(),
+            acceptUntill: new Date(),
+            paymentType: PaymentMethod.Prepayment,
+            name: '',
+            phone: '',
+            imageIds: [],
+        },
+    })
+
+    const { data, isLoading } = requestQueries.useGetRequestByIdQuery(id)
+
+    const [images, setImages] = useState<UploadDto[]>([])
+
+    const updateFormValuesFromTemplate = () => {
+        if (data) {
+            const transformedItems = data.items?.map(item => ({
+                category: item.category as Categories,
+                products: [
+                    {
+                        name: item.name,
+                        amount: item.amount,
+                        unit: item.unit,
+                    },
+                ],
+            }))
+
+            form.setValues({
+                items: transformedItems || [],
+                address: data.address || '',
+                deliveryTime: new Date(data.deliveryTime),
+                acceptUntill: new Date(data.acceptUntill),
+                paymentType:
+                    (data.paymentType as unknown as PaymentMethod) ||
+                    PaymentMethod.Prepayment,
+                name: data.name || '',
+                phone: data.phone || '',
+            })
+        }
+    }
+
+    useEffect(() => {
+        updateFormValuesFromTemplate()
+    }, [data])
+
     return (
-        <Flex direction='column' gap='md'>
-            <Text fw={600} size='xl'>
-                Заявка № {order.id}
-            </Text>
+        <Flex mt='md' gap='lg'>
+            {data &&
+                Array(data).map(
+                    (order: HorecaRequestWithProviderRequestDto, index) => (
+                        <>
+                            <Paper p='md' w='100%' shadow='md' withBorder>
+                                <LoadingOverlay
+                                    zIndex={1000}
+                                    overlayProps={{ blur: 2 }}
+                                    visible={isLoading}
+                                />
+                                {form.values.items.map(
+                                    (item, categoryIndex) => {
+                                        return (
+                                            <Box key={categoryIndex}>
+                                                <Box pos='relative'>
+                                                    <Select
+                                                        label='Категория'
+                                                        placeholder='Выберите категорию'
+                                                        data={Object.entries(
+                                                            CategoryLabels
+                                                        ).map(
+                                                            ([
+                                                                value,
+                                                                label,
+                                                            ]) => ({
+                                                                value,
+                                                                label,
+                                                            })
+                                                        )}
+                                                        {...form.getInputProps(
+                                                            `items.${categoryIndex}.category`
+                                                        )}
+                                                        mb='md'
+                                                        readOnly
+                                                    />
+                                                </Box>
+                                                {item.products.map(
+                                                    (product, productIndex) => {
+                                                        return (
+                                                            <Flex
+                                                                pos='relative'
+                                                                key={
+                                                                    productIndex
+                                                                }
+                                                                mb='md'
+                                                                justify='space-between'
+                                                                gap='5px'
+                                                            >
+                                                                <TextInput
+                                                                    label='Название товара'
+                                                                    {...form.getInputProps(
+                                                                        `items.${categoryIndex}.products.${productIndex}.name`
+                                                                    )}
+                                                                    readOnly
+                                                                />
+                                                                <TextInput
+                                                                    type='number'
+                                                                    label='Кол-во'
+                                                                    {...form.getInputProps(
+                                                                        `items.${categoryIndex}.products.${productIndex}.amount`
+                                                                    )}
+                                                                    readOnly
+                                                                />
+                                                                <TextInput
+                                                                    label='Ед. изм.'
+                                                                    {...form.getInputProps(
+                                                                        `items.${categoryIndex}.products.${productIndex}.unit`
+                                                                    )}
+                                                                    readOnly
+                                                                />
+                                                            </Flex>
+                                                        )
+                                                    }
+                                                )}
+                                            </Box>
+                                        )
+                                    }
+                                )}
 
-            <Flex gap='md'>
-                <Text size='lg' fw={600}>
-                    Информация по заказчику:
-                </Text>
+                                <Box mb='sm'>
+                                    <Flex
+                                        direction='column'
+                                        gap='md'
+                                        className='border-2 border-dashed border-[var(--mantine-color-indigo-6)] rounded cursor-pointer'
+                                        justify='center'
+                                        py='md'
+                                        px='md'
+                                    >
+                                        {images.length > 0 && (
+                                            <Flex mt='md' gap='sm'>
+                                                {images.map((img, index) => {
+                                                    return (
+                                                        <Box
+                                                            pos='relative'
+                                                            key={index}
+                                                        >
+                                                            <MantineImage
+                                                                w='100px'
+                                                                h='100px'
+                                                                fit='cover'
+                                                                className='aspect-square'
+                                                                radius='md'
+                                                                src={getImageUrl(
+                                                                    img.path
+                                                                )}
+                                                                onLoad={() =>
+                                                                    getImageUrl(
+                                                                        img.path
+                                                                    )
+                                                                }
+                                                            />
+                                                        </Box>
+                                                    )
+                                                })}
+                                            </Flex>
+                                        )}
+                                    </Flex>
+                                </Box>
 
-                <Flex direction='column' gap='md' w='100%'>
-                    <Text>
-                        Наименование заказчика: <span>{order.name}</span>
-                    </Text>
+                                <Box mb='sm'>
+                                    <Textarea
+                                        label='Комментарий к заявке'
+                                        description='До 400 символов'
+                                        {...form.getInputProps('comment')}
+                                        readOnly
+                                    />
+                                </Box>
 
-                    <Text>
-                        Менеджер для свявзи:{' '}
-                        <span>Макаров Василий Сергеевич</span>
-                    </Text>
+                                <Box mb='sm'>
+                                    <Autocomplete
+                                        label='Адрес доставки'
+                                        {...form.getInputProps('address')}
+                                        readOnly
+                                    />
+                                </Box>
 
-                    <Text>
-                        Телефон для свявзи: <span>{order.phone}</span>
-                    </Text>
+                                <Flex mb='md' gap='xl'>
+                                    <DateTimePicker
+                                        w='fit-content'
+                                        valueFormat='DD/MM/YYYY HH:mm:ss'
+                                        label='Привезите товар не позднее:'
+                                        placeholder='ДД/ММ/ГГГГ ЧЧ:ММ'
+                                        value={form.values.deliveryTime}
+                                        {...form.getInputProps('deliveryTime')}
+                                        readOnly
+                                    />
+                                    <DateInput
+                                        valueFormat='DD/MM/YY'
+                                        label='Принимать заявки до:'
+                                        placeholder='ДД.ММ.ГГ'
+                                        value={form.values.acceptUntill}
+                                        {...form.getInputProps('acceptUntill')}
+                                        readOnly
+                                    />
+                                </Flex>
 
-                    <Text>
-                        Принимать заявки до:{' '}
-                        <span>
-                            {dayjs(order.acceptUntill).format(
-                                'YYYY-MM-DD HH:mm'
-                            )}
-                        </span>
-                    </Text>
-                </Flex>
-            </Flex>
+                                <Radio.Group
+                                    name='paymentMethod'
+                                    mb='md'
+                                    label='Способ оплаты'
+                                    {...form.getInputProps('paymentType')}
+                                    readOnly
+                                >
+                                    <Group mt='xs'>
+                                        <Radio
+                                            icon={CheckIcon}
+                                            value={PaymentMethod.Prepayment}
+                                            label='Предоплата'
+                                        />
+                                        <Radio
+                                            icon={CheckIcon}
+                                            value={PaymentMethod.Deferment}
+                                            label='Отсрочка'
+                                        />
+                                        <Radio
+                                            icon={CheckIcon}
+                                            value={
+                                                PaymentMethod.PaymentUponDelivery
+                                            }
+                                            label='По факту'
+                                        />
+                                    </Group>
+                                </Radio.Group>
 
-            <Divider orientation='horizontal' />
-
-            <Flex>
-                <Text size='lg' fw={600}>
-                    Информация для поставщиков:
-                </Text>
-
-                <Flex direction='column' gap='md' w='100%'>
-                    <Text>
-                        Адрес доставки:{' '}
-                        <span>
-                            {dayjs(order.deliveryTime).format(
-                                'YYYY-MM-DD HH:mm'
-                            )}
-                        </span>
-                    </Text>
-
-                    <Text>
-                        Способ оплаты:{' '}
-                        <span>
-                            {
-                                PaymentMethodLabels[
-                                    order.paymentType as unknown as PaymentMethod
-                                ]
-                            }
-                        </span>
-                    </Text>
-
-                    <Text>
-                        Телефон для свявзи: <span>{order.phone}</span>
-                    </Text>
-
-                    <Text>
-                        Принимать заявки до:{' '}
-                        <span>
-                            {dayjs(order.acceptUntill).format(
-                                'YYYY-MM-DD HH:mm'
-                            )}
-                        </span>
-                    </Text>
-                </Flex>
-            </Flex>
-
-            <Divider orientation='horizontal' />
-
-            <Flex direction='column' gap='md'>
-                <Text size='xl' fw={600}>
-                    Категория товаров:
-                </Text>
-
-                {order.items.map((x, index) => (
-                    <Flex direction='column' gap='md' key={index}>
-                        <Text>{CategoryLabels[x.category as Categories]}</Text>
-
-                        <Paper key={index} bg='#F5F7FD' p='md'>
-                            <Flex justify='space-between' align='center'>
-                                <Text>{x.name}</Text>
-                                <Text>{x.amount + ' ' + x.unit}</Text>
-                                <Text>
-                                    {(order.paymentType as unknown as PaymentMethod) !==
-                                    PaymentMethod.Deferment
-                                        ? 'Отсрочки нет'
-                                        : PaymentMethodLabels[
-                                              order.paymentType as unknown as PaymentMethod
-                                          ]}
-                                </Text>
-
-                                <Text>
-                                    {order.images?.length === 0
-                                        ? 'нет фотографии'
-                                        : order.images?.map(x => (
-                                              <MantineImage
-                                                  key={x.id}
-                                                  src={getImageUrl(x.path)}
-                                              />
-                                          ))}
-                                </Text>
-                            </Flex>
-                        </Paper>
-                    </Flex>
-                ))}
-
-                {order.comment && (
-                    <Flex direction='column' gap='md'>
-                        <Text>Комментарий к заказу:</Text>
-
-                        <Paper withBorder p='md'>
-                            <Text>{order.comment}</Text>
-                        </Paper>
-                    </Flex>
+                                <Flex mb='xl' gap='xl'>
+                                    <TextInput
+                                        placeholder='Название компании'
+                                        {...form.getInputProps('name')}
+                                        readOnly
+                                    />
+                                    <TextInput
+                                        placeholder='Номер телефона'
+                                        {...form.getInputProps('phone')}
+                                        readOnly
+                                    />
+                                </Flex>
+                            </Paper>
+                        </>
+                    )
                 )}
-            </Flex>
         </Flex>
     )
 }
 
-export function handleApplicationsDetailsModals(order: HorecaRequestDto) {
+export function handleApplicationsDetailsModals(id: number) {
     return modals.open({
         modalId: 'application-modal',
-        children: <ApplicationsDetailsModals order={order} />,
+        children: <ApplicationsDetailsModals id={id} />,
         centered: true,
         size: 'xl',
         radius: 'lg',

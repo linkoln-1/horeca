@@ -126,7 +126,9 @@ export function ApplicationsViews() {
                                         cursor: 'pointer',
                                     }}
                                     onClick={() =>
-                                        handleApplicationsDetailsModals(order)
+                                        handleApplicationsDetailsModals(
+                                            order.id
+                                        )
                                     }
                                 >
                                     <Text fw={500}>Заявка № {order.id}</Text>

@@ -6,6 +6,7 @@ import {
     HorecaRequestSearchDto,
 } from '@/shared/lib/horekaApi/Api'
 import { useCustomInfiniteQuery } from '@/shared/lib/reactQuery/useCustomInfiniteQuery'
+import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
 
 interface GetRequestQueryParams {
     offset?: number
@@ -18,6 +19,13 @@ export function useGetRequestQuery(params: GetRequestQueryParams) {
     return useCustomInfiniteQuery({
         queryKey: ['horeca-request', params],
         queryFn: () => api.horecaRequestsControllerFindAll(params),
+    })
+}
+
+export function useGetRequestByIdQuery(id: number) {
+    return useCustomQuery({
+        queryKey: ['horeca-request-id', id],
+        queryFn: () => api.horecaRequestsControllerGet(id),
     })
 }
 
