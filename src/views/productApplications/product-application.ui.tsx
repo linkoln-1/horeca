@@ -5,11 +5,8 @@ import React from 'react'
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { providerRequest } from '@/entities/provider-request'
 import {
-    Box,
     Button,
     Flex,
-    Loader,
-    Paper,
     Select,
     Text,
     Image as MantineImage,
@@ -17,18 +14,12 @@ import {
 } from '@mantine/core'
 import Link from 'next/link'
 
-import { packageTypeLabel } from '@/shared/constants/packageType'
 import {
     PaymentMethod,
     PaymentMethodLabels,
 } from '@/shared/constants/paymentMethod'
-import { getImageUrl } from '@/shared/helpers'
 import { role } from '@/shared/helpers/getRole'
 import { groupRequestsByDate } from '@/shared/helpers/groupRequestsByDate'
-import {
-    HorecaRequestDto,
-    ProductPackagingType,
-} from '@/shared/lib/horekaApi/Api'
 
 export function ProductApplicationViews() {
     const user = useUserStore(state => state.user)
@@ -37,6 +28,8 @@ export function ProductApplicationViews() {
 
     const groupedRequests =
         incomingRequests && groupRequestsByDate(incomingRequests.data || [])
+
+    console.log(groupedRequests && Object.entries(groupedRequests).length === 0)
 
     return (
         <Flex direction='column' gap='md'>
@@ -84,6 +77,35 @@ export function ProductApplicationViews() {
                                 ))}
                             </Table.Tr>
                         </Table.Thead>
+
+                        {groupedRequests &&
+                            Object.entries(groupedRequests).length === 0 && (
+                                <Flex
+                                    direction='column'
+                                    gap='md'
+                                    pos='relative'
+                                >
+                                    <Flex
+                                        direction='column'
+                                        justify='center'
+                                        align='center'
+                                        h='50vh'
+                                        pos='absolute'
+                                        w='78vw'
+                                    >
+                                        <Text fw={600} size='xl'>
+                                            Скоро здесь появятся новые заявки! А
+                                            пока вы можете заполнить свой
+                                            каталог
+                                        </Text>
+                                        <Text c='gray'>
+                                            Перейдите к заполнению каталога в
+                                            левом меню, нажав на раздел «Мой
+                                            каталог»
+                                        </Text>
+                                    </Flex>
+                                </Flex>
+                            )}
 
                         {groupedRequests &&
                             Object.entries(groupedRequests).map(
