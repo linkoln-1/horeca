@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { requestQueries } from '../../entities/horeca-request'
+import { useUserStore } from '@/core/providers/userStoreContext'
 import { handleApplicationsDetailsModals } from '@/views/applications/ui/applicationsDetailsModal'
 import {
     Badge,
@@ -26,6 +27,7 @@ import {
     Categories,
     HorecaRequestSearchDto,
     HorecaRequestStatus,
+    UserRole,
 } from '@/shared/lib/horekaApi/Api'
 
 const limit = 10
@@ -62,6 +64,8 @@ export function ApplicationsViews() {
             status: activeStatus,
         }) as unknown as HorecaRequestSearchDto,
     })
+
+    const user = useUserStore(state => state.user)
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab)
@@ -182,16 +186,23 @@ export function ApplicationsViews() {
 
                                         <Flex
                                             justify='space-between'
-                                            align='center'
+                                            align={
+                                                user?.role === UserRole.Horeca
+                                                    ? 'start'
+                                                    : 'center'
+                                            }
                                         >
                                             <Flex
                                                 direction='column'
                                                 gap='md'
                                                 maw={230}
                                             >
-                                                <Text size='sm'>
-                                                    Название: {order.name}
-                                                </Text>
+                                                {user?.role ===
+                                                UserRole.Horeca ? null : (
+                                                    <Text size='sm'>
+                                                        Название: {order.name}
+                                                    </Text>
+                                                )}
                                                 <Text size='sm'>
                                                     Категории:{' '}
                                                     {Array.from(
