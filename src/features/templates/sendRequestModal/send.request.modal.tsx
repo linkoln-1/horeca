@@ -7,10 +7,17 @@ export function SendRequestModal() {
                 Вы уверены, что хотите отправить новую заявку на биржу?
             </Text>
             <Flex w='90%' gap='md'>
-                <Button flex={1} fw='400' size='md' radius='xl' bg='indigo'>
+                <Button flex={1} fw='400' size='md' radius='xl' bg='indigo.4'>
                     Нет, не отправлять
                 </Button>
-                <Button flex={1} fw='400' size='md' radius='xl' bg='pink'>
+                <Button
+                    flex={1}
+                    fw='400'
+                    size='md'
+                    radius='xl'
+                    bg='pink'
+                    type='submit'
+                >
                     Да, отправить
                 </Button>
             </Flex>

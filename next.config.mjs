@@ -8,7 +8,6 @@ const nextConfig = {
     },
     reactStrictMode: false,
     experimental: {
-        webpackMemoryOptimizations: true,
         optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
     },
     typescript: {
@@ -17,6 +16,6 @@ const nextConfig = {
     eslint: {
         ignoreDuringBuilds: true,
     },
-};
+}
 
-export default nextConfig;
+export default nextConfig

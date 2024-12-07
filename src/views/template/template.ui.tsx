@@ -2,7 +2,6 @@
 
 import { templateQueries } from '@/entities/template'
 import {
-    Box,
     Button,
     Card,
     Divider,
@@ -21,7 +20,7 @@ import { Categories } from '@/shared/lib/horekaApi/Api'
 
 import '@/styles/template.scss'
 
-const LIMIT = 5
+const LIMIT = 10
 
 export function TemplateApplicationViews() {
     const {

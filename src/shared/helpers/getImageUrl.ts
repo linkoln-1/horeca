@@ -1,6 +1,6 @@
 export const getImageUrl = (imagePath: string | undefined) => {
     return imagePath
-        ? `${process.env.NEXT_PUBLIC_APP_BASE_API}${imagePath}`
+        ? `${process.env.NEXT_PUBLIC_APP_BASE_API}/${imagePath}`
         : ''
 }
 

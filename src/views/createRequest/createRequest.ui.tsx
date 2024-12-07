@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 
 import { requestQueries } from '../../entities/horeca-request'
 import { templateQueries } from '@/entities/template'
+import { imageQueries } from '@/entities/uploads'
 import { SaveModal } from '@/features/templates/saveModal'
 import { ThanksModal } from '@/features/templates/thanksModal'
 import {
@@ -30,12 +31,16 @@ import { FileWithPath } from '@mantine/dropzone'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { IconPlus, IconX } from '@tabler/icons-react'
-import dayjs from 'dayjs'
 
 import { CategoryLabels, errors, HorecaTemplateDto } from '@/shared/constants'
 import { HorecaRequestForm } from '@/shared/constants'
 import { PaymentMethod } from '@/shared/constants/paymentMethod'
-import { Categories, HorecaRequestCreateDto } from '@/shared/lib/horekaApi/Api'
+import { getImageUrl } from '@/shared/helpers'
+import {
+    Categories,
+    HorecaRequestCreateDto,
+    UploadDto,
+} from '@/shared/lib/horekaApi/Api'
 import { CustomDropzone } from '@/shared/ui/CustomDropzone'
 
 export function CreateRequestView() {
@@ -59,12 +64,13 @@ export function CreateRequestView() {
             paymentType: PaymentMethod.Prepayment,
             name: '',
             phone: '',
+            imageIds: [],
         },
     })
 
     const [showCategory, setShowCategory] = useState(true)
     const dropzone = useRef<() => void>(null)
-    const [images, setImages] = useState<FileWithPath[]>([])
+    const [images, setImages] = useState<UploadDto[]>([])
 
     const { mutateAsync: createRequest } =
         requestQueries.useCreateRequestMutation()
@@ -75,6 +81,8 @@ export function CreateRequestView() {
             id: +selectedTemplateId,
             enabled: +selectedTemplateId !== 0,
         })
+    const { mutateAsync: uploadImage, isPending: isPendingImage } =
+        imageQueries.useImageUploadMutation()
 
     const templateOptions =
         templates?.map(template => ({
@@ -113,8 +121,45 @@ export function CreateRequestView() {
         form.removeListItem(`items.${categoryIndex}.products`, productIndex)
     }
 
-    const handleImages = (files: FileWithPath[]) => {
-        setImages(files)
+    const handleAddMainImage = async (files: File[] | null) => {
+        if (files && files.length > 0) {
+            try {
+                const uploadedImageDtos: UploadDto[] = await Promise.all(
+                    files.map(async file => {
+                        const response = await uploadImage({ file })
+                        return response
+                    })
+                )
+
+                const uploadedImageIds = uploadedImageDtos.map(dto => dto.id)
+
+                form.setValues(prevState => ({
+                    ...prevState,
+                    imageIds: [
+                        ...(prevState.imageIds ?? []),
+                        ...uploadedImageIds,
+                    ],
+                }))
+
+                setImages(prevImages => [
+                    ...(prevImages ?? []),
+                    ...uploadedImageDtos,
+                ])
+
+                toast.success('Картинка успешно загружена!')
+            } catch (e) {
+                console.error('Error uploading images:', e)
+                toast.error(
+                    'Ошибка при загрузке изображений. Попробуйте ещё раз.'
+                )
+            }
+        } else {
+            toast.error('Не выбрано ни одного файла для загрузки.')
+        }
+    }
+
+    const handleDeleteImage = (index: number) => {
+        setImages(prevImages => prevImages.filter((_, i) => i !== index))
     }
 
     const handleFormSubmit = async (values: HorecaRequestForm) => {
@@ -327,18 +372,18 @@ export function CreateRequestView() {
                         <CustomDropzone
                             display='none'
                             openRef={dropzone}
-                            onDrop={files => handleImages(files)}
+                            onDrop={handleAddMainImage}
+                        />
+
+                        <LoadingOverlay
+                            zIndex={1000}
+                            overlayProps={{ blur: 2 }}
+                            visible={isPendingImage}
                         />
                         <Flex
                             direction='column'
                             gap='md'
-                            c='gray.5'
-                            onClick={() => dropzone.current?.()}
-                            style={{
-                                border: '2px dashed gray',
-                                borderRadius: '8px',
-                                cursor: 'pointer',
-                            }}
+                            className='border-2 border-dashed border-[var(--mantine-color-indigo-6)] rounded cursor-pointer'
                             justify='center'
                             py='md'
                             px='md'
@@ -348,8 +393,10 @@ export function CreateRequestView() {
                                 w='fit-content'
                                 size='md'
                                 fw='500'
-                                c='white'
-                                bg='indigo'
+                                c='indigo.6'
+                                variant='transparent'
+                                leftSection={<IconPlus />}
+                                onClick={() => dropzone.current?.()}
                             >
                                 Добавить фотографии
                             </Button>
@@ -357,30 +404,36 @@ export function CreateRequestView() {
                             {images.length > 0 && (
                                 <Flex mt='md' gap='sm'>
                                     {images.map((img, index) => {
-                                        const imageUrl =
-                                            URL.createObjectURL(img)
                                         return (
                                             <Box pos='relative' key={index}>
                                                 <MantineImage
                                                     w='100px'
                                                     h='100px'
                                                     fit='cover'
+                                                    className='aspect-square'
                                                     radius='md'
-                                                    src={imageUrl}
+                                                    src={getImageUrl(img.path)}
                                                     onLoad={() =>
-                                                        URL.revokeObjectURL(
-                                                            imageUrl
-                                                        )
+                                                        getImageUrl(img.path)
                                                     }
                                                 />
-                                                <IconX
-                                                    cursor='pointer'
-                                                    color='white'
+                                                <Button
+                                                    type='button'
                                                     style={{
                                                         position: 'absolute',
-                                                        top: 5,
-                                                        right: 5,
+                                                        top: 0,
+                                                        right: -5,
                                                     }}
+                                                    onClick={() =>
+                                                        handleDeleteImage(index)
+                                                    }
+                                                    bg='transparent'
+                                                    rightSection={
+                                                        <IconX
+                                                            cursor='pointer'
+                                                            color='red'
+                                                        />
+                                                    }
                                                 />
                                             </Box>
                                         )

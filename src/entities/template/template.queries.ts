@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { api } from '@/shared/lib/horekaApi'
 import {
@@ -15,9 +15,12 @@ type QueryType = {
     sort?: string
 }
 
-export function useGetHorecaTemplateQuery(query?: QueryType) {
+export function useGetHorecaTemplateQuery(
+    query?: QueryType,
+    enabled: boolean = true
+) {
     return useCustomInfiniteQuery({
-        queryKey: ['template'],
+        queryKey: ['template', enabled],
         queryFn: () => api.horecaRequestsTemplateControllerFindAll(query),
     })
 }
@@ -30,7 +33,7 @@ export function useGetByIdHorecaTemplateQuery({
     enabled?: boolean
 }) {
     return useCustomQuery({
-        queryKey: ['template-id'],
+        queryKey: ['template-id', id],
         queryFn: () => api.horecaRequestsTemplateControllerFind(id),
 
         enabled,
@@ -38,16 +41,28 @@ export function useGetByIdHorecaTemplateQuery({
 }
 
 export function useCreateHorecaTemplateMutation() {
+    const queryClient = useQueryClient()
+
     return useMutation({
         mutationFn: ({ data }: { data: HorecaRequestTemplateCreateDto }) =>
             api.horecaRequestsTemplateControllerCreate(data),
+
+        onSuccess: async ({ data }) => {
+            await queryClient.invalidateQueries({ queryKey: ['template'] })
+        },
     })
 }
 
 export function useUpdateHorecaTemplateMutation(id: number) {
+    const queryClient = useQueryClient()
+
     return useMutation({
         mutationFn: ({ data }: { data: HorecaRequestTemplateUpdateDto }) =>
             api.horecaRequestsTemplateControllerUpdate(id, data),
+
+        onSuccess: async ({ data }) => {
+            await queryClient.invalidateQueries({ queryKey: ['template-id'] })
+        },
     })
 }
 
