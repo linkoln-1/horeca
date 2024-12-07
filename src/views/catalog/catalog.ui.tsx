@@ -92,50 +92,54 @@ export function Catalog() {
                             </Table.Thead>
 
                             <Table.Tbody>
-                                {data?.map((product, index) => (
-                                    <Table.Tr key={index}>
-                                        <Table.Td align='center' p='md'>
-                                            {product.name}
-                                        </Table.Td>
+                                {data?.map((product, index) => {
+                                    return (
+                                        <Table.Tr key={index}>
+                                            <Table.Td align='center' p='md'>
+                                                {product.name}
+                                            </Table.Td>
 
-                                        <Table.Td align='center' p='md'>
-                                            {product.producer}
-                                        </Table.Td>
+                                            <Table.Td align='center' p='md'>
+                                                {product.producer}
+                                            </Table.Td>
 
-                                        <Table.Td align='center' p='md'>
-                                            {product.description === 'beer'
-                                                ? 'Пиво'
-                                                : product.description}
-                                        </Table.Td>
+                                            <Table.Td align='center' p='md'>
+                                                {product.description === 'beer'
+                                                    ? 'Пиво'
+                                                    : product.description}
+                                            </Table.Td>
 
-                                        <Table.Td align='center' p='md'>
-                                            {
-                                                packageTypeLabel[
-                                                    product.packagingType as ProductPackagingType
-                                                ]
-                                            }
-                                        </Table.Td>
+                                            <Table.Td align='center' p='md'>
+                                                {
+                                                    packageTypeLabel[
+                                                        product.packagingType as ProductPackagingType
+                                                    ]
+                                                }
+                                            </Table.Td>
 
-                                        <Table.Td align='center' p='md'>
-                                            {product.cost}
-                                        </Table.Td>
+                                            <Table.Td align='center' p='md'>
+                                                {product.cost}
+                                            </Table.Td>
 
-                                        <Table.Td align='center' p='md'>
-                                            {product.count}
-                                        </Table.Td>
+                                            <Table.Td align='center' p='md'>
+                                                {product.count}
+                                            </Table.Td>
 
-                                        <Table.Td align='center' p='md'>
-                                            {product.images?.map((x, index) => (
-                                                <MantineImage
-                                                    key={index}
-                                                    src={getImageUrl(
-                                                        `/${x.path}`
-                                                    )}
-                                                />
-                                            ))}
-                                        </Table.Td>
-                                    </Table.Tr>
-                                ))}
+                                            <Table.Td align='center' p='md'>
+                                                {product.images?.map(
+                                                    (x, index) => (
+                                                        <MantineImage
+                                                            key={index}
+                                                            src={getImageUrl(
+                                                                x.path
+                                                            )}
+                                                        />
+                                                    )
+                                                )}
+                                            </Table.Td>
+                                        </Table.Tr>
+                                    )
+                                })}
                             </Table.Tbody>
                         </Table>
                     </Flex>

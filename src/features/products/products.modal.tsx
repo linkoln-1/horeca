@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import React, { useRef, useState } from 'react'
+import { toast } from 'react-toastify'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { productsQueries } from '@/entities/products'
@@ -18,9 +19,11 @@ import {
     Tooltip,
     Image as MantineImage,
     MultiSelect,
+    Box,
+    LoadingOverlay,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { IconTrash } from '@tabler/icons-react'
+import { IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 
 import { CategoryLabels } from '@/shared/constants'
 import { packageTypeLabel } from '@/shared/constants/packageType'
@@ -64,20 +67,25 @@ export function ProductsModal() {
             imageIds: [],
         },
     })
-    const [imageRequest, setImageRequestId] = useState<UploadDto[]>()
 
     const { mutate: createProduct } = productsQueries.useProductMutation()
-    const { mutateAsync: uploadImage } = imageQueries.useImageUploadMutation()
+    const { mutateAsync: uploadImage, isPending: isImagePending } =
+        imageQueries.useImageUploadMutation()
+
+    const dropzone = useRef<() => void>(null)
+    const [images, setImages] = useState<UploadDto[]>([])
 
     const handleAddMainImage = async (files: File[] | null) => {
         if (files && files.length > 0) {
             try {
-                const uploadedImageIds = await Promise.all(
+                const uploadedImageDtos: UploadDto[] = await Promise.all(
                     files.map(async file => {
                         const response = await uploadImage({ file })
-                        return response.id
+                        return response
                     })
                 )
+
+                const uploadedImageIds = uploadedImageDtos.map(dto => dto.id)
 
                 form.setValues(prevState => ({
                     ...prevState,
@@ -86,10 +94,26 @@ export function ProductsModal() {
                         ...uploadedImageIds,
                     ],
                 }))
+
+                setImages(prevImages => [
+                    ...(prevImages ?? []),
+                    ...uploadedImageDtos,
+                ])
+
+                toast.success('Картинка успешно загружена!')
             } catch (e) {
-                console.error(e)
+                console.error('Error uploading images:', e)
+                toast.error(
+                    'Ошибка при загрузке изображений. Попробуйте ещё раз.'
+                )
             }
+        } else {
+            toast.error('Не выбрано ни одного файла для загрузки.')
         }
+    }
+
+    const handleDeleteImage = (index: number) => {
+        setImages(prevImages => prevImages.filter((_, i) => i !== index))
     }
 
     return (
@@ -210,21 +234,94 @@ export function ProductsModal() {
                     {/*    </Grid.Col>*/}
                     {/*))}*/}
 
-                    {form.values.imageIds.length < 30 && (
-                        <Grid.Col
-                            span={{
-                                base: 12,
-                            }}
-                        >
-                            <Flex direction='column' gap='xs' w='100%'>
-                                <CustomDropzone
-                                    onDrop={handleAddMainImage}
-                                    accept={allowedFormats}
-                                    className='aspect-square w-5/6 h-[200px] mx-auto'
-                                />
+                    <Grid.Col
+                        span={{
+                            base: 12,
+                        }}
+                    >
+                        <Box mb='sm'>
+                            <CustomDropzone
+                                display='none'
+                                openRef={dropzone}
+                                onDrop={handleAddMainImage}
+                            />
+
+                            <LoadingOverlay
+                                zIndex={1000}
+                                overlayProps={{ blur: 2 }}
+                                visible={isImagePending}
+                            />
+
+                            <Flex
+                                direction='column'
+                                gap='md'
+                                className='border-2 border-dashed border-[var(--mantine-color-indigo-6)] rounded cursor-pointer'
+                                justify='center'
+                                py='md'
+                                px='md'
+                            >
+                                <Button
+                                    mx='auto'
+                                    w='fit-content'
+                                    size='md'
+                                    fw='500'
+                                    c='indigo.6'
+                                    variant='transparent'
+                                    leftSection={<IconPlus />}
+                                    onClick={() => dropzone.current?.()}
+                                >
+                                    Добавить фотографии
+                                </Button>
+
+                                {images.length > 0 && (
+                                    <Flex mt='md' gap='sm'>
+                                        {images.map((img, index) => {
+                                            return (
+                                                <Box pos='relative' key={index}>
+                                                    <MantineImage
+                                                        w='100px'
+                                                        h='100px'
+                                                        fit='cover'
+                                                        className='aspect-square'
+                                                        radius='md'
+                                                        src={getImageUrl(
+                                                            img.path
+                                                        )}
+                                                        onLoad={() =>
+                                                            getImageUrl(
+                                                                img.path
+                                                            )
+                                                        }
+                                                    />
+                                                    <Button
+                                                        type='button'
+                                                        style={{
+                                                            position:
+                                                                'absolute',
+                                                            top: 0,
+                                                            right: -5,
+                                                        }}
+                                                        onClick={() =>
+                                                            handleDeleteImage(
+                                                                index
+                                                            )
+                                                        }
+                                                        bg='transparent'
+                                                        rightSection={
+                                                            <IconX
+                                                                cursor='pointer'
+                                                                color='red'
+                                                            />
+                                                        }
+                                                    />
+                                                </Box>
+                                            )
+                                        })}
+                                    </Flex>
+                                )}
                             </Flex>
-                        </Grid.Col>
-                    )}
+                        </Box>
+                    </Grid.Col>
                 </Grid>
 
                 <Group justify='center' mt='md'>

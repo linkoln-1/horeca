@@ -74,10 +74,11 @@ export function EditTemplateViews({ id }: { id: string }) {
     const { data: selectedTemplate } =
         templateQueries.useGetByIdHorecaTemplateQuery({ id: +id })
 
-    const { mutateAsync: updateTemplate, isPending: isImagePending } =
+    const { mutateAsync: updateTemplate } =
         templateQueries.useUpdateHorecaTemplateMutation(+id)
 
-    const { mutateAsync: uploadImage } = imageQueries.useImageUploadMutation()
+    const { mutateAsync: uploadImage, isPending: isImagePending } =
+        imageQueries.useImageUploadMutation()
 
     const dropzone = useRef<() => void>(null)
     const [images, setImages] = useState<UploadDto[]>([])
