@@ -1,8 +1,21 @@
 'use client'
 
-import { Box, Button, Divider, Flex, Paper, Text } from '@mantine/core'
+import { FavoriteProvidersModal } from '@/features/favoriteProviders/favoriteProviders.modal'
+import {
+    Box,
+    Button,
+    Divider,
+    Flex,
+    Paper,
+    Text,
+    Image as MantineImage,
+    Stack,
+} from '@mantine/core'
+import { modals } from '@mantine/modals'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+
+import { suppliers } from '@/shared/constants/favoriteProvidersData'
 
 type Info = {
     name: string
@@ -23,151 +36,103 @@ type FakeHistory = {
 
 export function Advertisement() {
     const router = usePathname()
-    const fakeHistory: FakeHistory[] = [
-        {
-            id: 1,
-            number: 524252,
-            data: '20.05.2023',
-            text: 'Опубликовано (оплачено)',
-            info: {
-                name: 'Палтус (в наличии)',
-                manufacturer: 'ИП Громов А.Б.',
-                description:
-                    'Палтус — как и полагается представителю семейства камбаловых — рыба плоская; ее еще называют морским языком — но какую только рыбу так не называют',
-            },
-            infoCategory: {
-                name: 'Название',
-                manufacturer: 'Производитель',
-                description: 'Описание',
-            },
-        },
-        {
-            id: 2,
-            number: 524252,
-            data: '20.05.2023',
-            text: 'Отклонено (отсутствует описание товара)',
-            info: {
-                name: 'Палтус (в наличии)',
-                manufacturer: 'ИП Громов А.Б.',
-            },
-            infoCategory: {
-                name: 'Название',
-                manufacturer: 'Производитель',
-            },
-            link: '#',
-            linkText: 'Заполнить заявку снова',
-        },
-        {
-            id: 3,
-            number: 524252,
-            data: '20.05.2023',
-            text: 'Объявление соответствует требованиям',
-            info: {
-                name: 'Палтус (в наличии)',
-                manufacturer: 'ИП Громов А.Б.',
-                description:
-                    'Палтус — как и полагается представителю семейства камбаловых — рыба плоская; ее еще называют морским языком — но какую только рыбу так не называют',
-            },
-            infoCategory: {
-                name: 'Название',
-                manufacturer: 'Производитель',
-                description: 'Описание',
-            },
-            link: '#',
-            linkText: 'Перейти к оплате',
-        },
-    ]
 
     return (
-        <Flex direction='column' gap='md'>
-            <Box>
-                <Button
-                    variant='transparent'
-                    component={Link}
-                    color={
-                        router === '/user/advertising/rates' ? 'blue' : 'black'
-                    }
-                    href='/user/advertising/rates'
-                    fw={400}
-                >
-                    Тарифы
-                </Button>
-                <Button
-                    variant='transparent'
-                    component={Link}
-                    href='/user/advertising/advertisement'
-                    color={
-                        router === '/user/advertising/advertisement'
-                            ? 'blue'
-                            : 'black'
-                    }
-                    fw={400}
-                >
-                    История заявок
-                </Button>
-            </Box>
+        <Flex direction='column' gap='xl' p='md'>
+            {suppliers.map((suplier, index) => {
+                return (
+                    <Flex w='100%' key={index}>
+                        <Paper
+                            w='100%'
+                            withBorder
+                            shadow='sm'
+                            radius='lg'
+                            p='lg'
+                        >
+                            <Flex>
+                                <Flex w='100%' gap='md'>
+                                    <MantineImage
+                                        fit='cover'
+                                        w={180}
+                                        h={180}
+                                        radius='md'
+                                        src={suplier.img}
+                                    />
 
-            <Flex gap='md' direction='column'>
-                {fakeHistory.map(item => (
-                    <Box key={item.id}>
-                        <Paper withBorder shadow='sm' p='md'>
-                            <Text mb='sm' fw={700} size='xl'>
-                                № {item.number} от {item.data}
-                            </Text>
-                            <Text
-                                mb='sm'
-                                c={
-                                    item.text === 'Опубликовано (оплачено)'
-                                        ? 'green'
-                                        : item.text ===
-                                            'Отклонено (отсутствует описание товара)'
-                                          ? 'red'
-                                          : item.text ===
-                                              'Объявление соответствует требованиям'
-                                            ? 'orange'
-                                            : 'black'
-                                }
-                            >
-                                {item.text}
-                            </Text>
-                            <Divider my='xs' size='xs' color='gray.4' />
-                            <Box>
-                                <Text fw={700} mb={10}>
-                                    Информация по вашему товару
-                                </Text>
-                                <Flex direction='column' flex={1} gap='xs'>
-                                    {Object.keys(item.info).map(key => (
-                                        <Text key={key} size='sm' c='dimmed'>
-                                            {
-                                                item.infoCategory[
-                                                    key as keyof Info
-                                                ]
-                                            }
-                                            : {item.info[key as keyof Info]}
-                                        </Text>
-                                    ))}
+                                    <Stack py='md' justify='space-between'>
+                                        <Flex gap='md'>
+                                            <Text fw={600} span size='md'>
+                                                Наименование:
+                                            </Text>
+
+                                            <Text display='inline' size='md'>
+                                                {suplier.name}
+                                            </Text>
+                                        </Flex>
+                                        <Flex gap='md'>
+                                            <Text fw={600} span size='md'>
+                                                Рейтинг:
+                                            </Text>
+
+                                            <Text display='inline' size='md'>
+                                                {suplier.rating} / 5
+                                            </Text>
+                                        </Flex>
+                                        <Flex gap='md'>
+                                            <Text fw={600} size='md'>
+                                                Категории товаров:
+                                            </Text>
+                                            <Text size='md'>
+                                                {suplier.categories.map(
+                                                    category => {
+                                                        return category + '; '
+                                                    }
+                                                )}
+                                            </Text>
+                                        </Flex>
+                                    </Stack>
                                 </Flex>
-                            </Box>
-                            {item.link && item.linkText ? (
-                                <Button
-                                    component={Link}
-                                    size='md'
-                                    mt={25}
-                                    w='100%'
-                                    href={item.link}
-                                    color={
-                                        item.linkText === 'Перейти к оплате'
-                                            ? 'orange'
-                                            : 'blue'
-                                    }
+
+                                <Stack
+                                    className='flex-1'
+                                    justify='center'
+                                    gap='36px'
+                                    align='center'
                                 >
-                                    <Text>{item.linkText}</Text>
-                                </Button>
-                            ) : null}
+                                    <Button
+                                        href='/user/horeca/chat/2'
+                                        component={Link}
+                                        size='20px'
+                                        className='cursor-pointer'
+                                        c='indigo'
+                                        variant='transparent'
+                                    >
+                                        Открыть список чатов
+                                    </Button>
+                                    <Text
+                                        onClick={handleModal}
+                                        size='20px'
+                                        className='cursor-pointer'
+                                        c='pink.7'
+                                    >
+                                        Удалить из избранного
+                                    </Text>
+                                </Stack>
+                            </Flex>
                         </Paper>
-                    </Box>
-                ))}
-            </Flex>
+                    </Flex>
+                )
+            })}
         </Flex>
     )
+}
+
+function handleModal() {
+    modals.open({
+        centered: true,
+        modalId: 'favoriteProvider',
+        radius: 'lg',
+        size: 'xl',
+        children: <FavoriteProvidersModal />,
+    })
 }
