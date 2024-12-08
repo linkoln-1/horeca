@@ -158,9 +158,18 @@ export function AppLayout({ children }: AppLayoutProps) {
                                             path ===
                                             `/user${role({ user })}${x.link}`
 
+                                        const isDynamicActive = x.match?.some(
+                                            route =>
+                                                path.startsWith(
+                                                    `/user${role({ user })}${route}`
+                                                )
+                                        )
+
+                                        console.log(isDynamicActive)
+
                                         return (
                                             <Link
-                                                className={`flex items-center justify-between h-[18px] text-[14px] font-bold ${isActive ? 'text-[var(--mantine-color-indigo-4)]' : 'text-[#2B2B2B]'} hover:text-[#474747] relative`}
+                                                className={`flex items-center justify-between h-[18px] text-[14px] font-bold ${isActive || isDynamicActive ? 'text-[var(--mantine-color-indigo-4)]' : 'text-[#2B2B2B]'} hover:text-[#474747] relative`}
                                                 key={x.label}
                                                 href={`/user${role({ user })}${x.link}`}
                                             >

@@ -26,6 +26,7 @@ type SidebarLinkItem = {
     description: string
     subDescription?: string
     iconRight?: FC
+    match?: string[]
 }
 
 type SidebarDividerItem = {
@@ -72,6 +73,7 @@ export const horecaSidebarData: SidebarItem[] = [
         icon: IconTablePlus,
         description: 'Заполните матрицу и сравнивайте цены прямо внутри',
         link: '/template/application',
+        match: ['/template/edit'],
     },
     {
         id: 5,
@@ -81,6 +83,7 @@ export const horecaSidebarData: SidebarItem[] = [
         description:
             'Здесь вы можете изменить условия приемки и контактный номер',
         link: '/settings/edit',
+        match: ['/settings/product-acceptance-terms'],
     },
     {
         id: 6,
