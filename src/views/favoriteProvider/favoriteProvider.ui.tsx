@@ -26,7 +26,7 @@ export function FavoriteProviderViews() {
                     justify='center'
                     align='center'
                     direction='column'
-                    h='50vh'
+                    h='70vh'
                 >
                     <Text size='lg'>
                         Это список ваших любимых поставщиков. Добавляйте

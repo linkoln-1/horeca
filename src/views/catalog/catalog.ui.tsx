@@ -72,7 +72,7 @@ export function Catalog() {
                     </Flex>
 
                     <Flex direction='column' gap='md'>
-                        <Table>
+                        <Table withRowBorders withColumnBorders>
                             <Table.Thead bg='indigo.4'>
                                 <Table.Tr>
                                     {[

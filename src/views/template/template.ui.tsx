@@ -1,9 +1,9 @@
 'use client'
 
 import { templateQueries } from '@/entities/template'
-import { ApplicationsDetailsModals } from '@/views/applications/ui/applicationsDetailsModal'
 import { ViewTemplateModal } from '@/views/template/ui'
 import {
+    Box,
     Button,
     Card,
     Divider,
@@ -15,6 +15,7 @@ import {
     Text,
 } from '@mantine/core'
 import { modals } from '@mantine/modals'
+import { IconX } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 
@@ -100,7 +101,7 @@ export function TemplateApplicationViews() {
                                         w={250}
                                         direction='column'
                                         gap='md'
-                                        bg='indigo.6'
+                                        bg='indigo.4'
                                         align='start'
                                         c='#fff'
                                         px='md'
@@ -122,6 +123,7 @@ export function TemplateApplicationViews() {
                                         gap='md'
                                         p='md'
                                         w='100%'
+                                        pos='relative'
                                     >
                                         {content.items &&
                                             content.items.map((item, index) => (
@@ -152,9 +154,23 @@ export function TemplateApplicationViews() {
                                                 </Flex>
                                             ))}
 
-                                        <Flex justify='space-between'>
+                                        <Button
+                                            pos='absolute'
+                                            top={10}
+                                            right={10}
+                                            rightSection={<IconX color='red' />}
+                                            variant='transparent'
+                                            p={0}
+                                            styles={{
+                                                section: {
+                                                    margin: 0,
+                                                },
+                                            }}
+                                        />
+
+                                        <Flex justify='end' gap='md'>
                                             <Button
-                                                c='blue'
+                                                c='indigo.4'
                                                 fw='500'
                                                 px='0'
                                                 variant='transparent'

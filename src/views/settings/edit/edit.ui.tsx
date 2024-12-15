@@ -5,7 +5,9 @@ import { toast } from 'react-toastify'
 
 import { userQueries } from '@/entities/user'
 import {
+    Box,
     Button,
+    Flex,
     LoadingOverlay,
     PasswordInput,
     TextInput,
@@ -116,14 +118,16 @@ export function EditViews() {
                     withAsterisk
                 />
 
-                <Button
-                    type='submit'
-                    color='indigo.4'
-                    size='large'
-                    loading={isPending}
-                >
-                    Сохранить изменения
-                </Button>
+                <Flex justify='center'>
+                    <Button
+                        type='submit'
+                        color='indigo.4'
+                        size='large'
+                        loading={isPending}
+                    >
+                        Сохранить изменения
+                    </Button>
+                </Flex>
             </form>
         </Page>
     )

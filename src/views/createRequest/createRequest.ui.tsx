@@ -247,7 +247,7 @@ export function CreateRequestView() {
                     onChange={value => setSelectedTemplateId(String(value))}
                 />
             </Box>
-            <Paper p='md' w='100%' shadow='md' withBorder maw='70%'>
+            <Paper p='md' w='100%' shadow='md' withBorder maw='54%'>
                 <LoadingOverlay
                     zIndex={1000}
                     overlayProps={{ blur: 2 }}
@@ -299,8 +299,7 @@ export function CreateRequestView() {
                                             pos='relative'
                                             key={productIndex}
                                             mb='md'
-                                            justify='space-between'
-                                            gap='5px'
+                                            gap='xl'
                                         >
                                             <TextInput
                                                 label='Название товара'
@@ -368,7 +367,7 @@ export function CreateRequestView() {
                         </Button>
                     </Flex>
 
-                    <Box mb='sm'>
+                    <Flex direction='column' gap='sm'>
                         <CustomDropzone
                             display='none'
                             openRef={dropzone}
@@ -442,10 +441,10 @@ export function CreateRequestView() {
                             )}
                         </Flex>
 
-                        <Text c='gray.5'>
+                        <Text c='#868e96' className='text-[14px]'>
                             Можно добавить не более 5 фотографий
                         </Text>
-                    </Box>
+                    </Flex>
 
                     <Box mb='sm'>
                         <Textarea
@@ -463,20 +462,23 @@ export function CreateRequestView() {
                     </Box>
 
                     <Flex mb='md' gap='xl'>
+                        <DateInput
+                            valueFormat='DD/MM/YY'
+                            label='Принимать заявки до:'
+                            placeholder='ДД.ММ.ГГ'
+                            value={form.values.acceptUntill}
+                            size='md'
+                            {...form.getInputProps('acceptUntill')}
+                        />
+
                         <DateTimePicker
                             w='fit-content'
                             valueFormat='DD/MM/YYYY HH:mm:ss'
                             label='Привезите товар не позднее:'
                             placeholder='ДД/ММ/ГГГГ ЧЧ:ММ'
                             value={form.values.deliveryTime}
+                            size='md'
                             {...form.getInputProps('deliveryTime')}
-                        />
-                        <DateInput
-                            valueFormat='DD/MM/YY'
-                            label='Принимать заявки до:'
-                            placeholder='ДД.ММ.ГГ'
-                            value={form.values.acceptUntill}
-                            {...form.getInputProps('acceptUntill')}
                         />
                     </Flex>
 
@@ -516,7 +518,7 @@ export function CreateRequestView() {
                         />
                     </Flex>
 
-                    <Flex justify='space-between'>
+                    <Flex justify='end' gap='md'>
                         <Button
                             onClick={() =>
                                 handleModal(
@@ -526,10 +528,15 @@ export function CreateRequestView() {
                                     <SaveModal forms={form} />
                                 )
                             }
-                            c='indigo'
+                            c='indigo.4'
                             size='lg'
                             fw='500'
-                            variant='outline'
+                            styles={{
+                                root: {
+                                    border: '1px solid #748ffc',
+                                    backgroundColor: '#fff',
+                                },
+                            }}
                         >
                             Сохранить шаблон
                         </Button>

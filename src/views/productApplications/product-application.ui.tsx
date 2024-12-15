@@ -178,6 +178,7 @@ export function ProductApplicationViews() {
                                                                 p={0}
                                                                 variant='transparent'
                                                                 c='indigo.4'
+                                                                fw={400}
                                                             >
                                                                 Просмотреть
                                                                 заявку
@@ -188,6 +189,7 @@ export function ProductApplicationViews() {
                                                                 c='gray'
                                                                 disabled
                                                                 bg='transparent'
+                                                                fw={400}
                                                             >
                                                                 Скрыть заявку
                                                             </Button>
@@ -195,6 +197,7 @@ export function ProductApplicationViews() {
                                                                 p={0}
                                                                 variant='transparent'
                                                                 c='#CC2C79'
+                                                                fw={400}
                                                             >
                                                                 Пожаловаться
                                                             </Button>

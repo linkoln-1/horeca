@@ -49,7 +49,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     const form = useForm<profileProps>({
         initialValues: {},
     })
-    const isMobile = useBreakpoint('md')
+    const isMobile = useBreakpoint('xl')
     const path = usePathname()
 
     const { user, accessToken } = useUserStore(state => state)
@@ -82,7 +82,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         span={{
                             base: 0,
                             xs: 0,
-                            sm: 'content',
+                            sm: 2,
                             md: 2,
                         }}
                         h='calc(100vh - 140px)'
@@ -94,6 +94,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                             p='md'
                             radius='md'
                             h='100%'
+                            w='100%'
                         >
                             <Flex direction='column' gap={24}>
                                 <Flex
@@ -165,8 +166,6 @@ export function AppLayout({ children }: AppLayoutProps) {
                                                 )
                                         )
 
-                                        console.log(isDynamicActive)
-
                                         return (
                                             <Link
                                                 className={`flex items-center justify-between h-[18px] text-[14px] font-bold ${isActive || isDynamicActive ? 'text-[var(--mantine-color-indigo-4)]' : 'text-[#2B2B2B]'} hover:text-[#474747] relative`}
@@ -182,7 +181,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                                                     {x.label}
                                                 </Flex>
                                                 {x.badge && <x.badge />}
-                                                {x.iconRight && <x.iconRight />}
+                                                {/*{x.iconRight && <x.iconRight />}*/}
                                             </Link>
                                         )
                                     })}
@@ -195,8 +194,8 @@ export function AppLayout({ children }: AppLayoutProps) {
                     span={{
                         base: 12,
                         xs: 12,
-                        sm: isMobile ? 12 : 10,
-                        md: isMobile ? 12 : 10,
+                        sm: isMobile ? 12 : 9,
+                        md: isMobile ? 12 : 9,
                     }}
                 >
                     {children}

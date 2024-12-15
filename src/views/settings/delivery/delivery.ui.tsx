@@ -184,14 +184,16 @@ export function DeliveryViews() {
                     />
                 </Flex>
 
-                <Button
-                    type='submit'
-                    color='indigo.4'
-                    size='large'
-                    loading={isPending}
-                >
-                    Сохранить изменения
-                </Button>
+                <Flex justify='center'>
+                    <Button
+                        type='submit'
+                        color='indigo.4'
+                        size='large'
+                        loading={isPending}
+                    >
+                        Сохранить изменения
+                    </Button>
+                </Flex>
             </form>
         </Page>
     )

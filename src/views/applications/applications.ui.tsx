@@ -19,9 +19,11 @@ import {
 } from '@mantine/core'
 import { IconMessage } from '@tabler/icons-react'
 import dayjs from 'dayjs'
+import { useRouter } from 'next/navigation'
 
 import { CategoryLabels } from '@/shared/constants'
 import { applications } from '@/shared/constants/applications'
+import { role } from '@/shared/helpers/getRole'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 import {
     Categories,
@@ -43,6 +45,8 @@ export function ApplicationsViews() {
     const [activeStatus, setActiveStatus] = useState(
         statusMap[applications[0].label]
     )
+
+    const router = useRouter()
 
     const getLabelByStatus = (status: string): string => {
         const application = applications.find(
@@ -82,6 +86,7 @@ export function ApplicationsViews() {
                     color='indigo.4'
                     data={applications.map(app => app.label)}
                     orientation={isMobile ? 'vertical' : 'horizontal'}
+                    w={isMobile ? '100%' : ''}
                 />
             </Flex>
 
@@ -113,7 +118,7 @@ export function ApplicationsViews() {
                             <Grid.Col
                                 span={{
                                     base: 12,
-                                    md: 4,
+                                    md: 6,
                                 }}
                                 key={index}
                             >
@@ -126,13 +131,12 @@ export function ApplicationsViews() {
                                         cursor: 'pointer',
                                     }}
                                     onClick={() =>
-                                        handleApplicationsDetailsModals(
-                                            order.id
+                                        router.push(
+                                            `/user/${user && role({ user })}/applications/${order.id}/comparison`
                                         )
                                     }
                                 >
                                     <Text fw={500}>Заявка № {order.id}</Text>
-
                                     <Flex
                                         align='center'
                                         justify='space-between'
@@ -178,7 +182,6 @@ export function ApplicationsViews() {
                                         mt='md'
                                         mb='md'
                                     />
-
                                     <Flex direction='column' gap='md'>
                                         <Text size='sm'>
                                             <strong>
@@ -240,6 +243,20 @@ export function ApplicationsViews() {
                                             </Flex>
                                         </Flex>
                                     </Flex>
+                                    <Box>
+                                        <Button
+                                            bg='transparent'
+                                            c='indigo.4'
+                                            onClick={() =>
+                                                handleApplicationsDetailsModals(
+                                                    order.id
+                                                )
+                                            }
+                                            p={0}
+                                        >
+                                            Посмотреть заявку
+                                        </Button>
+                                    </Box>
                                 </Card>
                             </Grid.Col>
                         ))}
