@@ -68,8 +68,9 @@ export interface ErrorDto {
         | 'INVALID_QUERY_STRING'
         | 'FORBIDDEN_ACTION'
         | 'TEMPLATE_DOES_NOT_EXISTS'
+        | 'VALIDATION_ERROR'
     /** @example ["password|IS_NOT_EMPTY"] */
-    message?: string[]
+    message?: any[][]
     /** @example "Bad Request" */
     error: string
     /** @example 400 */
@@ -143,6 +144,9 @@ export enum Categories {
     CleaningProducts = 'cleaningProducts',
     BakeryProducts = 'bakeryProducts',
     TeeAndCoffee = 'teeAndCoffee',
+    FrozenVegetablesAndFruits = 'frozenVegetablesAndFruits',
+    TextilesAndClothing = 'textilesAndClothing',
+    Equipment = 'equipment',
 }
 
 export enum DeliveryMethods {
@@ -282,10 +286,15 @@ export interface PaginatedDto {
     total: number
 }
 
+export enum PaymentType {
+    Prepayment = 'Prepayment',
+    Deferment = 'Deferment',
+    PaymentUponDelivery = 'PaymentUponDelivery',
+}
+
 export enum HorecaRequestStatus {
     Pending = 'Pending',
     Active = 'Active',
-    Finished = 'Finished',
     CompletedSuccessfully = 'CompletedSuccessfully',
     CompletedUnsuccessfully = 'CompletedUnsuccessfully',
 }
@@ -304,6 +313,7 @@ export interface HorecaRequestItemDto {
 }
 
 export interface HorecaRequestDto {
+    paymentType: PaymentType
     status: HorecaRequestStatus
     id: number
     userId: number
@@ -312,7 +322,6 @@ export interface HorecaRequestDto {
     deliveryTime: string
     /** @format date-time */
     acceptUntill: string
-    paymentType: object
     name: string
     phone: string
     items: HorecaRequestItemDto[]
@@ -343,6 +352,7 @@ export interface HRProviderRequestDto {
     cover: number
     id: number
     userId: number
+    horecaRequest?: HorecaRequestDto
     horecaRequestId: number
     comment: string
     /** @format date-time */
@@ -355,6 +365,7 @@ export interface HRProviderRequestDto {
 }
 
 export interface HorecaRequestWithProviderRequestDto {
+    paymentType: PaymentType
     status: HorecaRequestStatus
     id: number
     userId: number
@@ -363,7 +374,6 @@ export interface HorecaRequestWithProviderRequestDto {
     deliveryTime: string
     /** @format date-time */
     acceptUntill: string
-    paymentType: object
     name: string
     phone: string
     items: HorecaRequestItemDto[]
@@ -386,10 +396,46 @@ export interface HorecaRequestSetStatusDto {
     providerRequestId: number
 }
 
+export interface NotificationPayload {
+    data:
+        | ReviewNotificationPayload
+        | ProviderRequestCreatedNotificationPayload
+        | ProviderRequestStatusChangedNotificationPayload
+        | ProviderAddedToFavouritesNotificationPayload
+        | ProviderDeletedFromFavouritesNotificationPayload
+}
+
+export interface ReviewNotificationPayload {
+    hRequestId: number
+    pRequestId: number
+    chatId: number
+}
+
+export interface ProviderRequestCreatedNotificationPayload {
+    hRequestId: number
+    pRequestId: number
+}
+
+export interface ProviderRequestStatusChangedNotificationPayload {
+    pRequestId: number
+    hRequestId: number
+    status: HorecaRequestStatus
+}
+
+export interface ProviderAddedToFavouritesNotificationPayload {
+    horecaId: number
+}
+
+export interface ProviderDeletedFromFavouritesNotificationPayload {
+    horecaId: number
+}
+
 export interface ChatCreateDto {
     opponentId: number
     providerRequestId?: number
     horecaRequestId?: number
+    horecaFavouriteId?: number
+    supportRequestId?: number
     type: 'Support' | 'Order' | 'Private'
 }
 
@@ -419,7 +465,6 @@ export interface ChatDto {
     type: ChatType
     id: number
     messages: ChatMessageDto[]
-    active: boolean
     /** @format date-time */
     createdAt: string
     /** @format date-time */
@@ -443,12 +488,6 @@ export interface ChatProviderRequestReviewDto {
     createdAt: string
     /** @format date-time */
     updatedAt: string
-}
-
-export enum PaymentType {
-    Prepayment = 'Prepayment',
-    Deferment = 'Deferment',
-    PaymentUponDelivery = 'PaymentUponDelivery',
 }
 
 export interface ChatHorecaRequestDto {
@@ -486,27 +525,88 @@ export interface ChatProviderRequestDto {
     updatedAt: string
 }
 
-export interface ChatFullDto {
-    opponents: number[]
-    type: ChatType
+export interface ChatHorecaFavouritesDto {
     id: number
-    providerRequest?: ChatProviderRequestDto
-    messages: ChatMessageDto[]
-    active: boolean
+    userId: number
+    providerId: number
+    chatId: number
     /** @format date-time */
     createdAt: string
     /** @format date-time */
     updatedAt: string
 }
 
+export enum SupportRequestStatus {
+    Default = 'Default',
+    Active = 'Active',
+    Resolved = 'Resolved',
+}
+
+export interface ChatSupportRequestDto {
+    status: SupportRequestStatus
+    id: number
+    userId: number
+    content: string
+    adminId: number
+    chatId: number
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+}
+
+export interface ChatFullDto {
+    opponents: number[]
+    type: ChatType
+    id: number
+    providerRequest?: ChatProviderRequestDto
+    horecaFavourites?: ChatHorecaFavouritesDto
+    supportRequest?: ChatSupportRequestDto
+    messages: ChatMessageDto[]
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+}
+
+export interface WsMessageCreateDto {
+    chatId: number
+    message: string
+    authorId: number
+}
+
 export interface FavouritesCreateDto {
     providerId: number
+}
+
+export interface FavouritesUserDto {
+    name: string
 }
 
 export interface FavouritesDto {
     providerId: number
     id: number
     userId: number
+    chatId: number
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+    user: FavouritesUserDto
+    provider: FavouritesUserDto
+}
+
+export interface SupportRequestCreateDto {
+    content?: string
+}
+
+export interface SupportRequestDto {
+    id: number
+    userId: number
+    content: string | null
+    status: object
+    adminId: number | null
+    chatId: number
     /** @format date-time */
     createdAt: string
     /** @format date-time */
@@ -544,6 +644,7 @@ export interface ProviderRequestCreateDto {
 export interface ProviderRequestDto {
     id: number
     userId: number
+    horecaRequest?: HorecaRequestDto
     horecaRequestId: number
     comment: string
     /** @format date-time */
@@ -566,33 +667,13 @@ export enum ProductPackagingType {
 }
 
 export interface ProductCreateDto {
-    packagingType: ProductPackagingType
-    category:
-        | 'alcoholicDrinks'
-        | 'grocerySpicesSeasonings'
-        | 'softDrinks'
-        | 'readyMeals'
-        | 'stationery'
-        | 'confectionery'
-        | 'cannedFoods'
-        | 'dairyProducts'
-        | 'iceCream'
-        | 'meat'
-        | 'lowAlcoholDrinks'
-        | 'semiFinishedProducts'
-        | 'dishes'
-        | 'cashDesk'
-        | 'instantFoods'
-        | 'fish'
-        | 'fruitsAndVegetables'
-        | 'cleaningProducts'
-        | 'bakeryProducts'
-        | 'teeAndCoffee'
+    category: Categories
     name: string
     description: string
     producer: string
     cost: number
     count: number
+    packagingType: ProductPackagingType
     imageIds: number[]
 }
 
@@ -622,6 +703,9 @@ export interface ProductDto {
         | 'cleaningProducts'
         | 'bakeryProducts'
         | 'teeAndCoffee'
+        | 'frozenVegetablesAndFruits'
+        | 'textilesAndClothing'
+        | 'equipment'
     name: string
     description: string
     producer: string
@@ -656,36 +740,19 @@ export interface ProductSearchDto {
         | 'cleaningProducts'
         | 'bakeryProducts'
         | 'teeAndCoffee'
+        | 'frozenVegetablesAndFruits'
+        | 'textilesAndClothing'
+        | 'equipment'
 }
 
 export interface ProductUpdateDto {
-    packagingType: ProductPackagingType
-    category:
-        | 'alcoholicDrinks'
-        | 'grocerySpicesSeasonings'
-        | 'softDrinks'
-        | 'readyMeals'
-        | 'stationery'
-        | 'confectionery'
-        | 'cannedFoods'
-        | 'dairyProducts'
-        | 'iceCream'
-        | 'meat'
-        | 'lowAlcoholDrinks'
-        | 'semiFinishedProducts'
-        | 'dishes'
-        | 'cashDesk'
-        | 'instantFoods'
-        | 'fish'
-        | 'fruitsAndVegetables'
-        | 'cleaningProducts'
-        | 'bakeryProducts'
-        | 'teeAndCoffee'
+    category: Categories
     name: string
     description: string
     producer: string
     cost: number
     count: number
+    packagingType: ProductPackagingType
     imageIds: number[]
 }
 
@@ -705,6 +772,28 @@ export interface ReviewDto {
     createdAt: string
     /** @format date-time */
     updatedAt: string
+}
+
+export interface HorecaRequestCreatePrivateDto {
+    /** @minItems 1 */
+    items: HorecaRequestItemCreateDto[]
+    /** @default [] */
+    imageIds?: number[]
+    address: string
+    /** @format date-time */
+    deliveryTime: string
+    /** @format date-time */
+    acceptUntill: string
+    paymentType: 'Prepayment' | 'Deferment' | 'PaymentUponDelivery'
+    name: string
+    phone: string
+    comment?: string
+    providerId: number
+}
+
+export interface HorecaPrivateRequestDto {
+    horecaRequestId: number
+    providerRequestId: number
 }
 
 export type QueryParamsType = Record<string | number, any>
@@ -1237,7 +1326,7 @@ export class Api<
          *
          * @tags HorecaRequests
          * @name HorecaRequestsControllerCreate
-         * @summary Create products(categories) set proposal required for HoReCa
+         * @summary Create products(categories) set proposal needed for HoReCa
          * @request POST:/api/horeca/requests
          * @secure
          */
@@ -1368,6 +1457,23 @@ export class Api<
         ) =>
             this.request<SuccessDto, ErrorDto>({
                 path: `/api/horeca/requests/${id}/cancel`,
+                method: 'GET',
+                secure: true,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags WS
+         * @name NotificationControllerGet
+         * @request GET:/api/notifications
+         * @secure
+         */
+        notificationControllerGet: (params: RequestParams = {}) =>
+            this.request<SuccessDto, ErrorDto>({
+                path: `/api/notifications`,
                 method: 'GET',
                 secure: true,
                 format: 'json',
@@ -1516,7 +1622,7 @@ export class Api<
             data: FavouritesCreateDto,
             params: RequestParams = {}
         ) =>
-            this.request<SuccessDto, ErrorDto>({
+            this.request<FavouritesDto, ErrorDto>({
                 path: `/api/horeca/favourites`,
                 method: 'POST',
                 body: data,
@@ -1531,7 +1637,7 @@ export class Api<
          *
          * @tags Favourites
          * @name FavouritesControllerFindAll
-         * @summary Get all favourite providers
+         * @summary Get all favourite providers/horecas
          * @request GET:/api/horeca/favourites
          * @secure
          */
@@ -1576,6 +1682,71 @@ export class Api<
             this.request<SuccessDto, ErrorDto>({
                 path: `/api/horeca/favourites/${providerId}`,
                 method: 'DELETE',
+                secure: true,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags SupportRequest
+         * @name SupportRequestsControllerCreate
+         * @summary Creates request to support
+         * @request POST:/api/support/requests
+         * @secure
+         */
+        supportRequestsControllerCreate: (
+            data: SupportRequestCreateDto,
+            params: RequestParams = {}
+        ) =>
+            this.request<SupportRequestDto, ErrorDto>({
+                path: `/api/support/requests`,
+                method: 'POST',
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags SupportRequest
+         * @name SupportRequestsControllerResolve
+         * @summary Marks request to support as resolved
+         * @request POST:/api/support/requests/{id}/resolve
+         * @secure
+         */
+        supportRequestsControllerResolve: (
+            id: number,
+            params: RequestParams = {}
+        ) =>
+            this.request<SuccessDto, ErrorDto>({
+                path: `/api/support/requests/${id}/resolve`,
+                method: 'POST',
+                secure: true,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags SupportRequest
+         * @name SupportRequestsAdminControllerAssignAdmin
+         * @summary Admin assigns himself to customer support request
+         * @request POST:/api/support/requests/{id}/assign
+         * @secure
+         */
+        supportRequestsAdminControllerAssignAdmin: (
+            id: number,
+            params: RequestParams = {}
+        ) =>
+            this.request<SuccessDto, ErrorDto>({
+                path: `/api/support/requests/${id}/assign`,
+                method: 'POST',
                 secure: true,
                 format: 'json',
                 ...params,
@@ -1850,6 +2021,29 @@ export class Api<
         ) =>
             this.request<ReviewDto, ErrorDto>({
                 path: `/api/reviews/horeca`,
+                method: 'POST',
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags HorecaPrivateRequests
+         * @name HorecaPrivateRequestsControllerCreatePrivate
+         * @summary Create products(categories) set proposal needed for HoReCa and send to the favourite provider
+         * @request POST:/api/horeca/requests/private/private
+         * @secure
+         */
+        horecaPrivateRequestsControllerCreatePrivate: (
+            data: HorecaRequestCreatePrivateDto,
+            params: RequestParams = {}
+        ) =>
+            this.request<HorecaPrivateRequestDto, ErrorDto>({
+                path: `/api/horeca/requests/private/private`,
                 method: 'POST',
                 body: data,
                 secure: true,

@@ -39,22 +39,22 @@ export const horecaSidebarData: SidebarItem[] = [
     {
         id: 1,
         type: 'link',
-        label: 'Создать заявку',
-        icon: IconFilePencil,
-        description:
-            'Если хотите найти редкий товар или собрать эксклюзивные предложения поставщиков',
-        link: '/create/request',
-        button: 'Перейти к запросу',
-    },
-    {
-        id: 2,
-        type: 'link',
         label: 'Мои заявки',
         icon: IconChecklist,
         description: 'История ваших заявок и чат с поставщиками',
         link: '/applications',
         button: 'Перейти к заказам',
         iconRight: IconMail,
+    },
+    {
+        id: 2,
+        type: 'link',
+        label: 'Создать заявку',
+        icon: IconFilePencil,
+        description:
+            'Если хотите найти редкий товар или собрать эксклюзивные предложения поставщиков',
+        link: '/create/request',
+        button: 'Перейти к запросу',
     },
     {
         id: 3,

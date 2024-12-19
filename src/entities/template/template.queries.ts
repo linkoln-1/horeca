@@ -20,7 +20,7 @@ export function useGetHorecaTemplateQuery(
     enabled: boolean = true
 ) {
     return useCustomInfiniteQuery({
-        queryKey: ['template', enabled],
+        queryKey: ['template'],
         queryFn: () => api.horecaRequestsTemplateControllerFindAll(query),
     })
 }
@@ -66,8 +66,15 @@ export function useUpdateHorecaTemplateMutation(id: number) {
     })
 }
 
-export function useDeleteHorecaTemplateMutation(id: number) {
+export function useDeleteHorecaTemplateMutation() {
+    const queryClient = useQueryClient()
+
     return useMutation({
-        mutationFn: () => api.horecaRequestsTemplateControllerDelete(id),
+        mutationFn: ({ id }: { id: number }) =>
+            api.horecaRequestsTemplateControllerDelete(id),
+
+        onSuccess: async ({ data }) => {
+            await queryClient.invalidateQueries({ queryKey: ['template'] })
+        },
     })
 }

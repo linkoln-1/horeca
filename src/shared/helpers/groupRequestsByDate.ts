@@ -13,3 +13,20 @@ export function groupRequestsByDate(requests: HorecaRequestDto[]) {
         {} as Record<string, HorecaRequestDto[]>
     )
 }
+
+export function groupByCategory<T, K extends keyof T>(
+    items: T[],
+    categoryKey: K
+): Record<string, T[]> {
+    return items.reduce(
+        (acc, item) => {
+            const key = String(item[categoryKey])
+            if (!acc[key]) {
+                acc[key] = []
+            }
+            acc[key].push(item)
+            return acc
+        },
+        {} as Record<string, T[]>
+    )
+}

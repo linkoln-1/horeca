@@ -31,11 +31,13 @@ import { FileWithPath } from '@mantine/dropzone'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { IconPlus, IconX } from '@tabler/icons-react'
+import { useRouter } from 'next/navigation'
 
 import { CategoryLabels, errors, HorecaTemplateDto } from '@/shared/constants'
 import { HorecaRequestForm } from '@/shared/constants'
 import { PaymentMethod } from '@/shared/constants/paymentMethod'
 import { getImageUrl } from '@/shared/helpers'
+import { isFormFilled } from '@/shared/helpers/isForEmpty'
 import {
     Categories,
     HorecaRequestCreateDto,
@@ -52,7 +54,7 @@ export function CreateRequestView() {
                     products: [
                         {
                             name: '',
-                            amount: 0,
+                            amount: '',
                             unit: '',
                         },
                     ],
@@ -71,16 +73,20 @@ export function CreateRequestView() {
     const [showCategory, setShowCategory] = useState(true)
     const dropzone = useRef<() => void>(null)
     const [images, setImages] = useState<UploadDto[]>([])
+    const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
+    const router = useRouter()
 
     const { mutateAsync: createRequest } =
         requestQueries.useCreateRequestMutation()
-    const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
+
     const { data: templates } = templateQueries.useGetHorecaTemplateQuery()
+
     const { data: selectedTemplate, isLoading: selectedTemplateLoading } =
         templateQueries.useGetByIdHorecaTemplateQuery({
             id: +selectedTemplateId,
             enabled: +selectedTemplateId !== 0,
         })
+
     const { mutateAsync: uploadImage, isPending: isPendingImage } =
         imageQueries.useImageUploadMutation()
 
@@ -170,7 +176,7 @@ export function CreateRequestView() {
                     item.products.map(product => ({
                         category: item.category,
                         name: product.name,
-                        amount: product.amount,
+                        amount: +product.amount,
                         unit: product.unit,
                     }))
                 ),
@@ -187,6 +193,7 @@ export function CreateRequestView() {
             toast.success('Заявка успешно создана!')
 
             handleModal('thanksTemplateModal', '', 'md', <ThanksModal />)
+            router.push('/user/horeca/applications')
         } catch (e: any) {
             const errorKey = e?.error?.error
 
@@ -537,6 +544,7 @@ export function CreateRequestView() {
                                     backgroundColor: '#fff',
                                 },
                             }}
+                            disabled={!isFormFilled(form.values)}
                         >
                             Сохранить шаблон
                         </Button>
@@ -569,5 +577,12 @@ function handleModal(
         radius: 'md',
         size,
         children,
+
+        styles: {
+            title: {
+                fontWeight: 'bold',
+                fontSize: '20px',
+            },
+        },
     })
 }

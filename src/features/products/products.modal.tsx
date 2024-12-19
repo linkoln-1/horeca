@@ -46,15 +46,6 @@ export function ProductsModal() {
         x => CategoryLabels[x as Categories]
     )
 
-    const packageTypes = Object.values(ProductPackagingType)
-        .filter(value => typeof value === 'string')
-        .map(x => ({
-            value: x.trim(),
-            label:
-                packageTypeLabel[x as ProductPackagingType]?.trim() ||
-                'Не указано',
-        }))
-
     const form = useForm<ProductCreateDto>({
         initialValues: {
             category: categories as unknown as Categories,
@@ -63,7 +54,7 @@ export function ProductsModal() {
             producer: '',
             cost: 0,
             count: 0,
-            packagingType: [] as unknown as ProductPackagingType,
+            packagingType: 'Box' as ProductPackagingType,
             imageIds: [],
         },
     })
@@ -119,13 +110,15 @@ export function ProductsModal() {
     return (
         <Flex direction='column' gap='lg' p='md'>
             <Text fw={700} size='xl' className='text-center'>
-                Добавить Новый товар
+                Добавить новый товар
             </Text>
             <form
                 className='flex flex-col gap-8'
                 onSubmit={async e => {
                     e.preventDefault()
-                    createProduct(form.values)
+                    createProduct({
+                        data: form.values,
+                    })
                 }}
             >
                 <Grid>
@@ -180,12 +173,10 @@ export function ProductsModal() {
                 />
 
                 <Group grow>
-                    <MultiSelect
+                    <TextInput
                         label='Фасовка'
                         placeholder='Выберите фасовку'
-                        data={packageTypes}
                         {...form.getInputProps('packagingType')}
-                        searchable
                     />
 
                     <NumberInput
@@ -202,38 +193,7 @@ export function ProductsModal() {
                     />
                 </Group>
 
-                {/*TODO оставлено пока поправиться загрузка картинок на бэке (после загрузки картинки должно выдавать ссылку на картинкку*/}
                 <Grid>
-                    {/*{form.values.imageIds.map((item, index) => (*/}
-                    {/*    <Grid.Col*/}
-                    {/*        key={index}*/}
-                    {/*        span={{*/}
-                    {/*            base: 12,*/}
-                    {/*            md: 6,*/}
-                    {/*            lg: 3,*/}
-                    {/*        }}*/}
-                    {/*        pos='relative'*/}
-                    {/*    >*/}
-                    {/*        <Tooltip label='Удалить картинку'>*/}
-                    {/*            <ActionIcon*/}
-                    {/*                // onClick={() => removeImage(item.id)}*/}
-                    {/*                color='gray'*/}
-                    {/*                pos='absolute'*/}
-                    {/*                right={rem(8 + 10)}*/}
-                    {/*                top={rem(8 + 10)}*/}
-                    {/*            >*/}
-                    {/*                <IconTrash size={20} />*/}
-                    {/*            </ActionIcon>*/}
-                    {/*        </Tooltip>*/}
-                    {/*        <MantineImage*/}
-                    {/*            radius='md'*/}
-                    {/*            src={''}*/}
-                    {/*            alt='portfolio'*/}
-                    {/*            className='aspect-square'*/}
-                    {/*        />*/}
-                    {/*    </Grid.Col>*/}
-                    {/*))}*/}
-
                     <Grid.Col
                         span={{
                             base: 12,

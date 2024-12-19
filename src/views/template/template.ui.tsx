@@ -1,5 +1,7 @@
 'use client'
 
+import { toast } from 'react-toastify'
+
 import { templateQueries } from '@/entities/template'
 import { ViewTemplateModal } from '@/views/template/ui'
 import {
@@ -13,13 +15,14 @@ import {
     Loader,
     Paper,
     Text,
+    Tooltip,
 } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import { IconX } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 
-import { CategoryLabels, HorecaTemplateDto } from '@/shared/constants'
+import { CategoryLabels, errors, HorecaTemplateDto } from '@/shared/constants'
 import { Categories } from '@/shared/lib/horekaApi/Api'
 
 import '@/styles/template.scss'
@@ -35,6 +38,26 @@ export function TemplateApplicationViews() {
     } = templateQueries.useGetHorecaTemplateQuery({
         limit: LIMIT,
     })
+
+    const { mutateAsync: deleteTemplate } =
+        templateQueries.useDeleteHorecaTemplateMutation()
+
+    const handleDeleteTemplate = async (templateId: number) => {
+        try {
+            await deleteTemplate({ id: templateId })
+
+            toast.success('Шаблон успешно удален')
+        } catch (e: any) {
+            const errorKey = e?.error?.error
+
+            const errorMessage =
+                errorKey in errors
+                    ? errors[errorKey as keyof typeof errors]
+                    : 'Неизвестная ошибка. Попробуйте ещё раз.'
+
+            toast.error(errorMessage)
+        }
+    }
 
     if (!templates) return <Loader />
 
@@ -154,19 +177,31 @@ export function TemplateApplicationViews() {
                                                 </Flex>
                                             ))}
 
-                                        <Button
-                                            pos='absolute'
-                                            top={10}
-                                            right={10}
-                                            rightSection={<IconX color='red' />}
-                                            variant='transparent'
-                                            p={0}
-                                            styles={{
-                                                section: {
-                                                    margin: 0,
-                                                },
-                                            }}
-                                        />
+                                        <Tooltip
+                                            label='Вы действительно хотите удалить этот шаблон?'
+                                            bg='indigo.4'
+                                        >
+                                            <Button
+                                                pos='absolute'
+                                                top={10}
+                                                right={10}
+                                                rightSection={
+                                                    <IconX color='red' />
+                                                }
+                                                variant='transparent'
+                                                p={0}
+                                                styles={{
+                                                    section: {
+                                                        margin: 0,
+                                                    },
+                                                }}
+                                                onClick={() =>
+                                                    handleDeleteTemplate(
+                                                        template.id
+                                                    )
+                                                }
+                                            />
+                                        </Tooltip>
 
                                         <Flex justify='end' gap='md'>
                                             <Button

@@ -222,45 +222,47 @@ export function ViewTemplateModal({ id }: { id: number }) {
                             gap='xl'
                             w='50%'
                         >
-                            <Box mb='sm'>
-                                <Flex
-                                    direction='column'
-                                    gap='md'
-                                    className='border-2 border-dashed border-[var(--mantine-color-indigo-6)] rounded cursor-pointer'
-                                    justify='center'
-                                    py='md'
-                                    px='md'
-                                >
-                                    {images.length > 0 && (
-                                        <Flex mt='md' gap='sm'>
-                                            {images.map((img, index) => {
-                                                return (
-                                                    <Box
-                                                        pos='relative'
-                                                        key={index}
-                                                    >
-                                                        <MantineImage
-                                                            w='100px'
-                                                            h='100px'
-                                                            fit='cover'
-                                                            className='aspect-square'
-                                                            radius='md'
-                                                            src={getImageUrl(
-                                                                img.path
-                                                            )}
-                                                            onLoad={() =>
-                                                                getImageUrl(
+                            {images.length > 0 && (
+                                <Box mb='sm'>
+                                    <Flex
+                                        direction='column'
+                                        gap='md'
+                                        className='border-2 border-dashed border-[var(--mantine-color-indigo-6)] rounded cursor-pointer'
+                                        justify='center'
+                                        py='md'
+                                        px='md'
+                                    >
+                                        {images.length > 0 && (
+                                            <Flex mt='md' gap='sm'>
+                                                {images.map((img, index) => {
+                                                    return (
+                                                        <Box
+                                                            pos='relative'
+                                                            key={index}
+                                                        >
+                                                            <MantineImage
+                                                                w='100px'
+                                                                h='100px'
+                                                                fit='cover'
+                                                                className='aspect-square'
+                                                                radius='md'
+                                                                src={getImageUrl(
                                                                     img.path
-                                                                )
-                                                            }
-                                                        />
-                                                    </Box>
-                                                )
-                                            })}
-                                        </Flex>
-                                    )}
-                                </Flex>
-                            </Box>
+                                                                )}
+                                                                onLoad={() =>
+                                                                    getImageUrl(
+                                                                        img.path
+                                                                    )
+                                                                }
+                                                            />
+                                                        </Box>
+                                                    )
+                                                })}
+                                            </Flex>
+                                        )}
+                                    </Flex>
+                                </Box>
+                            )}
 
                             <Textarea
                                 size='md'

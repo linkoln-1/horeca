@@ -29,8 +29,6 @@ export function ProductApplicationViews() {
     const groupedRequests =
         incomingRequests && groupRequestsByDate(incomingRequests.data || [])
 
-    console.log(groupedRequests && Object.entries(groupedRequests).length === 0)
-
     return (
         <Flex direction='column' gap='md'>
             {incomingRequests && user && (
@@ -179,6 +177,8 @@ export function ProductApplicationViews() {
                                                                 variant='transparent'
                                                                 c='indigo.4'
                                                                 fw={400}
+                                                                component={Link}
+                                                                href={`/user/${role({ user })}/products/applications/${request.id}`}
                                                             >
                                                                 Просмотреть
                                                                 заявку

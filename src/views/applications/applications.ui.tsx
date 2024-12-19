@@ -19,7 +19,7 @@ import {
 } from '@mantine/core'
 import { IconMessage } from '@tabler/icons-react'
 import dayjs from 'dayjs'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 import { CategoryLabels } from '@/shared/constants'
 import { applications } from '@/shared/constants/applications'
@@ -45,8 +45,6 @@ export function ApplicationsViews() {
     const [activeStatus, setActiveStatus] = useState(
         statusMap[applications[0].label]
     )
-
-    const router = useRouter()
 
     const getLabelByStatus = (status: string): string => {
         const application = applications.find(
@@ -130,133 +128,149 @@ export function ApplicationsViews() {
                                     style={{
                                         cursor: 'pointer',
                                     }}
-                                    onClick={() =>
-                                        router.push(
-                                            `/user/${user && role({ user })}/applications/${order.id}/comparison`
-                                        )
-                                    }
                                 >
-                                    <Text fw={500}>Заявка № {order.id}</Text>
-                                    <Flex
-                                        align='center'
-                                        justify='space-between'
+                                    <Link
+                                        href={`/user/${user && role({ user })}/applications/${order.id}/comparison`}
                                     >
-                                        <Flex align='center' gap='md'>
-                                            <Badge
-                                                color={
-                                                    order.status.toLowerCase() ===
-                                                    'active'
-                                                        ? 'green'
-                                                        : order.status.toLowerCase() ===
-                                                            'pending'
-                                                          ? 'yellow'
-                                                          : 'gray'
-                                                }
-                                                variant='light'
-                                                w={150}
-                                            >
-                                                {getLabelByStatus(order.status)}
-                                            </Badge>
+                                        <Text fw={500}>
+                                            Заявка № {order.id}
+                                        </Text>
+                                        <Flex
+                                            align='center'
+                                            justify='space-between'
+                                        >
+                                            <Flex align='center' gap='md'>
+                                                <Badge
+                                                    color={
+                                                        order.status.toLowerCase() ===
+                                                        'active'
+                                                            ? 'green'
+                                                            : order.status.toLowerCase() ===
+                                                                'pending'
+                                                              ? 'yellow'
+                                                              : 'gray'
+                                                    }
+                                                    variant='light'
+                                                    w={150}
+                                                >
+                                                    {getLabelByStatus(
+                                                        order.status
+                                                    )}
+                                                </Badge>
+                                                <Box>
+                                                    {order.comment && (
+                                                        <Text
+                                                            size='sm'
+                                                            c='blue'
+                                                            style={{
+                                                                marginBottom: 5,
+                                                            }}
+                                                            truncate='end'
+                                                        >
+                                                            {order.comment}{' '}
+                                                        </Text>
+                                                    )}
+                                                </Box>
+                                            </Flex>
+
                                             <Box>
-                                                {order.comment && (
-                                                    <Text
-                                                        size='sm'
-                                                        c='blue'
-                                                        style={{
-                                                            marginBottom: 5,
-                                                        }}
-                                                        truncate='end'
-                                                    >
-                                                        {order.comment}{' '}
-                                                    </Text>
-                                                )}
+                                                <IconMessage
+                                                    size={30}
+                                                    color={
+                                                        order.status.toLowerCase() ===
+                                                        'pending'
+                                                            ? 'gray'
+                                                            : 'black'
+                                                    }
+                                                />
                                             </Box>
                                         </Flex>
-
-                                        <Box>
-                                            <IconMessage size={30} />
-                                        </Box>
-                                    </Flex>
-                                    <Divider
-                                        orientation='horizontal'
-                                        mt='md'
-                                        mb='md'
-                                    />
-                                    <Flex direction='column' gap='md'>
-                                        <Text size='sm'>
-                                            <strong>
-                                                Информация по вашему заказу
-                                            </strong>
-                                        </Text>
-
-                                        <Flex
-                                            justify='space-between'
-                                            align={
-                                                user?.role === UserRole.Horeca
-                                                    ? 'start'
-                                                    : 'center'
-                                            }
-                                        >
-                                            <Flex
-                                                direction='column'
-                                                gap='md'
-                                                maw={230}
-                                            >
-                                                {user?.role ===
-                                                UserRole.Horeca ? null : (
-                                                    <Text size='sm'>
-                                                        Название: {order.name}
-                                                    </Text>
-                                                )}
-                                                <Text size='sm'>
-                                                    Категории:{' '}
-                                                    {Array.from(
-                                                        new Set(
-                                                            order.items.map(
-                                                                item =>
-                                                                    CategoryLabels[
-                                                                        item.category as Categories
-                                                                    ]
-                                                            )
-                                                        )
-                                                    ).join(', ')}
-                                                </Text>
-                                            </Flex>
+                                        <Divider
+                                            orientation='horizontal'
+                                            mt='md'
+                                            mb='md'
+                                        />
+                                        <Flex direction='column' gap='md'>
+                                            <Text size='sm'>
+                                                <strong>
+                                                    Информация по вашему заказу
+                                                </strong>
+                                            </Text>
 
                                             <Flex
-                                                direction='column'
-                                                gap='md'
-                                                maw={200}
+                                                justify='space-between'
+                                                align={
+                                                    user?.role ===
+                                                    UserRole.Horeca
+                                                        ? 'start'
+                                                        : 'center'
+                                                }
                                             >
-                                                <Text size='sm'>
-                                                    Адрес доставки:{' '}
-                                                    {order.address}
-                                                </Text>
-                                                <Text size='sm'>
-                                                    Дата доставки:{' '}
-                                                    {dayjs(
-                                                        order.deliveryTime
-                                                    ).format(
-                                                        'YYYY-MM-DD HH:mm'
+                                                <Flex
+                                                    direction='column'
+                                                    gap='md'
+                                                    maw={230}
+                                                >
+                                                    {user?.role ===
+                                                    UserRole.Horeca ? null : (
+                                                        <Text size='sm'>
+                                                            Название:{' '}
+                                                            {order.name}
+                                                        </Text>
                                                     )}
-                                                </Text>
+                                                    <Text size='sm'>
+                                                        Категории:{' '}
+                                                        {Array.from(
+                                                            new Set(
+                                                                order.items.map(
+                                                                    item =>
+                                                                        CategoryLabels[
+                                                                            item.category as Categories
+                                                                        ]
+                                                                )
+                                                            )
+                                                        ).join(', ')}
+                                                    </Text>
+                                                </Flex>
+
+                                                <Flex
+                                                    direction='column'
+                                                    gap='md'
+                                                    maw={200}
+                                                >
+                                                    <Text size='sm'>
+                                                        Адрес доставки:{' '}
+                                                        {order.address}
+                                                    </Text>
+                                                    <Text size='sm'>
+                                                        Дата доставки:{' '}
+                                                        {dayjs(
+                                                            order.deliveryTime
+                                                        ).format(
+                                                            'YYYY-MM-DD HH:mm'
+                                                        )}
+                                                    </Text>
+                                                </Flex>
                                             </Flex>
                                         </Flex>
-                                    </Flex>
-                                    <Box>
-                                        <Button
-                                            bg='transparent'
-                                            c='indigo.4'
-                                            onClick={() =>
-                                                handleApplicationsDetailsModals(
-                                                    order.id
-                                                )
-                                            }
-                                            p={0}
-                                        >
-                                            Посмотреть заявку
-                                        </Button>
-                                    </Box>
+                                        <Box>
+                                            <Button
+                                                bg='transparent'
+                                                c='indigo.4'
+                                                onClick={e => {
+                                                    {
+                                                        e.preventDefault()
+                                                        handleApplicationsDetailsModals(
+                                                            order.id
+                                                        )
+                                                    }
+                                                }}
+                                                p={0}
+                                            >
+                                                Посмотреть заявку
+                                            </Button>
+                                        </Box>
+                                    </Link>
                                 </Card>
                             </Grid.Col>
                         ))}

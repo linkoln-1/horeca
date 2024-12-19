@@ -2,7 +2,7 @@ import { Categories } from '@/shared/lib/horekaApi/Api'
 
 export type HorecaRequestFormCategoryItems = {
     name: string
-    amount: number
+    amount: number | string
     unit: string
 }
 

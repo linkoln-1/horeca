@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/shared/lib/horekaApi'
 import {
     HorecaRequestSearchDto,
+    ProductCreateDto,
     ProductSearchDto,
     ProductUpdateDto,
 } from '@/shared/lib/horekaApi/Api'
@@ -20,7 +21,9 @@ export function useProductMutation() {
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: api.productsControllerCreate,
+        mutationFn: ({ data }: { data: ProductCreateDto }) => {
+            return api.productsControllerCreate(data)
+        },
         onSettled: async () => {
             await queryClient.invalidateQueries({ queryKey: ['product'] })
         },
