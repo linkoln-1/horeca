@@ -432,9 +432,13 @@ export interface ProviderDeletedFromFavouritesNotificationPayload {
 
 export interface ChatCreateDto {
     opponentId: number
+    /** Required when type Order */
     providerRequestId?: number
+    /** Required when type Order */
     horecaRequestId?: number
+    /** Required when type Private */
     horecaFavouriteId?: number
+    /** Required when type Support */
     supportRequestId?: number
     type: 'Support' | 'Order' | 'Private'
 }
@@ -613,6 +617,11 @@ export interface SupportRequestDto {
     updatedAt: string
 }
 
+export interface SupportRequestSearchDto {
+    status: SupportRequestStatus
+    isNew?: boolean
+}
+
 export interface ProviderHorecaRequestSearchDto {
     /** @default false */
     includeHiddenAndViewed?: boolean
@@ -660,12 +669,6 @@ export interface ProviderRequestSearchDto {
     status: ProviderRequestStatus
 }
 
-export enum ProductPackagingType {
-    Bottle = 'Bottle',
-    Box = 'Box',
-    Pallet = 'Pallet',
-}
-
 export interface ProductCreateDto {
     category: Categories
     name: string
@@ -673,12 +676,11 @@ export interface ProductCreateDto {
     producer: string
     cost: number
     count: number
-    packagingType: ProductPackagingType
+    packagingType: string
     imageIds: number[]
 }
 
 export interface ProductDto {
-    packagingType: ProductPackagingType
     isEditable: boolean
     id: number
     userId: number
@@ -711,6 +713,7 @@ export interface ProductDto {
     producer: string
     cost: number
     count: number
+    packagingType: string | null
     /** @format date-time */
     createdAt: string
     /** @format date-time */
@@ -752,7 +755,7 @@ export interface ProductUpdateDto {
     producer: string
     cost: number
     count: number
-    packagingType: ProductPackagingType
+    packagingType: string
     imageIds: number[]
 }
 
@@ -1714,6 +1717,40 @@ export class Api<
          * No description
          *
          * @tags SupportRequest
+         * @name SupportRequestsAdminControllerList
+         * @summary Admin get list of all support requests
+         * @request GET:/api/support/requests
+         * @secure
+         */
+        supportRequestsAdminControllerList: (
+            query?: {
+                offset?: number
+                limit?: number
+                search?: SupportRequestSearchDto
+                /** fieldName(numeric)|ASC/DESC */
+                sort?: string
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    data: SupportRequestDto[]
+                    total: number
+                },
+                ErrorDto
+            >({
+                path: `/api/support/requests`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags SupportRequest
          * @name SupportRequestsControllerResolve
          * @summary Marks request to support as resolved
          * @request POST:/api/support/requests/{id}/resolve
@@ -1870,9 +1907,30 @@ export class Api<
          * No description
          *
          * @tags ProviderRequests
+         * @name ProviderRequestsControllerGet
+         * @summary Get provider request
+         * @request GET:/api/provider/requests/{id}
+         * @secure
+         */
+        providerRequestsControllerGet: (
+            id: number,
+            params: RequestParams = {}
+        ) =>
+            this.request<ProviderRequestDto, ErrorDto>({
+                path: `/api/provider/requests/${id}`,
+                method: 'GET',
+                secure: true,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ProviderRequests
          * @name ProviderRequestsControllerCancel
          * @summary Cancel request
-         * @request PUT:/api/provider/requests/id
+         * @request PUT:/api/provider/requests/{id}
          * @secure
          */
         providerRequestsControllerCancel: (
@@ -1881,7 +1939,7 @@ export class Api<
             params: RequestParams = {}
         ) =>
             this.request<ProviderRequestDto, ErrorDto>({
-                path: `/api/provider/requests/id`,
+                path: `/api/provider/requests/${id}`,
                 method: 'PUT',
                 body: data,
                 secure: true,

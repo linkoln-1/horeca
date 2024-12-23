@@ -1,6 +1,4 @@
-import { ProductPackagingType } from '@/shared/lib/horekaApi/Api'
-
-export const packageTypeLabel: Record<ProductPackagingType, string> = {
+export const packageTypeLabel: Record<string, string> = {
     Bottle: 'Бутылка',
     Box: 'Коробка',
     Pallet: 'Поддон',

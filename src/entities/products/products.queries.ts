@@ -1,21 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { api } from '@/shared/lib/horekaApi'
-import {
-    HorecaRequestSearchDto,
-    ProductCreateDto,
-    ProductSearchDto,
-    ProductUpdateDto,
-} from '@/shared/lib/horekaApi/Api'
+import { ProductCreateDto, ProductUpdateDto } from '@/shared/lib/horekaApi/Api'
+import { ProductPaginatedQuery } from '@/shared/lib/horekaApi/types'
 import { useCustomInfiniteQuery } from '@/shared/lib/reactQuery/useCustomInfiniteQuery'
 import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
-
-interface GetRequestQueryParams {
-    offset?: number
-    limit?: number
-    search?: ProductSearchDto
-    sort?: string
-}
 
 export function useProductMutation() {
     const queryClient = useQueryClient()
@@ -30,10 +19,14 @@ export function useProductMutation() {
     })
 }
 
-export function useGetProductsInfiniteQuery(params: GetRequestQueryParams) {
+export function useGetProductsInfiniteQuery(query: ProductPaginatedQuery) {
     return useCustomInfiniteQuery({
-        queryKey: ['product', params],
-        queryFn: () => api.productsControllerFindAll(params),
+        queryKey: ['product'],
+        queryFn: ({ pageParam }) =>
+            api.productsControllerFindAll({
+                ...query,
+                offset: pageParam,
+            }),
     })
 }
 

@@ -46,7 +46,7 @@ export const horecaMenu = [
         description:
             'Здесь вы можете следить за минимальным остатком и планировать закупки',
         subDescription: 'В разработке',
-        link: '/assistant',
+        link: '/support',
     },
     {
         id: 6,

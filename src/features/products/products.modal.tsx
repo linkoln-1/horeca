@@ -1,37 +1,36 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { productsQueries } from '@/entities/products'
 import { imageQueries } from '@/entities/uploads'
+import { handlePreviewModal } from '@/views/catalog/ui'
 import {
-    ActionIcon,
     Button,
     Flex,
     Grid,
     Group,
     NumberInput,
-    rem,
     Select,
     Text,
     Textarea,
     TextInput,
-    Tooltip,
     Image as MantineImage,
-    MultiSelect,
     Box,
     LoadingOverlay,
+    Tooltip,
+    ActionIcon,
+    rem,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { modals } from '@mantine/modals'
 import { IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 
 import { CategoryLabels } from '@/shared/constants'
-import { packageTypeLabel } from '@/shared/constants/packageType'
 import { getImageUrl } from '@/shared/helpers'
 import {
     Categories,
     ProductCreateDto,
-    ProductPackagingType,
     ProviderProfileDto,
     UploadDto,
 } from '@/shared/lib/horekaApi/Api'
@@ -39,7 +38,17 @@ import { CustomDropzone } from '@/shared/ui/CustomDropzone'
 
 const allowedFormats: string[] = ['image/png', 'image/jpeg']
 
-export function ProductsModal() {
+type ProductsModalProps = {
+    initialValues?: ProductCreateDto
+    initialImages?: UploadDto[]
+}
+
+export function ProductsModal({
+    initialValues,
+    initialImages = [],
+}: ProductsModalProps) {
+    const [isPreviewVisible, setIsPreviewVisible] = useState(false)
+
     const user = useUserStore(state => state.user)
 
     const categories = (user?.profile as ProviderProfileDto)?.categories.map(
@@ -47,14 +56,14 @@ export function ProductsModal() {
     )
 
     const form = useForm<ProductCreateDto>({
-        initialValues: {
+        initialValues: initialValues || {
             category: categories as unknown as Categories,
             name: '',
             description: '',
             producer: '',
             cost: 0,
             count: 0,
-            packagingType: 'Box' as ProductPackagingType,
+            packagingType: '',
             imageIds: [],
         },
     })
@@ -64,7 +73,7 @@ export function ProductsModal() {
         imageQueries.useImageUploadMutation()
 
     const dropzone = useRef<() => void>(null)
-    const [images, setImages] = useState<UploadDto[]>([])
+    const [images, setImages] = useState<UploadDto[]>(initialImages)
 
     const handleAddMainImage = async (files: File[] | null) => {
         if (files && files.length > 0) {
@@ -107,6 +116,19 @@ export function ProductsModal() {
         setImages(prevImages => prevImages.filter((_, i) => i !== index))
     }
 
+    const handlePreview = () => {
+        setIsPreviewVisible(!isPreviewVisible)
+    }
+
+    useEffect(() => {
+        if (isPreviewVisible) {
+            handlePreviewModal({
+                form: form,
+                images: images,
+            })
+        }
+    }, [isPreviewVisible])
+
     return (
         <Flex direction='column' gap='lg' p='md'>
             <Text fw={700} size='xl' className='text-center'>
@@ -116,9 +138,12 @@ export function ProductsModal() {
                 className='flex flex-col gap-8'
                 onSubmit={async e => {
                     e.preventDefault()
+                    setIsPreviewVisible(false)
                     createProduct({
                         data: form.values,
                     })
+                    toast.success('Товар успешно добавлен в каталог')
+                    modals.close('product')
                 }}
             >
                 <Grid>
@@ -165,17 +190,20 @@ export function ProductsModal() {
                             label: CategoryLabels[x as Categories],
                         })
                     )}
+                    label='Категория товара'
                     placeholder='Выберите категорию'
                     value={form.values.category}
                     onChange={value => {
                         form.setFieldValue('category', value as Categories)
                     }}
+                    required
                 />
 
                 <Group grow>
                     <TextInput
                         label='Фасовка'
-                        placeholder='Выберите фасовку'
+                        required
+                        placeholder='Введите фасовку'
                         {...form.getInputProps('packagingType')}
                     />
 
@@ -220,59 +248,50 @@ export function ProductsModal() {
                                 py='md'
                                 px='md'
                             >
-                                <Button
-                                    mx='auto'
-                                    w='fit-content'
-                                    size='md'
-                                    fw='500'
-                                    c='indigo.6'
-                                    variant='transparent'
-                                    leftSection={<IconPlus />}
-                                    onClick={() => dropzone.current?.()}
-                                >
-                                    Добавить фотографии
-                                </Button>
+                                {images.length < 5 && (
+                                    <Button
+                                        mx='auto'
+                                        w='fit-content'
+                                        size='md'
+                                        fw='500'
+                                        c='indigo.6'
+                                        variant='transparent'
+                                        leftSection={<IconPlus />}
+                                        onClick={() => dropzone.current?.()}
+                                    >
+                                        Добавить фотографии
+                                    </Button>
+                                )}
 
                                 {images.length > 0 && (
                                     <Flex mt='md' gap='sm'>
-                                        {images.map((img, index) => {
+                                        {images.map((x, index) => {
                                             return (
                                                 <Box pos='relative' key={index}>
+                                                    <Tooltip label='Удалить картинку'>
+                                                        <ActionIcon
+                                                            onClick={() =>
+                                                                handleDeleteImage(
+                                                                    index
+                                                                )
+                                                            }
+                                                            color='gray'
+                                                            pos='absolute'
+                                                            right={rem(8 + 10)}
+                                                            top={rem(8 + 10)}
+                                                        >
+                                                            <IconTrash
+                                                                size={20}
+                                                            />
+                                                        </ActionIcon>
+                                                    </Tooltip>
                                                     <MantineImage
-                                                        w='100px'
-                                                        h='100px'
-                                                        fit='cover'
-                                                        className='aspect-square'
                                                         radius='md'
                                                         src={getImageUrl(
-                                                            img.path
+                                                            x.path
                                                         )}
-                                                        onLoad={() =>
-                                                            getImageUrl(
-                                                                img.path
-                                                            )
-                                                        }
-                                                    />
-                                                    <Button
-                                                        type='button'
-                                                        style={{
-                                                            position:
-                                                                'absolute',
-                                                            top: 0,
-                                                            right: -5,
-                                                        }}
-                                                        onClick={() =>
-                                                            handleDeleteImage(
-                                                                index
-                                                            )
-                                                        }
-                                                        bg='transparent'
-                                                        rightSection={
-                                                            <IconX
-                                                                cursor='pointer'
-                                                                color='red'
-                                                            />
-                                                        }
+                                                        alt='portfolio'
+                                                        className='aspect-square'
                                                     />
                                                 </Box>
                                             )
@@ -280,12 +299,24 @@ export function ProductsModal() {
                                     </Flex>
                                 )}
                             </Flex>
+
+                            <Text size='sm' mt='xs' c='gray.6'>
+                                Можно добавить не более 5 фотографии
+                            </Text>
                         </Box>
                     </Grid.Col>
                 </Grid>
 
                 <Group justify='center' mt='md'>
-                    <Button variant='default'>Предпросмотр</Button>
+                    <Button
+                        variant='default'
+                        onClick={e => {
+                            e.preventDefault()
+                            handlePreview()
+                        }}
+                    >
+                        Предпросмотр
+                    </Button>
                     <Button type='submit' color='indigo.4'>
                         Опубликовать товар
                     </Button>
@@ -293,4 +324,24 @@ export function ProductsModal() {
             </form>
         </Flex>
     )
+}
+
+export function handleModal({
+    initialValues,
+    images,
+}: {
+    initialValues?: ProductCreateDto
+    images?: UploadDto[]
+} = {}) {
+    modals.open({
+        centered: true,
+        modalId: 'product',
+        size: 'xl',
+        children: (
+            <ProductsModal
+                initialValues={initialValues}
+                initialImages={images}
+            />
+        ),
+    })
 }

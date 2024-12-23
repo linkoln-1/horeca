@@ -73,7 +73,7 @@ export const supplierMessages = [
 export const assistantMessages = [
     {
         type: 'message',
-        from: 'assistant',
+        from: 'support',
         text: 'Добрый день! Чем мы можем Вам помочь?',
     },
     {
@@ -83,7 +83,7 @@ export const assistantMessages = [
     },
     {
         type: 'message',
-        from: 'assistant',
+        from: 'support',
         text: 'Спасибо за обращение! Сейчас разберемся.',
     },
 ]

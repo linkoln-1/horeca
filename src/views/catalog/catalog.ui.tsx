@@ -1,8 +1,10 @@
 'use client'
 
+import React from 'react'
+
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { productsQueries } from '@/entities/products'
-import { ProductsModal } from '@/features/products'
+import { handleModal, ProductsModal } from '@/features/products'
 import {
     Box,
     Button,
@@ -12,17 +14,14 @@ import {
     Loader,
     Image as MantineImage,
     Table,
+    Grid,
 } from '@mantine/core'
 import { modals } from '@mantine/modals'
+import { images } from 'next/dist/build/webpack/config/blocks/images'
 
 import { CategoryLabels } from '@/shared/constants'
-import { packageTypeLabel } from '@/shared/constants/packageType'
 import { getImageUrl } from '@/shared/helpers'
-import {
-    Categories,
-    ProductPackagingType,
-    ProviderProfileDto,
-} from '@/shared/lib/horekaApi/Api'
+import { Categories, ProviderProfileDto } from '@/shared/lib/horekaApi/Api'
 
 const limit = 10
 
@@ -108,11 +107,7 @@ export function Catalog() {
                                             </Table.Td>
 
                                             <Table.Td align='center' p='md'>
-                                                {
-                                                    packageTypeLabel[
-                                                        product.packagingType as ProductPackagingType
-                                                    ]
-                                                }
+                                                {product.packagingType}
                                             </Table.Td>
 
                                             <Table.Td align='center' p='md'>
@@ -123,16 +118,39 @@ export function Catalog() {
                                                 {product.count}
                                             </Table.Td>
 
-                                            <Table.Td align='center' p='md'>
-                                                {product.images?.map(
-                                                    (x, index) => (
-                                                        <MantineImage
-                                                            key={index}
-                                                            src={getImageUrl(
-                                                                x.path
-                                                            )}
-                                                        />
-                                                    )
+                                            <Table.Td
+                                                align='center'
+                                                p='md'
+                                                w={300}
+                                            >
+                                                {product.images &&
+                                                product.images.length === 0 ? (
+                                                    <Text>Нет фотографии</Text>
+                                                ) : (
+                                                    <div
+                                                        style={{
+                                                            display: 'grid',
+                                                            gridTemplateColumns:
+                                                                'repeat(3, 60px)',
+                                                            gap: '8px',
+                                                            justifyContent:
+                                                                'center',
+                                                        }}
+                                                    >
+                                                        {product.images?.map(
+                                                            (x, index) => (
+                                                                <MantineImage
+                                                                    key={index}
+                                                                    radius='md'
+                                                                    src={getImageUrl(
+                                                                        x.path
+                                                                    )}
+                                                                    alt='portfolio'
+                                                                    className='aspect-square'
+                                                                />
+                                                            )
+                                                        )}
+                                                    </div>
                                                 )}
                                             </Table.Td>
                                         </Table.Tr>
@@ -176,13 +194,4 @@ export function Catalog() {
             )}
         </Flex>
     )
-}
-
-function handleModal() {
-    modals.open({
-        centered: true,
-        modalId: 'product',
-        size: 'xl',
-        children: <ProductsModal />,
-    })
 }

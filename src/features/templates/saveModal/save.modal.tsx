@@ -39,7 +39,7 @@ export function SaveModal({ forms }: SaveModalProps) {
                     item.products.map(product => ({
                         category: item.category,
                         name: product.name,
-                        amount: product.amount,
+                        amount: +product.amount,
                         unit: product.unit,
                     }))
                 )

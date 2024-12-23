@@ -48,7 +48,7 @@ export function AdminViews() {
     }
 
     const path = usePathname()
-    const isAssistantPage = path.includes('assistant')
+    const isAssistantPage = path.includes('support')
 
     const messages = assistantMessages
     const chats = assistantChats

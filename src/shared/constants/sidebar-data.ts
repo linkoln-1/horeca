@@ -93,7 +93,7 @@ export const horecaSidebarData: SidebarItem[] = [
         description:
             'Здесь вы можете следить за минимальным остатком и планировать закупки',
         subDescription: 'В разработке',
-        link: '/assistant',
+        link: '/support',
         iconRight: IconMail,
     },
 ]
@@ -155,7 +155,7 @@ export const providerSidebarData: SidebarItem[] = [
         icon: IconHelpSquareRounded,
         description: 'У вас пока нет ни одного запроса к нам',
         subDescription: 'В разработке',
-        link: '/assistant',
+        link: '/support',
         iconRight: IconMail,
     },
 ]

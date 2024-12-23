@@ -16,11 +16,9 @@ import {
 import { useForm } from '@mantine/form'
 
 import { CategoryLabels, errors } from '@/shared/constants'
-import { packageTypeLabel } from '@/shared/constants/packageType'
 import {
     Categories,
     DeliveryMethods,
-    ProductPackagingType,
     ProfileType,
     ProviderProfileDto,
     UpdateUserDto,
