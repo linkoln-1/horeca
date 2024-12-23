@@ -21,4 +21,7 @@ export const CategoryLabels: Record<Categories, string> = {
     cleaningProducts: 'Уборка и чистящие средства',
     bakeryProducts: 'Хлеб, хлебобулочные изделия',
     teeAndCoffee: 'Чай, кофе, какао, заменители',
+    frozenVegetablesAndFruits: 'Замороженные овощи и фрукты',
+    textilesAndClothing: 'Текстиль и одежда',
+    equipment: 'Оборудование',
 }

@@ -4,7 +4,8 @@ import React from 'react'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { productsQueries } from '@/entities/products'
-import { handleModal, ProductsModal } from '@/features/products'
+import { handleModal } from '@/features/products'
+import { handleUpdateModal } from '@/views/catalog/ui/update-modal'
 import {
     Box,
     Button,
@@ -14,10 +15,10 @@ import {
     Loader,
     Image as MantineImage,
     Table,
-    Grid,
+    ActionIcon,
+    Tooltip,
 } from '@mantine/core'
-import { modals } from '@mantine/modals'
-import { images } from 'next/dist/build/webpack/config/blocks/images'
+import { IconEdit, IconTrash } from '@tabler/icons-react'
 
 import { CategoryLabels } from '@/shared/constants'
 import { getImageUrl } from '@/shared/helpers'
@@ -61,7 +62,7 @@ export function Catalog() {
                                 variant='filled'
                                 size='md'
                                 color='indigo.4'
-                                onClick={handleModal}
+                                onClick={() => handleModal()}
                             >
                                 Добавить новый товар
                             </Button>
@@ -80,6 +81,7 @@ export function Catalog() {
                                         'Цена (за ед.)',
                                         'Кол-во',
                                         'Фотографии',
+                                        'Действия',
                                     ].map((tab, index) => (
                                         <Table.Th key={index} c='#FFF' p='md'>
                                             <Flex justify='center'>{tab}</Flex>
@@ -152,6 +154,43 @@ export function Catalog() {
                                                         )}
                                                     </div>
                                                 )}
+                                            </Table.Td>
+
+                                            <Table.Td align='center' p='md'>
+                                                <Flex gap='md' justify='center'>
+                                                    <Tooltip
+                                                        label='Редактировать товар'
+                                                        bg='indigo.4'
+                                                        c='white'
+                                                    >
+                                                        <ActionIcon
+                                                            bg='indigo'
+                                                            onClick={() =>
+                                                                handleUpdateModal(
+                                                                    {
+                                                                        id: product.id,
+                                                                    }
+                                                                )
+                                                            }
+                                                        >
+                                                            <IconEdit
+                                                                size={18}
+                                                            />
+                                                        </ActionIcon>
+                                                    </Tooltip>
+
+                                                    <Tooltip
+                                                        label='Удалить товар'
+                                                        bg='pink.5'
+                                                        c='white'
+                                                    >
+                                                        <ActionIcon bg='red'>
+                                                            <IconTrash
+                                                                size={18}
+                                                            />
+                                                        </ActionIcon>
+                                                    </Tooltip>
+                                                </Flex>
                                             </Table.Td>
                                         </Table.Tr>
                                     )

@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { productsQueries } from '@/entities/products'
 import { imageQueries } from '@/entities/uploads'
-import { handlePreviewModal } from '@/views/catalog/ui'
+import { handlePreviewModal } from '@/views/catalog/ui/preview-modal'
 import {
     Button,
     Flex,
