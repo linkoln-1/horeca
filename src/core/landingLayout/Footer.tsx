@@ -47,7 +47,9 @@ export function Footer(props: FooterProps) {
                             direction={'column'}
                             className='sm:w-[206px] gap-y-2 lg:gap-y-[20px]'
                         >
-                            <div>Связаться с нами</div>
+                            <div className='font-semibold'>
+                                Связаться с нами
+                            </div>
                             <Flex direction={'row'}>
                                 <div className='rounded-full bg-[#F8F9FA] p-2'>
                                     <IconBrandTelegram
