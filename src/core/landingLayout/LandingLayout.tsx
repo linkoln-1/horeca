@@ -2,10 +2,7 @@ import { ReactNode } from 'react'
 
 import { Footer } from './Footer'
 import { Header } from './Header'
-import {
-    Container,
-    Grid,
-} from '@mantine/core'
+import { Container, Grid } from '@mantine/core'
 
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 
@@ -22,16 +19,7 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
                     <Header />
                 </Grid.Col>
 
-                <Grid.Col
-                    span={{
-                        base: 12,
-                        xs: 12,
-                        sm: isMobile ? 12 : 9,
-                        md: isMobile ? 12 : 9,
-                    }}
-                >
-                    {children}
-                </Grid.Col>
+                <Grid.Col>{children}</Grid.Col>
             </Grid>
             <Footer />
         </Container>

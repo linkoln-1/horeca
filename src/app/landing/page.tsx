@@ -1,3 +1,5 @@
+import { LandingViews } from '@/views/landing'
+
 export default function Landing() {
-    return <div>asd</div>
+    return <LandingViews />
 }
