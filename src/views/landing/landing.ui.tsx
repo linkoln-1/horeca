@@ -2,6 +2,7 @@ import { Cards } from './cards'
 import { Establishments } from './establishments'
 import { MainDescription } from './main_description'
 import { MainPartViews } from './main_part'
+import { Provider } from './provider'
 
 export function LandingViews() {
     return (
@@ -10,6 +11,7 @@ export function LandingViews() {
             <Cards />
             <MainDescription />
             <Establishments />
+            <Provider />
         </div>
     )
 }
