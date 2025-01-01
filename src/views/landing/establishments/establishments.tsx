@@ -2,8 +2,8 @@ import { Image } from '@mantine/core'
 
 export function Establishments() {
     return (
-        <div className='w-full px-4 py-12'>
-            <div className='bg-[#FF8787] py-2 lg:py-4 px-6 lg:px-[84px] xl:text-[36px] w-max mt-[120px] mb-[40px] uppercase font-extrabold text-white'>
+        <div className='w-full px-4 xl:pt-12'>
+            <div className='bg-[#FF8787] py-2 lg:py-4 px-6 lg:px-[84px] xl:text-[36px] w-max mt-[70px] xl:mt-[120px] mb-[40px] uppercase font-extrabold text-white'>
                 Для заведений
             </div>
             <div className='flex flex-col lg:flex-row shadow-lg py-8 justify-between px-14 items-center gap-y-14 lg:divide-x'>
