@@ -2,7 +2,7 @@ import { Image } from '@mantine/core'
 
 export function Steps() {
     return (
-        <div className='hidden lg:flex flex-col pt-[170px] justify-center items-center'>
+        <div className='hidden lg:flex flex-col pt-[120px] justify-center items-center'>
             <div className='w-full bg-[#FF8787] py-5 flex justify-center items-center text-white text-[22px] xl:text-[32px] font-bold'>
                 Как перестать тратить время и деньги на неэффективную закупку?
             </div>

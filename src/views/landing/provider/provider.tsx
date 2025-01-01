@@ -2,8 +2,8 @@ import { Image } from '@mantine/core'
 
 export function Provider() {
     return (
-        <div className='w-full px-4 py-12'>
-            <div className='flex justify-end mt-[120px] mb-[40px]'>
+        <div className='w-full px-4 pt-16 '>
+            <div className='flex justify-end xl:mt-[80px] mb-[40px]'>
                 <div className='bg-[#364FC7] py-2 lg:py-4 px-6 lg:px-[84px] w-max xl:text-[36px] uppercase font-extrabold text-white'>
                     Для поставщиков
                 </div>
