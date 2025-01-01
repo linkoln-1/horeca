@@ -3,6 +3,7 @@ import { Establishments } from './establishments'
 import { MainDescription } from './main_description'
 import { MainPartViews } from './main_part'
 import { Provider } from './provider'
+import { Steps } from './steps'
 
 export function LandingViews() {
     return (
@@ -12,6 +13,7 @@ export function LandingViews() {
             <MainDescription />
             <Establishments />
             <Provider />
+            <Steps />
         </div>
     )
 }
