@@ -1,4 +1,5 @@
 import { Cards } from './cards'
+import { ContactUs } from './contact_us/contact_us'
 import { Establishments } from './establishments'
 import { MainDescription } from './main_description'
 import { MainPartViews } from './main_part'
@@ -10,7 +11,7 @@ import { VideoBlock } from './video_block'
 
 export function LandingViews() {
     return (
-        <div className='p-0'>
+        <div className='p-0 bg-[#F8F9FA]'>
             <MainPartViews />
             <Cards />
             <MainDescription />
@@ -20,6 +21,7 @@ export function LandingViews() {
             <Stats />
             <VideoBlock />
             <StartBlock />
+            <ContactUs />
         </div>
     )
 }
