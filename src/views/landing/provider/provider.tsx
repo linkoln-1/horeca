@@ -2,13 +2,13 @@ import { Image } from '@mantine/core'
 
 export function Provider() {
     return (
-        <div className='w-full px-4 pt-16 '>
+        <div className='w-full pt-16 '>
             <div className='flex justify-end xl:mt-[80px] mb-[40px]'>
                 <div className='bg-[#364FC7] py-2 lg:py-4 px-6 lg:px-[84px] w-max xl:text-[36px] uppercase font-extrabold text-white'>
                     Для поставщиков
                 </div>
             </div>
-            <div className='flex flex-col lg:flex-row shadow-lg py-8 justify-between px-14 items-center gap-y-14 lg:divide-x'>
+            <div className='flex flex-col lg:flex-row shadow-lg py-8 justify-between px-14 xl:px-[84px] items-center gap-y-14 lg:divide-x'>
                 <div className='flex flex-col items-center lg:items-start gap-y-5 md:w-1/2 justify-center '>
                     <div className='uppercase font-extrabold text-[14px] xl:text-2xl text-center md:text-left'>
                         Клиенты ищут вас сами
@@ -26,7 +26,7 @@ export function Provider() {
                         Получайте входящие заявки по вашим категориям товара.
                     </div>
                 </div>
-                <div className='flex flex-col items-start lg:items-start gap-y-5 md:w-1/2 justify-center lg:pl-20'>
+                <div className='flex flex-col items-center lg:items-start gap-y-5 md:w-1/2 justify-center lg:pl-20'>
                     <div className='uppercase font-extrabold text-[14px] xl:text-2xl text-center md:text-left'>
                         Откликайтесь на разные заявки
                     </div>

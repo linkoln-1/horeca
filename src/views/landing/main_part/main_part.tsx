@@ -1,9 +1,10 @@
-import { Container, Paper } from '@mantine/core'
+import { Paper } from '@mantine/core'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export function MainPartViews() {
     return (
-        <Paper w='100%' className=''>
+        <Paper w='100%'>
             <div className='hidden xl:flex w-full justify-center items-center'>
                 <div className='absolute h-[150px] mt-[200px] mr-[95px] w-[190px] z-10'>
                     <Image
@@ -20,7 +21,7 @@ export function MainPartViews() {
                     layout='fill'
                     objectFit='cover'
                     alt='main_image'
-                    className='transition duration-500 ease-in-out transform hover:scale-110 blur-sm md:blur-0'
+                    className='transition duration-500 ease-in-out transform hover:scale-110 blur-sm md:blur-0 max-h-[788px] max-w-[804px]'
                 />
                 <div className='absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center px-4 gap-y-2'>
                     <h1 className='text-white text-3xl md:text-4xl font-bold text-center'>
@@ -29,9 +30,12 @@ export function MainPartViews() {
                     <h4 className='text-white text-sm md:text-4xl text-center'>
                         Размещайте и получайте заказы в пару кликов
                     </h4>
-                    <div className='bg-[#FF8787] mt-8 font-semibold text-[14px] text-white py-[10px] px-[13px] lg:py-[13px] lg:px-[16px] xl:py-[16px] xl:px-[24px] rounded-[4px]'>
+                    <Link
+                        href={'/sign-in'}
+                        className='bg-[#FF8787] mt-8 font-semibold text-[14px] text-white py-[10px] px-[13px] lg:py-[13px] lg:px-[16px] xl:py-[16px] xl:px-[24px] rounded-[4px]'
+                    >
                         НАЧАТЬ УЖЕ СЕГОДНЯ
-                    </div>
+                    </Link>
                 </div>
             </div>
 
@@ -46,9 +50,12 @@ export function MainPartViews() {
                                 Размещайте и получайте заказы в пару кликов
                             </h4>
                         </div>
-                        <div className='bg-[#FF8787] font-semibold text-[14px] xl:text-[20px] lg:text-base text-white py-[10px] px-[13px] lg:py-[13px] lg:px-[16px] xl:py-[16px] xl:px-[24px] rounded-[4px]'>
+                        <Link
+                            href={'/sign-in'}
+                            className='bg-[#FF8787] font-semibold text-[14px] xl:text-[20px] lg:text-base text-white py-[10px] px-[13px] lg:py-[13px] lg:px-[16px] xl:py-[16px] xl:px-[24px] rounded-[4px]'
+                        >
                             НАЧАТЬ УЖЕ СЕГОДНЯ
-                        </div>
+                        </Link>
                     </div>
                 </div>
                 <div className='relative w-full h-[488px] lg:h-[530px] xl:h-[700px] 2xl:h-[900px]'>

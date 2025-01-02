@@ -2,12 +2,12 @@ import { Image } from '@mantine/core'
 
 export function Establishments() {
     return (
-        <div className='w-full px-4 xl:pt-12'>
+        <div className='w-full xl:pt-12'>
             <div className='bg-[#FF8787] py-2 lg:py-4 px-6 lg:px-[84px] xl:text-[36px] w-max mt-[70px] xl:mt-[120px] mb-[40px] uppercase font-extrabold text-white'>
                 Для заведений
             </div>
-            <div className='flex flex-col lg:flex-row shadow-lg py-8 justify-between px-14 items-center gap-y-14 lg:divide-x'>
-                <div className='flex flex-col items-center lg:items-start gap-y-5 md:w-1/2 justify-center '>
+            <div className='flex flex-col lg:flex-row shadow-md rounded-sm py-8 justify-between px-14 xl:px-[84px] items-center gap-y-14 lg:divide-x'>
+                <div className='flex flex-col items-center lg:items-start gap-y-5 md:w-1/2 justify-center'>
                     <div className='uppercase font-extrabold text-[14px] xl:text-2xl text-center md:text-left'>
                         Все предложения в одном месте
                     </div>
@@ -25,7 +25,7 @@ export function Establishments() {
                         заявки. Все данные у вас под рукой.
                     </div>
                 </div>
-                <div className='flex flex-col items-start lg:items-start gap-y-5 md:w-1/2 justify-center lg:pl-20'>
+                <div className='flex flex-col items-center lg:items-start gap-y-5 md:w-1/2 justify-center lg:pl-20'>
                     <div className='uppercase font-extrabold text-[14px] xl:text-2xl text-center md:text-left'>
                         Ваша универсальная заявка
                     </div>

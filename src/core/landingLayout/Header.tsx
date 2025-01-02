@@ -17,22 +17,22 @@ export function Header() {
 
     const isMobile = useBreakpoint('sm')
     return (
-        <Paper w='100%' p='sm'>
+        <Paper w='100%'>
             <Flex justify='space-between' align='center'>
                 <Flex align='center'>
                     <Link href={`/landing`}>
-                        <div className='relative w-[130px] h-[120px] sm:h-[120px] sm:w-[160px] md:h-[120px] md:w-[140px] lg:h-[62px] lg:w-[160px] lg:ml-[60px] lg:my-[20px]'>
+                        <div className='relative ml-5 lg:ml-[40px] xl:ml-[84px] w-[130px] h-[120px] sm:h-[120px] sm:w-[160px] md:h-[120px] md:w-[140px] lg:h-[62px] lg:w-[160px] lg:my-[20px]'>
                             <Image
                                 src='/assets/icons/logo.svg'
                                 alt='Horeka logo'
                                 layout='fill'
                                 objectFit='contain'
-                                className='object-contain'
+                                className='object-contain justify-start items-start'
                             />
                         </div>
                     </Link>
                     {isMobile && (
-                        <div className='absolute right-5 top-10'>
+                        <div className='absolute right-6 sm:right-8 top-10'>
                             <Burger
                                 opened={opened}
                                 onClick={toggleMenu}
@@ -45,7 +45,6 @@ export function Header() {
                         opened={opened}
                         onClose={toggleMenu}
                         size='100%'
-                        padding='md'
                         position='right'
                     >
                         <Flex direction='column' gap='lg'>
@@ -69,7 +68,9 @@ export function Header() {
                                     w={206}
                                     radius='xs'
                                 >
-                                    ОСТАВИТЬ ЗАЯВКУ
+                                    <Link href={'#contact-us'}>
+                                        ОСТАВИТЬ ЗАЯВКУ
+                                    </Link>
                                 </Button>
                             </Flex>
                         </Flex>
@@ -78,7 +79,7 @@ export function Header() {
                 {!isMobile && (
                     <Flex
                         align='center'
-                        className='gap-x-5 lg:gap-x-14 xl:gap-x-[158px]'
+                        className='gap-x-5 lg:gap-x-14 xl:gap-x-[158px] pr-[20px] lg:pr-[40px] xl:pr-[84px]'
                     >
                         <div className='flex text-sm lg:text-base justify-center items-center gap-x-5 xl:gap-x-[60px]'>
                             <div>Клиенты</div>
@@ -86,9 +87,12 @@ export function Header() {
                             <div>Как это работает</div>
                             <div>О нас</div>
                         </div>
-                        <div className='bg-[#FF8787] font-semibold text-[14px] text-white py-[10px] px-[13px] lg:py-[13px] lg:px-[16px] xl:py-[16px] xl:px-[24px] rounded-[4px]'>
+                        <Link
+                            href={'#contact-us'}
+                            className='bg-[#FF8787] font-semibold text-[14px] text-white py-[10px] px-[13px] lg:py-[13px] lg:px-[16px] xl:py-[16px] xl:px-[24px] rounded-[4px]'
+                        >
                             ОСТАВИТЬ ЗАЯВКУ
-                        </div>
+                        </Link>
                     </Flex>
                 )}
             </Flex>

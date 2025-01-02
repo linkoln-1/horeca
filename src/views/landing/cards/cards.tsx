@@ -1,8 +1,9 @@
 import { Badge, Card, Flex, Group, Image, Text } from '@mantine/core'
+import Link from 'next/link'
 
 export function Cards() {
     return (
-        <div className='flex flex-col gap-y-3 py-10 xl:pt-[100px] xl:pb-[180px] lg:flex-row justify-center items-center lg:items-stretch lg:gap-x-4 xl:px-[84px]'>
+        <div className='flex px-[20px] flex-col gap-y-3 py-10 xl:pt-[100px] xl:pb-[180px] lg:flex-row justify-center items-center lg:items-stretch lg:gap-x-4 xl:px-[84px]'>
             <Card
                 shadow='sm'
                 padding='lg'
@@ -27,9 +28,12 @@ export function Cards() {
                     alt='Norway'
                 />
                 <div className='flex justify-center'>
-                    <div className='flex justify-center w-[200px] xl:w-[230px] bg-[#FF8787] font-semibold text-[12px] text-white py-[10px] px-[13px] lg:py-[13px] lg:px-[16px] xl:py-[16px] xl:px-[20px] rounded-[4px]'>
+                    <Link
+                        href='/sign-in'
+                        className='flex justify-center w-[200px] xl:w-[230px] bg-[#FF8787] font-semibold text-[12px] text-white py-[10px] px-[13px] lg:py-[13px] lg:px-[16px] xl:py-[16px] xl:px-[20px] rounded-[4px]'
+                    >
                         НАЙТИ НОВЫХ КЛИЕНТОВ
-                    </div>
+                    </Link>
                 </div>
             </Card>
 
@@ -57,9 +61,12 @@ export function Cards() {
                     alt='Norway'
                 />
                 <div className='flex justify-center'>
-                    <div className='flex justify-center w-[200px] bg-[#FF8787] font-semibold text-[12px] text-white py-[10px] px-[13px] lg:py-[13px] lg:px-[16px] xl:py-[16px] xl:px-[24px] rounded-[4px]'>
+                    <Link
+                        href='/sign-in'
+                        className='flex justify-center w-[200px] bg-[#FF8787] font-semibold text-[12px] text-white py-[10px] px-[13px] lg:py-[13px] lg:px-[16px] xl:py-[16px] xl:px-[24px] rounded-[4px]'
+                    >
                         СОЗДАТЬ ЗАЯВКУ
-                    </div>
+                    </Link>
                 </div>
             </Card>
 
@@ -87,9 +94,12 @@ export function Cards() {
                     alt='Norway'
                 />
                 <div className='flex justify-center'>
-                    <div className='flex justify-center w-[200px] bg-[#FF8787] font-semibold text-[12px] text-white py-[10px] px-[13px] lg:py-[13px] lg:px-[16px] xl:py-[16px] xl:px-[24px] rounded-[4px]'>
+                    <Link
+                        href={'#contact-us'}
+                        className='flex justify-center w-[200px] bg-[#FF8787] font-semibold text-[12px] text-white py-[10px] px-[13px] lg:py-[13px] lg:px-[16px] xl:py-[16px] xl:px-[24px] rounded-[4px]'
+                    >
                         ЗАПОЛНИТЬ ФОРМУ
-                    </div>
+                    </Link>
                 </div>
             </Card>
         </div>
