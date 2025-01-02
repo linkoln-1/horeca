@@ -3,20 +3,15 @@
 import { useState } from 'react'
 import { IMaskInput } from 'react-imask'
 
-import {
-    Flex,
-    Group,
-    Image,
-    Input,
-    Radio,
-    Stack,
-    TextInput,
-} from '@mantine/core'
+import { Flex, Image, Input, Radio } from '@mantine/core'
 
 export function ContactUs() {
     const [value, setValue] = useState('Поставщик, производитель')
     return (
-        <div className='py-[80px] lg:py-[140px] xl:py-[61px] xl:mx-[84px] flex items-center lg:items-start justify-center shadow-md rounded-2xl bg-white xl:mb-[180px]'>
+        <div
+            id='contact-us'
+            className='py-[80px] lg:py-[140px] xl:py-[61px] xl:mx-[84px] flex items-center lg:items-start justify-center shadow-md bg-white xl:mb-[180px] rounded-2xl px-[20px]'
+        >
             <div className='mr-9 w-[491px] xl:w-[591px]'>
                 <div className='font-bold lg:text-[24px] xl:text-[32px]'>
                     Свяжитесь с нами сегодня

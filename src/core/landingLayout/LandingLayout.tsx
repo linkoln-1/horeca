@@ -2,25 +2,27 @@ import { ReactNode } from 'react'
 
 import { Footer } from './Footer'
 import { Header } from './Header'
-import { Container, Grid } from '@mantine/core'
-
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
+import { Container, Flex, Grid } from '@mantine/core'
 
 type LandingLayoutProps = {
     children: ReactNode
 }
 
 export default function LandingLayout({ children }: LandingLayoutProps) {
-    const isMobile = useBreakpoint('sm')
     return (
-        <Container className='min-h-screen flex flex-col justify-between' fluid>
-            <Grid>
-                <Grid.Col span={12}>
-                    <Header />
-                </Grid.Col>
-
-                <Grid.Col>{children}</Grid.Col>
-            </Grid>
+        <Container
+            className='min-h-screen flex flex-col justify-between'
+            fluid
+            styles={theme => ({
+                root: {
+                    padding: '0px',
+                },
+            })}
+        >
+            <Flex direction={'column'}>
+                <Header />
+                {children}
+            </Flex>
             <Footer />
         </Container>
     )

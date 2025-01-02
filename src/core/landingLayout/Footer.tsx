@@ -2,11 +2,9 @@ import { Container, Flex, Paper, PaperProps } from '@mantine/core'
 import { IconBrandTelegram, IconBrandWhatsapp } from '@tabler/icons-react'
 import Image from 'next/image'
 
-type FooterProps = PaperProps & {}
-
-export function Footer(props: FooterProps) {
+export function Footer() {
     return (
-        <Paper w='100%' bg='var(--mantine-color-indigo-0)' {...props}>
+        <Paper w='100%' bg='#EDF2FF'>
             <Container my='md' fluid>
                 <Flex
                     justify='space-between'
