@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { Card, Flex, Image, Text } from '@mantine/core'
+import { Card, Image } from '@mantine/core'
 import Link from 'next/link'
 
 export function Cards() {
@@ -11,7 +11,7 @@ export function Cards() {
     const [hovered2, setHovered2] = useState(false)
 
     return (
-        <div className='flex px-[20px] flex-col gap-y-3 py-10 xl:pt-[100px] xl:pb-[180px] lg:flex-row justify-center items-center lg:items-stretch lg:gap-x-4 xl:px-[84px]'>
+        <div id='clients' className='flex px-[20px] flex-col gap-y-3 py-10 xl:pt-[100px] xl:pb-[180px] lg:flex-row justify-center items-center lg:items-stretch lg:gap-x-4 xl:px-[84px]'>
             <Card
                 shadow='sm'
                 padding='lg'
@@ -151,7 +151,7 @@ export function Cards() {
                 <div className='lg:h-[360px] flex justify-center'>
                     <div className='relative w-full h-full flex justify-center'>
                         <Image
-                            src='/assets/images/Vector 2.png'
+                            src='/assets/images/Vector 3.png'
                             height={360}
                             width={360}
                             alt='Norway'

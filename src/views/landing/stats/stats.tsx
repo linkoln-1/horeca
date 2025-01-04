@@ -2,7 +2,7 @@ import { Image } from '@mantine/core'
 
 export function Stats() {
     return (
-        <div className='pt-[70px] lg:pt-[100px] xl:pt-[180px]'>
+        <div id='stats' className='pt-[70px] lg:pt-[100px] xl:pt-[180px]'>
             <div className='w-full bg-[#364FC7] py-5 flex justify-center items-center text-white text-[16px] xl:text-[32px] font-bold'>
                 Цифры скажут лучше слов!
             </div>
