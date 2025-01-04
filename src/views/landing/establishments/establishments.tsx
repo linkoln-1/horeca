@@ -2,7 +2,7 @@ import { Image } from '@mantine/core'
 
 export function Establishments() {
     return (
-        <div className='w-full xl:pt-12'>
+        <div id='establishments' className='w-full xl:pt-12'>
             <div className='bg-[#FF8787] py-2 lg:py-4 px-6 lg:px-[84px] xl:text-[36px] w-max mt-[70px] xl:mt-[120px] mb-[40px] uppercase font-extrabold text-white'>
                 Для заведений
             </div>

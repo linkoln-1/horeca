@@ -1,6 +1,7 @@
 import { Container, Flex, Paper, PaperProps } from '@mantine/core'
 import { IconBrandTelegram, IconBrandWhatsapp } from '@tabler/icons-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export function Footer() {
     return (
@@ -35,10 +36,20 @@ export function Footer() {
                             direction={'column'}
                             className='gap-y-2 lg:gap-y-[20px]'
                         >
-                            <div>Клиенты</div>
-                            <div>Преимущества</div>
-                            <div>Как это работает</div>
-                            <div>О нас</div>
+                            <div>
+                                <Link href={'#clients'}>Клиенты</Link>
+                            </div>
+                            <div>
+                                <Link href={'#establishments'}>
+                                    Преимущества
+                                </Link>
+                            </div>
+                            <div>
+                                <Link href={'#steps'}>Как это работает</Link>
+                            </div>
+                            <div>
+                                <Link href={'#stats'}>О нас</Link>
+                            </div>
                         </Flex>
 
                         <Flex
@@ -50,16 +61,39 @@ export function Footer() {
                             </div>
                             <Flex direction={'row'}>
                                 <div className='rounded-full bg-[#F8F9FA] p-2'>
-                                    <IconBrandTelegram
-                                        size={19}
-                                        color='#56A8E3'
-                                    />
+                                    <Link
+                                        href={'https://t.me/sphere_horeca_info'}
+                                        target='_blank'
+                                    >
+                                        <IconBrandTelegram
+                                            size={19}
+                                            color='#56A8E3'
+                                        />
+                                    </Link>
                                 </div>
                                 <div className='rounded-full bg-[#F8F9FA] p-2'>
-                                    <IconBrandWhatsapp
-                                        size={19}
-                                        color='#1FAF38'
-                                    />
+                                    <Link
+                                        href={'https://wa.me/79530890553'}
+                                        target='_blank'
+                                    >
+                                        <IconBrandWhatsapp
+                                            size={19}
+                                            color='#1FAF38'
+                                        />
+                                    </Link>
+                                </div>
+                                <div className='rounded-full bg-[#F8F9FA] p-2'>
+                                    <Link
+                                        href={'https://dzen.ru/sphere_horeca_'}
+                                        target='_blank'
+                                    >
+                                        <Image
+                                            src='/assets/images/dzen-logo.png'
+                                            height={19}
+                                            width={19}
+                                            alt='Norway'
+                                        />
+                                    </Link>
                                 </div>
                             </Flex>
                             <div>+7 (953) 089-05-53</div>

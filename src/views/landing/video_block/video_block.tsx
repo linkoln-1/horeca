@@ -1,4 +1,6 @@
+import { Image } from '@mantine/core'
 import { IconBrandTelegram, IconBrandWhatsapp } from '@tabler/icons-react'
+import Link from 'next/link'
 
 export function VideoBlock() {
     return (
@@ -25,18 +27,43 @@ export function VideoBlock() {
                 </div>
                 <div className='flex mt-4 lg:mt-0'>
                     <div className='flex rounded-full bg-[#F8F9FA] p-2'>
-                        <IconBrandTelegram
-                            className='w-[19px] h-[19px] xl:h-[40px] xl:w-[40px]'
-                            size={60}
-                            color='#56A8E3'
-                        />
+                        <Link
+                            href={'https://t.me/sphere_horeca_info'}
+                            target='_blank'
+                        >
+                            <IconBrandTelegram
+                                className='w-[19px] h-[19px] xl:h-[40px] xl:w-[40px]'
+                                size={60}
+                                color='#56A8E3'
+                            />
+                        </Link>
                     </div>
                     <div className='flex rounded-full bg-[#F8F9FA] p-2'>
-                        <IconBrandWhatsapp
-                            className='w-[19px] h-[19px] xl:h-[40px] xl:w-[40px]'
-                            size={60}
-                            color='#1FAF38'
-                        />
+                        <Link
+                            href={'https://wa.me/79530890553'}
+                            target='_blank'
+                        >
+                            <IconBrandWhatsapp
+                                className='w-[19px] h-[19px] xl:h-[40px] xl:w-[40px]'
+                                size={60}
+                                color='#1FAF38'
+                            />
+                        </Link>
+                    </div>
+                    <div className='flex rounded-full bg-[#F8F9FA] p-2'>
+                        <Link
+                            href={'https://dzen.ru/sphere_horeca_'}
+                            target='_blank'
+                        >
+                            <Image
+                                className='w-[19px] h-[19px] xl:h-[40px] xl:w-[40px]'
+                                src='/assets/images/dzen-logo.png'
+                                height={60}
+                                width={60}
+                                alt='Norway'
+                                fit='contain'
+                            />
+                        </Link>
                     </div>
                 </div>
             </div>

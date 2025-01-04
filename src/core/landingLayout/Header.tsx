@@ -48,17 +48,24 @@ export function Header() {
                         position='right'
                     >
                         <Flex direction='column' gap='lg'>
-                            <Flex gap={20} align='center' pos='relative'>
-                                Клиенты
+                            <Flex
+                                gap={20}
+                                align='center'
+                                pos='relative'
+                                className='cursor-pointer'
+                            >
+                                <Link href={'#clients'}>Клиенты</Link>
                             </Flex>
                             <Flex gap={20} align='center' pos='relative'>
-                                Преимущества
+                                <Link href={'#establishments'}>
+                                    Преимущества
+                                </Link>
                             </Flex>
                             <Flex gap={20} align='center' pos='relative'>
-                                Как это работает
+                                <Link href={'#steps'}>Как это работает</Link>
                             </Flex>
                             <Flex gap={20} align='center' pos='relative'>
-                                О нас
+                                <Link href={'#stats'}>О нас</Link>
                             </Flex>
                             <Flex gap={20} align='center' pos='relative'>
                                 <Button
@@ -82,10 +89,20 @@ export function Header() {
                         className='gap-x-5 lg:gap-x-14 xl:gap-x-[158px] pr-[20px] lg:pr-[40px] xl:pr-[84px]'
                     >
                         <div className='flex text-sm lg:text-base justify-center items-center gap-x-5 xl:gap-x-[60px]'>
-                            <div>Клиенты</div>
-                            <div>Преимущества</div>
-                            <div>Как это работает</div>
-                            <div>О нас</div>
+                            <div>
+                                <Link href={'#clients'}>Клиенты</Link>
+                            </div>
+                            <div>
+                                <Link href={'#establishments'}>
+                                    Преимущества
+                                </Link>
+                            </div>
+                            <div>
+                                <Link href={'#steps'}>Как это работает</Link>
+                            </div>
+                            <div>
+                                <Link href={'#stats'}>О нас</Link>
+                            </div>
                         </div>
                         <Link
                             href={'#contact-us'}
