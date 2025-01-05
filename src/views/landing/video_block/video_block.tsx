@@ -1,13 +1,38 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+
 import { Image } from '@mantine/core'
 import { IconBrandTelegram, IconBrandWhatsapp } from '@tabler/icons-react'
 import Link from 'next/link'
 
 export function VideoBlock() {
+    const [link, setLink] = useState('')
+
+    useEffect(() => {
+        const fetchLink = async () => {
+            try {
+                const response = await fetch(
+                    'http://localhost:1337/api/video-link'
+                )
+                if (!response.ok) {
+                    throw new Error('Network response was not ok')
+                }
+                const data = await response.json()
+                setLink(data.data.link)
+            } catch (error) {
+                console.error('Ошибка при получении данных:', error)
+            }
+        }
+
+        fetchLink()
+    }, [])
+
     return (
         <div className='flex flex-col px-[20px] xl:px-[84px] lg:flex-row lg:gap-x-14 xl:gap-x-[70px] gap-y-8 justify-center items-center pt-[60px] lg:items-start'>
             <div className='w-full lg:w-1/2 flex justify-center items-center'>
                 <iframe
-                    src='https://www.youtube.com/embed/b9c40uMAiEw?si=P1wpR1ubigzAhtBX'
+                    src={link}
                     title='YouTube video player'
                     allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
                     referrerPolicy='strict-origin-when-cross-origin'
