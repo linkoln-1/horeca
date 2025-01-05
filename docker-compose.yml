@@ -2,6 +2,8 @@ services:
   horeca:
     image: nextapp
     build: .
+    ports:
+      - "443:3000"
     deploy:
       resources:
         limits:
