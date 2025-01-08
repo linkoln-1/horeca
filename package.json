@@ -9,7 +9,7 @@
         "start": "next start",
         "lint": "next lint",
         "format": "prettier --write \"**/*.{ts,tsx,md,json,css}\"",
-        "libgen": "pnpm exec swagger-typescript-api -p http://95.163.222.187:3001/api-json -o ./src/shared/lib/horekaApi/",
+        "libgen": "pnpm exec swagger-typescript-api -p https://sphere-horeca.ru/api-json -o ./src/shared/lib/horekaApi/",
         "libgen:dev": "pnpm exec swagger-typescript-api -p http://localhost:8080/api-json -o ./src/shared/lib/horekaApi/"
     },
     "dependencies": {
