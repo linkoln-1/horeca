@@ -2,6 +2,7 @@ services:
   horeca:
     image: nextapp
     build: .
+    restart: always
     ports:
       - "127.0.0.1:3000:3000"
     deploy:
