@@ -175,7 +175,7 @@ export function Cards() {
                 </div>
                 <div className='flex justify-center'>
                     <Link
-                        href='/sign-in'
+                        href='#contact-us'
                         className='flex justify-center w-[200px] xl:w-[230px] bg-[#FF8787] font-semibold text-[12px] text-white py-[10px] px-[13px] lg:py-[13px] lg:px-[16px] xl:py-[16px] xl:px-[20px] rounded-[4px]'
                     >
                         НАЙТИ НОВЫХ КЛИЕНТОВ
