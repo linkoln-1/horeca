@@ -31,7 +31,7 @@ export function ContactUs() {
         }
 
         try {
-            const response = await fetch('http://localhost:1337/api/forms', {
+            const response = await fetch('https://sphere-horeca.ru/cms/api/forms', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -89,6 +89,7 @@ export function ContactUs() {
                             <Input
                                 required
                                 value={number}
+                                //@ts-ignore
                                 onChange={e => setNumber(e.target.value)}
                                 component={IMaskInput}
                                 placeholder='+7 (000) 00-00-00'

@@ -13,7 +13,7 @@ export function VideoBlock() {
         const fetchLink = async () => {
             try {
                 const response = await fetch(
-                    'http://localhost:1337/api/video-link'
+                    'https://sphere-horeca.ru/cms/api/video-link'
                 )
                 if (!response.ok) {
                     throw new Error('Network response was not ok')
