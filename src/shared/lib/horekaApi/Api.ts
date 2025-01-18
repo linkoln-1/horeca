@@ -1772,6 +1772,40 @@ export class Api<
          * No description
          *
          * @tags SupportRequest
+         * @name SupportRequestsControllerList
+         * @summary List of users's support requests
+         * @request GET:/api/support/requests/mine
+         * @secure
+         */
+        supportRequestsControllerList: (
+            query?: {
+                offset?: number
+                limit?: number
+                search?: SupportRequestSearchDto
+                /** fieldName(numeric)|ASC/DESC */
+                sort?: string
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    data: SupportRequestDto[]
+                    total: number
+                },
+                ErrorDto
+            >({
+                path: `/api/support/requests/mine`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags SupportRequest
          * @name SupportRequestsAdminControllerAssignAdmin
          * @summary Admin assigns himself to customer support request
          * @request POST:/api/support/requests/{id}/assign
