@@ -1,4 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { api } from '@/shared/lib/horekaApi'
 import { ChatCreateDto } from '@/shared/lib/horekaApi/Api'
@@ -12,10 +14,21 @@ export function useGetChatQuery() {
     })
 }
 
-export function useGetChatsByIdQuery(id: number) {
-    return useCustomQuery({
+export function useGetChatsByIdQuery({
+    id,
+    enabled,
+}: {
+    id: number
+    enabled: boolean
+}) {
+    return useQuery({
         queryKey: ['chat', id],
-        queryFn: () => api.chatsControllerGetChat(id),
+        queryFn: async () => {
+            const res = await api.chatsControllerGetChat(id)
+            return res
+        },
+
+        enabled,
     })
 }
 
@@ -54,5 +67,12 @@ export function useUpdateMessagesMutation() {
         onSuccess: async ({ data }) => {
             await queryClient.invalidateQueries({ queryKey: ['chat-messages'] })
         },
+    })
+}
+
+export function useGetUserSupportListQuery() {
+    return useCustomQuery({
+        queryKey: ['user-support-list'],
+        queryFn: () => api.supportRequestsControllerList(),
     })
 }
