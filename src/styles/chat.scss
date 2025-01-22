@@ -45,7 +45,6 @@
 .adminChatWeight {
   &:hover {
     background-color: #7a94ff;
-    //color: black !important;
     color: white !important;
     font-weight: 900 !important;
   }
@@ -56,4 +55,9 @@
 }
 .adminNotActiveChat {
   color: gray;
+}
+.active {
+  background-color: #7a94ff;
+  color: white !important;
+  font-weight: 900 !important;
 }

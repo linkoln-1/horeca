@@ -1,10 +1,10 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { chatQueries } from '@/entities/chats'
-import { useChatHorecaStore } from '@/entities/chats/chat.horeca.model'
+import { useChatHorecaStore } from '@/entities/chats/chat.users.model'
 import { CreateSupportRequestModal } from '@/views/chat/ui'
 import {
     Badge,
@@ -14,6 +14,7 @@ import {
     Input,
     Loader,
     LoadingOverlay,
+    ScrollArea,
     Text,
 } from '@mantine/core'
 import { modals } from '@mantine/modals'
@@ -24,10 +25,10 @@ import {
 } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 
-import { EVENTS } from '@/shared/constants/events'
 import { useWebSocketChat } from '@/shared/hooks/useWebsocketChat'
 import { api } from '@/shared/lib/horekaApi'
 import { SupportRequestStatus } from '@/shared/lib/horekaApi/Api'
+import { StatusType } from '@/shared/types/types'
 
 import '@/styles/chat.scss'
 
@@ -61,6 +62,7 @@ export function ChatView() {
             updatedAt: '',
         })
     const [loading, setLoading] = useState<boolean>(false)
+    const ref = useRef<HTMLDivElement>(null)
 
     const { data: userSupportRequestList } =
         chatQueries.useGetUserSupportListQuery()
@@ -74,6 +76,12 @@ export function ChatView() {
         chatId: chatId,
         booleanValue: chatId !== 0,
     })
+
+    const scrollToBottom = () =>
+        ref.current!.scrollTo({
+            top: ref.current!.scrollHeight,
+            behavior: 'smooth',
+        })
 
     const handleRequest = async (
         supportRequestId: number,
@@ -153,7 +161,7 @@ export function ChatView() {
 
             const messages = response.data?.messages || []
 
-            setChatMessagesWithInitial(chatId, initialMessageStore, messages)
+            setChatMessagesWithInitial(chatId, undefined, messages)
             setLoading(false)
         }
 
@@ -164,7 +172,8 @@ export function ChatView() {
         if (socketTicket) {
             const handleNewMessage = (message: any) => {
                 console.log('Новое сообщение:', message)
-                setChatMessagesWithInitial(chatId, undefined, message)
+
+                useChatHorecaStore.getState().addMessage(chatId, message)
             }
 
             socketTicket.on('message', handleNewMessage)
@@ -174,6 +183,10 @@ export function ChatView() {
             }
         }
     }, [socketTicket])
+
+    useEffect(() => {
+        if (ref.current) scrollToBottom()
+    }, [chats])
 
     if (!chats || !userSupportRequestList) return <Loader />
 
@@ -211,10 +224,23 @@ export function ChatView() {
                 <Flex h='calc(100vh - 400px)' mah='100vh' w='100%'>
                     <Flex
                         direction='column'
-                        className='overflow-y-auto custom-scrollbar'
+                        className='overflow-y-auto custom-scrollbar border-r'
                         w='100%'
                         maw={380}
                     >
+                        {userSupportRequestList.data.length === 0 && (
+                            <Flex
+                                justify='center'
+                                align='center'
+                                style={{ borderRight: '1px solid gray' }}
+                                h='100%'
+                            >
+                                <Text fw={700} size='lg'>
+                                    Сейчас нет заявок в тех.поддержку
+                                </Text>
+                            </Flex>
+                        )}
+
                         {userSupportRequestList.data.map((list, index) => (
                             <Box key={index}>
                                 <Flex align='center' w='100%'>
@@ -232,7 +258,7 @@ export function ChatView() {
                                         mt='xs'
                                         mb='xs'
                                         mr='sm'
-                                        className='adminChatWeight'
+                                        className={`adminChatWeight ${+supportRequestId === list.id ? 'active' : ''}`}
                                         onClick={() => {
                                             handleRequest(
                                                 list.id,
@@ -314,7 +340,7 @@ export function ChatView() {
                                                     }
                                                     fullWidth
                                                 >
-                                                    {list.status}
+                                                    {StatusType[list.status]}
                                                 </Badge>
                                             </Flex>
                                         </Flex>
@@ -333,8 +359,18 @@ export function ChatView() {
                         >
                             <Flex align='center' justify='center' h='100%'>
                                 <Flex gap='md' align='center'>
-                                    <IconSquareArrowLeft />
-                                    <Text ta='center'>Выберите чат слева</Text>
+                                    {userSupportRequestList.data.length ===
+                                    0 ? (
+                                        ''
+                                    ) : (
+                                        <IconSquareArrowLeft />
+                                    )}
+                                    <Text ta='center'>
+                                        {userSupportRequestList.data.length ===
+                                        0
+                                            ? 'У вас пока что нет чатов с тех.поддержкой'
+                                            : 'Выберите чат слева'}
+                                    </Text>
                                 </Flex>
                             </Flex>
                         </Flex>
@@ -344,6 +380,7 @@ export function ChatView() {
                             direction='column'
                             w='100%'
                             h='100%'
+                            justify='space-between'
                         >
                             <LoadingOverlay
                                 visible={loading}
@@ -352,71 +389,88 @@ export function ChatView() {
                             />
 
                             {chatId && (
-                                <Flex
-                                    direction='column'
-                                    px='xl'
-                                    flex='1'
-                                    mah='100%'
-                                    className='overflow-y-auto custom-scrollbar'
-                                >
-                                    {messages.map((chat, index) => {
-                                        const currentDate = dayjs(
-                                            chat.createdAt
-                                        ).format('YYYY-MM-DD')
-                                        const previousDate =
-                                            index > 0
-                                                ? dayjs(
-                                                      messages[index - 1]
-                                                          .createdAt
-                                                  ).format('YYYY-MM-DD')
-                                                : null
+                                <ScrollArea viewportRef={ref}>
+                                    <Flex
+                                        direction='column'
+                                        px='xl'
+                                        // flex='1'
+                                        mah='100%'
+                                        className='overflow-y-auto custom-scrollbar'
+                                    >
+                                        {messages.map((chat, index) => {
+                                            const currentDate = dayjs(
+                                                chat.createdAt
+                                            ).format('YYYY-MM-DD')
+                                            const previousDate =
+                                                index > 0
+                                                    ? dayjs(
+                                                          messages[index - 1]
+                                                              .createdAt
+                                                      ).format('YYYY-MM-DD')
+                                                    : null
 
-                                        return (
-                                            <Flex
-                                                key={index}
-                                                direction='column'
-                                                mb='md'
-                                            >
-                                                {(index === 0 ||
-                                                    currentDate !==
-                                                        previousDate) && (
-                                                    <Text
-                                                        w='100%'
-                                                        my='md'
-                                                        size='lg'
-                                                        c='gray.6'
-                                                        ta='center'
-                                                    >
-                                                        {currentDate}
-                                                    </Text>
-                                                )}
-
-                                                <Box
-                                                    className={
-                                                        chat.authorId &&
-                                                        chat.authorId === userId
-                                                            ? 'speech-bubble-to-me'
-                                                            : 'speech-bubble-from-me'
-                                                    }
-                                                    c={
-                                                        chat.authorId &&
-                                                        chat.authorId === userId
-                                                            ? 'white'
-                                                            : '#000'
-                                                    }
-                                                    bg={
-                                                        chat.authorId &&
-                                                        chat.authorId === userId
-                                                            ? 'indigo.6'
-                                                            : 'indigo.1'
-                                                    }
+                                            return (
+                                                <Flex
+                                                    key={index}
+                                                    direction='column'
+                                                    mb='md'
                                                 >
-                                                    {chat.message}
-                                                </Box>
-                                            </Flex>
-                                        )
-                                    })}
-                                </Flex>
+                                                    {(index === 0 ||
+                                                        currentDate !==
+                                                            previousDate) && (
+                                                        <Text
+                                                            w='100%'
+                                                            my='md'
+                                                            size='lg'
+                                                            c='gray.6'
+                                                            ta='center'
+                                                        >
+                                                            {currentDate}
+                                                        </Text>
+                                                    )}
+
+                                                    <Box
+                                                        className={
+                                                            chat.authorId &&
+                                                            chat.authorId ===
+                                                                userId
+                                                                ? 'speech-bubble-to-me'
+                                                                : 'speech-bubble-from-me'
+                                                        }
+                                                        c={
+                                                            chat.authorId &&
+                                                            chat.authorId ===
+                                                                userId
+                                                                ? 'white'
+                                                                : '#000'
+                                                        }
+                                                        bg={
+                                                            chat.authorId &&
+                                                            chat.authorId ===
+                                                                userId
+                                                                ? 'indigo.6'
+                                                                : 'indigo.1'
+                                                        }
+                                                    >
+                                                        <Text
+                                                            size='md'
+                                                            fw={700}
+                                                        >
+                                                            {chat.authorId &&
+                                                            chat.authorId ===
+                                                                userId
+                                                                ? 'Вы'
+                                                                : 'Поддержка HoreCa'}
+                                                        </Text>
+                                                        <Text size='md'>
+                                                            {chat.message}
+                                                        </Text>
+                                                    </Box>
+                                                </Flex>
+                                            )
+                                        })}
+                                    </Flex>
+                                </ScrollArea>
                             )}
 
                             <Flex

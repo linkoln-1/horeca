@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 
 import { chatQueries } from '@/entities/chats'
@@ -17,6 +17,8 @@ import {
     Button,
     Input,
     LoadingOverlay,
+    ScrollArea,
+    TextInput,
 } from '@mantine/core'
 import { IconPaperclip, IconSend2 } from '@tabler/icons-react'
 import { IconSquareArrowLeft } from '@tabler/icons-react'
@@ -26,6 +28,7 @@ import { useRouter } from 'next/navigation'
 import { useWebSocketChat } from '@/shared/hooks/useWebsocketChat'
 import { api } from '@/shared/lib/horekaApi'
 import { SupportRequestStatus } from '@/shared/lib/horekaApi/Api'
+import { StatusType } from '@/shared/types/types'
 
 import '@/styles/chat.scss'
 
@@ -60,6 +63,7 @@ export function AdminViews() {
             updatedAt: '',
         })
     const [loading, setLoading] = useState<boolean>(false)
+    const ref = useRef<HTMLDivElement>(null)
 
     const { mutateAsync: assignRequest, isPending: assignRequestPending } =
         supportQueries.useAdminAssignRequestChatMutation()
@@ -83,6 +87,12 @@ export function AdminViews() {
     const getChatId = (id: number) => {
         return setChatId(id)
     }
+
+    const scrollToBottom = () =>
+        ref.current!.scrollTo({
+            top: ref.current!.scrollHeight,
+            behavior: 'smooth',
+        })
 
     const handleSendMessage = () => {
         if (message.trim()) {
@@ -179,12 +189,32 @@ export function AdminViews() {
 
             const messages = response.data?.messages || []
 
-            setChatMessagesWithInitial(chatId, initialMessageStore, messages) // Передаём начальное сообщение
+            setChatMessagesWithInitial(chatId, undefined, messages)
             setLoading(false)
         }
 
         getMessages()
     }, [chatId > 0 ? chatId : null])
+
+    useEffect(() => {
+        if (socketTicket) {
+            const handleNewMessage = (message: any) => {
+                console.log('Новое сообщение:', message)
+
+                useChatAdminStore.getState().addMessage(chatId, message)
+            }
+
+            socketTicket.on('message', handleNewMessage)
+
+            return () => {
+                socketTicket.off('message', handleNewMessage)
+            }
+        }
+    }, [socketTicket])
+
+    useEffect(() => {
+        if (ref.current) scrollToBottom()
+    }, [chats])
 
     useEffect(() => {
         setOverlayVisible(status === 'Default')
@@ -250,7 +280,7 @@ export function AdminViews() {
                                         mt='xs'
                                         mb='xs'
                                         mr='sm'
-                                        className='adminChatWeight'
+                                        className={`adminChatWeight ${+supportRequestId === list.id ? 'active' : ''}`}
                                     >
                                         <Flex
                                             justify='space-between'
@@ -327,7 +357,7 @@ export function AdminViews() {
                                                     }
                                                     fullWidth
                                                 >
-                                                    {list.status}
+                                                    {StatusType[list.status]}
                                                 </Badge>
                                             </Flex>
                                         </Flex>
@@ -359,6 +389,7 @@ export function AdminViews() {
                             direction='column'
                             w='100%'
                             h='100%'
+                            justify='space-between'
                         >
                             <LoadingOverlay
                                 visible={loading}
@@ -413,74 +444,88 @@ export function AdminViews() {
                             )}
 
                             {supportRequestId && (
-                                <Flex
-                                    direction='column'
-                                    px='xl'
-                                    flex='1'
-                                    mah='100%'
-                                    className='overflow-y-auto custom-scrollbar'
-                                >
-                                    {messages.map((chat, index) => {
-                                        const currentDate = dayjs(
-                                            chat.createdAt
-                                        ).format('YYYY-MM-DD')
-                                        const previousDate =
-                                            index > 0
-                                                ? dayjs(
-                                                      messages[index - 1]
-                                                          .createdAt
-                                                  ).format('YYYY-MM-DD')
-                                                : null
+                                <ScrollArea viewportRef={ref}>
+                                    <Flex
+                                        direction='column'
+                                        px='xl'
+                                        // flex='1'
+                                        mah='100%'
+                                        className='custom-scrollbar'
+                                    >
+                                        {messages.map((chat, index) => {
+                                            const currentDate = dayjs(
+                                                chat.createdAt
+                                            ).format('YYYY-MM-DD')
+                                            const previousDate =
+                                                index > 0
+                                                    ? dayjs(
+                                                          messages[index - 1]
+                                                              .createdAt
+                                                      ).format('YYYY-MM-DD')
+                                                    : null
 
-                                        return (
-                                            <Flex
-                                                key={index}
-                                                direction='column'
-                                                mb='md'
-                                            >
-                                                {(index === 0 ||
-                                                    currentDate !==
-                                                        previousDate) && (
-                                                    <Text
-                                                        w='100%'
-                                                        my='md'
-                                                        size='lg'
-                                                        c='gray.6'
-                                                        ta='center'
-                                                    >
-                                                        {currentDate}
-                                                    </Text>
-                                                )}
-
-                                                <Box
-                                                    c={
-                                                        chat.authorId &&
-                                                        chat.authorId !==
-                                                            adminId
-                                                            ? 'white'
-                                                            : '#000'
-                                                    }
-                                                    className={
-                                                        chat.authorId &&
-                                                        chat.authorId !==
-                                                            adminId
-                                                            ? 'speech-bubble-to-me'
-                                                            : 'speech-bubble-from-me'
-                                                    }
-                                                    bg={
-                                                        chat.authorId &&
-                                                        chat.authorId !==
-                                                            adminId
-                                                            ? 'indigo.6'
-                                                            : 'indigo.1'
-                                                    }
+                                            return (
+                                                <Flex
+                                                    key={index}
+                                                    direction='column'
+                                                    mb='md'
                                                 >
-                                                    {chat.message}
-                                                </Box>
-                                            </Flex>
-                                        )
-                                    })}
-                                </Flex>
+                                                    {(index === 0 ||
+                                                        currentDate !==
+                                                            previousDate) && (
+                                                        <Text
+                                                            w='100%'
+                                                            my='md'
+                                                            size='lg'
+                                                            c='gray.6'
+                                                            ta='center'
+                                                        >
+                                                            {currentDate}
+                                                        </Text>
+                                                    )}
+
+                                                    <Box
+                                                        c={
+                                                            chat.authorId &&
+                                                            chat.authorId !==
+                                                                adminId
+                                                                ? 'white'
+                                                                : '#000'
+                                                        }
+                                                        className={
+                                                            chat.authorId &&
+                                                            chat.authorId !==
+                                                                adminId
+                                                                ? 'speech-bubble-to-me'
+                                                                : 'speech-bubble-from-me'
+                                                        }
+                                                        bg={
+                                                            chat.authorId &&
+                                                            chat.authorId !==
+                                                                adminId
+                                                                ? 'indigo.6'
+                                                                : 'indigo.1'
+                                                        }
+                                                    >
+                                                        <Text
+                                                            size='md'
+                                                            fw={700}
+                                                        >
+                                                            {chat.authorId &&
+                                                            chat.authorId !==
+                                                                adminId
+                                                                ? 'Пользователь'
+                                                                : 'Поддержка HoreCa'}
+                                                        </Text>
+                                                        <Text size='md'>
+                                                            {chat.message}
+                                                        </Text>
+                                                    </Box>
+                                                </Flex>
+                                            )
+                                        })}
+                                    </Flex>
+                                </ScrollArea>
                             )}
 
                             <Flex
@@ -498,7 +543,7 @@ export function AdminViews() {
                                     color='#4299e1'
                                     stroke={2}
                                 />
-                                <Input
+                                <TextInput
                                     value={message}
                                     onChange={e => setMessage(e.target.value)}
                                     size='lg'
