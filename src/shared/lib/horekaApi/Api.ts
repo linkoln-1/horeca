@@ -454,6 +454,7 @@ export interface ChatMessageDto {
     chatId: number
     message: string
     authorId: number | null
+    author?: UserDto | null
     /** @default false */
     isServer: boolean
     /** @default false */
