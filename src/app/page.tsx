@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
 
 export default function IndexPage() {
-    return redirect('/sign-in')
+    return redirect('/landing')
 }
