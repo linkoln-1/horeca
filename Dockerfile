@@ -6,7 +6,6 @@ RUN corepack enable pnpm && pnpm i --frozen-lockfile
 FROM base as builder
 WORKDIR /app
 COPY . .
-RUN corepack enable pnpm && pnpm libgen
 RUN corepack enable pnpm && pnpm build
 
 

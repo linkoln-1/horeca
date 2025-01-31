@@ -85,7 +85,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                             sm: 2,
                             md: 2,
                         }}
-                        h='calc(100vh - 140px)'
+                        h='calc(100vh - 235px)'
                         pos='sticky'
                         top={20}
                     >
@@ -194,8 +194,16 @@ export function AppLayout({ children }: AppLayoutProps) {
                     span={{
                         base: 12,
                         xs: 12,
-                        sm: isMobile ? 12 : 9,
-                        md: isMobile ? 12 : 9,
+                        sm: isMobile
+                            ? 12
+                            : decode && decode.role === roles[2].role
+                              ? 12
+                              : 9,
+                        md: isMobile
+                            ? 12
+                            : decode && decode.role === roles[2].role
+                              ? 12
+                              : 9,
                     }}
                 >
                     {children}

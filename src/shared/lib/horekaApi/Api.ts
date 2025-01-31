@@ -605,10 +605,10 @@ export interface SupportRequestCreateDto {
 }
 
 export interface SupportRequestDto {
+    status: SupportRequestStatus
     id: number
     userId: number
     content: string | null
-    status: object
     adminId: number | null
     chatId: number
     /** @format date-time */
@@ -1772,6 +1772,40 @@ export class Api<
          * No description
          *
          * @tags SupportRequest
+         * @name SupportRequestsControllerList
+         * @summary List of users's support requests
+         * @request GET:/api/support/requests/mine
+         * @secure
+         */
+        supportRequestsControllerList: (
+            query?: {
+                offset?: number
+                limit?: number
+                search?: SupportRequestSearchDto
+                /** fieldName(numeric)|ASC/DESC */
+                sort?: string
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    data: SupportRequestDto[]
+                    total: number
+                },
+                ErrorDto
+            >({
+                path: `/api/support/requests/mine`,
+                method: 'GET',
+                query: query,
+                secure: true,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags SupportRequest
          * @name SupportRequestsAdminControllerAssignAdmin
          * @summary Admin assigns himself to customer support request
          * @request POST:/api/support/requests/{id}/assign
@@ -2093,7 +2127,7 @@ export class Api<
          * @tags HorecaPrivateRequests
          * @name HorecaPrivateRequestsControllerCreatePrivate
          * @summary Create products(categories) set proposal needed for HoReCa and send to the favourite provider
-         * @request POST:/api/horeca/requests/private/private
+         * @request POST:/api/horeca/requests/private
          * @secure
          */
         horecaPrivateRequestsControllerCreatePrivate: (
@@ -2101,7 +2135,7 @@ export class Api<
             params: RequestParams = {}
         ) =>
             this.request<HorecaPrivateRequestDto, ErrorDto>({
-                path: `/api/horeca/requests/private/private`,
+                path: `/api/horeca/requests/private`,
                 method: 'POST',
                 body: data,
                 secure: true,

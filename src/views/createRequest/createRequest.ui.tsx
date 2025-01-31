@@ -169,6 +169,7 @@ export function CreateRequestView() {
     }
 
     const handleFormSubmit = async (values: HorecaRequestForm) => {
+        console.log(values)
         try {
             const formattedData: HorecaRequestCreateDto = {
                 ...values,
@@ -480,7 +481,7 @@ export function CreateRequestView() {
 
                         <DateTimePicker
                             w='fit-content'
-                            valueFormat='DD/MM/YYYY HH:mm:ss'
+                            valueFormat='DD/MM/YYYY HH:mm'
                             label='Привезите товар не позднее:'
                             placeholder='ДД/ММ/ГГГГ ЧЧ:ММ'
                             value={form.values.deliveryTime}
