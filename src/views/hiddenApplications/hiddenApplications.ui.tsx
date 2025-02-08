@@ -3,20 +3,21 @@
 import React from 'react'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
-import { Flex, Grid, Paper, Text, Button, Loader, Table } from '@mantine/core'
-import { IconChevronLeft } from '@tabler/icons-react'
+import { Flex, Text, Button, Loader, Table } from '@mantine/core'
+import { IconChevronLeft, IconRestore } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 
 import { hiddenApplications } from '@/shared/constants'
-import {
-    PaymentMethod,
-    PaymentMethodLabels,
-} from '@/shared/constants/paymentMethod'
 import { role } from '@/shared/helpers/getRole'
 
 export function HiddenApplicationsViews() {
     const user = useUserStore(state => state.user)
     const router = useRouter()
+
+    //TODO:возврат заявки из скрытого
+    const onClickRestore = (id: number) => {
+        console.log('id - ', id)
+    }
 
     if (!user) return <Loader />
 
@@ -60,7 +61,7 @@ export function HiddenApplicationsViews() {
                                 {[
                                     '№ Скрытой заявки',
                                     'Адрес и дата доставки',
-                                    'Способ доставки',
+                                    'Комментарий',
                                     'Отсрочка',
                                     'Почему скрыта',
                                 ].map((tab, index) => (
@@ -108,6 +109,16 @@ export function HiddenApplicationsViews() {
                                             </Table.Td>
                                             <Table.Td align='center' p='md'>
                                                 {request.reason}
+                                            </Table.Td>
+                                            <Table.Td align='center' p='md'>
+                                                <IconRestore
+                                                    onClick={() =>
+                                                        onClickRestore(
+                                                            request.id
+                                                        )
+                                                    }
+                                                    className='cursor-pointer'
+                                                />
                                             </Table.Td>
                                         </Table.Tr>
                                     ))}

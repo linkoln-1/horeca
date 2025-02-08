@@ -79,7 +79,7 @@ export function Catalog() {
                                         'Характеристики',
                                         'Фасовка',
                                         'Цена (за ед.)',
-                                        'Кол-во',
+                                        'Кол-во (в наличии)',
                                         'Фотографии',
                                         'Действия',
                                     ].map((tab, index) => (
@@ -105,6 +105,8 @@ export function Catalog() {
                                             <Table.Td align='center' p='md'>
                                                 {product.description === 'beer'
                                                     ? 'Пиво'
+                                                    : product.description.length > 50
+                                                    ? `${product.description.slice(0, 50)}...`
                                                     : product.description}
                                             </Table.Td>
 

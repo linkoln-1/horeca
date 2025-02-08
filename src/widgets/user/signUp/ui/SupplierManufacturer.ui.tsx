@@ -59,7 +59,8 @@ export function SupplierManufacturer({
     const isFullyFilledStepTwo =
         form.values.profile.categories.length > 0 &&
         form.values.profile.minOrderAmount > 0 &&
-        form.values.profile.deliveryMethods.length > 0
+        form.values.profile.deliveryMethods.length > 0 &&
+        form.values.phone
 
     const steps = [SignUpStepOne, SignUpStepTwo]
 

@@ -3,7 +3,15 @@
 import React from 'react'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
-import { Button, Flex, Table, Text, Textarea } from '@mantine/core'
+import {
+    Button,
+    Checkbox,
+    Flex,
+    Table,
+    Text,
+    Textarea,
+    TextInput,
+} from '@mantine/core'
 import { useRouter } from 'next/navigation'
 
 import { role } from '@/shared/helpers/getRole'
@@ -178,13 +186,24 @@ export function ProductApplicationsByIdViews() {
                                                     </Text>
                                                 </Table.Td>
                                                 <Table.Td align='center' p='md'>
-                                                    не указано
+                                                    <Checkbox
+                                                        className='flex justify-center'
+                                                        defaultChecked={false}
+                                                    />
                                                 </Table.Td>
                                                 <Table.Td align='center' p='md'>
-                                                    не указано
+                                                    <TextInput
+                                                        className='flex justify-center'
+                                                        placeholder='Наименование'
+                                                        required
+                                                    />
                                                 </Table.Td>
                                                 <Table.Td align='center' p='md'>
-                                                    {product.price}
+                                                    <TextInput
+                                                        className='flex justify-center'
+                                                        placeholder='Цена за всё (руб)'
+                                                        required
+                                                    />
                                                 </Table.Td>
                                                 <Table.Td align='center' p='md'>
                                                     фото
