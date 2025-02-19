@@ -50,6 +50,9 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      react-imask:
+        specifier: ^7.6.1
+        version: 7.6.1(react@18.3.1)
       react-toastify:
         specifier: ^10.0.6
         version: 10.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -161,6 +164,10 @@ packages:
     resolution: {integrity: sha512-SRJ4jYmXRqV1/Xc+TIVG84WjHBXKlxO9sHQnA2Pf12QQEAp1LOh6kDzNHXcUnbH1QI0FDoPPVOt+vyUDucxpaw==}
     engines: {node: '>=6.0.0'}
     hasBin: true
+
+  '@babel/runtime-corejs3@7.26.7':
+    resolution: {integrity: sha512-55gRV8vGrCIYZnaQHQrD92Lo/hYE3Sj5tmbuf0hhHR7sj2CWhEhHU89hbq+UVDXvFG1zUVXJhUkEq1eAfqXtFw==}
+    engines: {node: '>=6.9.0'}
 
   '@babel/runtime@7.26.0':
     resolution: {integrity: sha512-FDSOghenHTiToteC/QRlv2q3DhPZ/oOXTBoirfWNx1Cx3TMVcGWQtMMmQcSvb/JjpNeGzx8Pq/b4fKEJuWm1sw==}
@@ -904,6 +911,9 @@ packages:
     resolution: {integrity: sha512-EiPU8G6dQG0GFHNR8ljnZFki/8a+cQwEQ+7wpxdChl02Q8HXlwEZWD5lqAF8vC2sEC3Tehr8hy7vErz88LHyUA==}
     engines: {node: ^14.18.0 || >=16.10.0}
 
+  core-js-pure@3.40.0:
+    resolution: {integrity: sha512-AtDzVIgRrmRKQai62yuSIN5vNiQjcJakJb4fbhVw3ehxx7Lohphvw9SGNWKhLFqSxC4ilD0g/L1huAYFQU3Q6A==}
+
   cosmiconfig@9.0.0:
     resolution: {integrity: sha512-itvL5h8RETACmOTFc4UfIyB2RfEHi71Ax6E/PivVxq9NseKbOWpeyHEOIbmAw1rs8Ak0VursQNww7lf7YtUwzg==}
     engines: {node: '>=14'}
@@ -1403,6 +1413,10 @@ packages:
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
+
+  imask@7.6.1:
+    resolution: {integrity: sha512-sJlIFM7eathUEMChTh9Mrfw/IgiWgJqBKq2VNbyXvBZ7ev/IlO6/KQTKlV/Fm+viQMLrFLG/zCuudrLIwgK2dg==}
+    engines: {npm: '>=4.0.0'}
 
   immer@10.1.1:
     resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
@@ -2013,6 +2027,12 @@ packages:
     engines: {node: '>= 10.13'}
     peerDependencies:
       react: '>= 16.8 || 18.0.0'
+
+  react-imask@7.6.1:
+    resolution: {integrity: sha512-vLNfzcCz62Yzx/GRGh5tiCph9Gbh2cZu+Tz8OiO5it2eNuuhpA0DWhhSlOtVtSJ80+Bx+vFK5De8eQ9AmbkXzA==}
+    engines: {npm: '>=4.0.0'}
+    peerDependencies:
+      react: '>=0.14.0'
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
@@ -2719,6 +2739,11 @@ snapshots:
   '@babel/parser@7.26.5':
     dependencies:
       '@babel/types': 7.26.5
+
+  '@babel/runtime-corejs3@7.26.7':
+    dependencies:
+      core-js-pure: 3.40.0
+      regenerator-runtime: 0.14.1
 
   '@babel/runtime@7.26.0':
     dependencies:
@@ -3528,6 +3553,8 @@ snapshots:
 
   consola@3.4.0: {}
 
+  core-js-pure@3.40.0: {}
+
   cosmiconfig@9.0.0(typescript@5.5.4):
     dependencies:
       env-paths: 2.2.1
@@ -4173,6 +4200,10 @@ snapshots:
 
   ignore@5.3.2: {}
 
+  imask@7.6.1:
+    dependencies:
+      '@babel/runtime-corejs3': 7.26.7
+
   immer@10.1.1: {}
 
   immutable@5.0.3: {}
@@ -4778,6 +4809,12 @@ snapshots:
 
   react-dropzone-esm@15.2.0(react@18.3.1):
     dependencies:
+      prop-types: 15.8.1
+      react: 18.3.1
+
+  react-imask@7.6.1(react@18.3.1):
+    dependencies:
+      imask: 7.6.1
       prop-types: 15.8.1
       react: 18.3.1
 

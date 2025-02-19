@@ -3,16 +3,26 @@
 import React from 'react'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
+import { providerRequest } from '@/entities/provider-request'
 import { Flex, Text, Button, Loader, Table } from '@mantine/core'
 import { IconChevronLeft, IconRestore } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 
-import { hiddenApplications } from '@/shared/constants'
 import { role } from '@/shared/helpers/getRole'
+import { groupRequestsByDate } from '@/shared/helpers/groupRequestsByDate'
 
 export function HiddenApplicationsViews() {
     const user = useUserStore(state => state.user)
     const router = useRouter()
+
+    const { data: incomingRequests } =
+        providerRequest.useProviderRequestIncomeQuery({
+            includeHiddenAndViewed: 'false',
+        })
+
+    const groupedRequests =
+        incomingRequests && groupRequestsByDate(incomingRequests.data || [])
+    console.log(groupedRequests)
 
     //TODO:возврат заявки из скрытого
     const onClickRestore = (id: number) => {
@@ -38,7 +48,7 @@ export function HiddenApplicationsViews() {
                 </Button>
             </Flex>
             <Flex direction='column' gap='md'>
-                {!hiddenApplications ? (
+                {!groupedRequests ? (
                     <Flex
                         direction='column'
                         justify='center'
@@ -72,59 +82,90 @@ export function HiddenApplicationsViews() {
                             </Table.Tr>
                         </Table.Thead>
 
-                        {hiddenApplications.map((orderGroup, groupIndex) => (
-                            <React.Fragment key={groupIndex}>
-                                <Table.Tbody>
-                                    <Table.Tr>
-                                        <Table.Td
-                                            colSpan={5}
-                                            align='left'
-                                            p='md'
-                                        >
-                                            <Text
-                                                size='sm'
-                                                c='#909090'
-                                            >{`Размещены: ${orderGroup.date}`}</Text>
-                                        </Table.Td>
-                                    </Table.Tr>
+                        {groupedRequests &&
+                            Object.entries(groupedRequests).map(
+                                ([orderGroup, groupIndex]) => (
+                                    <React.Fragment key={orderGroup}>
+                                        <Table.Tbody>
+                                            <Table.Tr>
+                                                <Table.Td
+                                                    colSpan={5}
+                                                    align='left'
+                                                    p='md'
+                                                >
+                                                    <Text
+                                                        size='sm'
+                                                        c='#909090'
+                                                    >{`Размещены: ${orderGroup}`}</Text>
+                                                </Table.Td>
+                                            </Table.Tr>
 
-                                    {orderGroup.items.map(request => (
-                                        <Table.Tr key={request.id} bg='#F5F7FD'>
-                                            <Table.Td align='center' p='md'>
-                                                {request.orderNumber}
-                                            </Table.Td>
-                                            <Table.Td align='center' p='md'>
-                                                <Text size='sm'>
-                                                    до {request.deliveryDate}
-                                                </Text>
-                                                <Text size='sm'>
-                                                    {request.address}
-                                                </Text>
-                                            </Table.Td>
-                                            <Table.Td align='center' p='md'>
-                                                {request.deliveryMethod}
-                                            </Table.Td>
-                                            <Table.Td align='center' p='md'>
-                                                {request.delay}
-                                            </Table.Td>
-                                            <Table.Td align='center' p='md'>
-                                                {request.reason}
-                                            </Table.Td>
-                                            <Table.Td align='center' p='md'>
-                                                <IconRestore
-                                                    onClick={() =>
-                                                        onClickRestore(
-                                                            request.id
-                                                        )
-                                                    }
-                                                    className='cursor-pointer'
-                                                />
-                                            </Table.Td>
-                                        </Table.Tr>
-                                    ))}
-                                </Table.Tbody>
-                            </React.Fragment>
-                        ))}
+                                            {groupIndex.map(request => (
+                                                <Table.Tr
+                                                    key={request.id}
+                                                    bg='#F5F7FD'
+                                                >
+                                                    <Table.Td
+                                                        align='center'
+                                                        p='md'
+                                                    >
+                                                        {request.id}
+                                                    </Table.Td>
+                                                    <Table.Td
+                                                        align='center'
+                                                        p='md'
+                                                    >
+                                                        <Text size='sm'>
+                                                            <Text size='sm'>
+                                                                {
+                                                                    request.address
+                                                                }
+                                                            </Text>
+                                                            до{' '}
+                                                            {new Date(
+                                                                request.deliveryTime
+                                                            ).toLocaleDateString()}
+                                                        </Text>
+                                                    </Table.Td>
+                                                    <Table.Td
+                                                        align='center'
+                                                        p='md'
+                                                    >
+                                                        {request.comment}
+                                                    </Table.Td>
+                                                    <Table.Td
+                                                        align='center'
+                                                        p='md'
+                                                    >
+                                                        {request.acceptUntill}
+                                                    </Table.Td>
+                                                    <Table.Td
+                                                        align='center'
+                                                        p='md'
+                                                    >
+                                                        {
+                                                            request.reviewNotificationSent
+                                                        }
+                                                    </Table.Td>
+                                                    <Table.Td
+                                                        align='center'
+                                                        p='md'
+                                                    >
+                                                        <IconRestore
+                                                            onClick={() =>
+                                                                onClickRestore(
+                                                                    request.id
+                                                                )
+                                                            }
+                                                            className='cursor-pointer'
+                                                        />
+                                                    </Table.Td>
+                                                </Table.Tr>
+                                            ))}
+                                        </Table.Tbody>
+                                    </React.Fragment>
+                                )
+                            )}
                     </Table>
                 )}
             </Flex>
