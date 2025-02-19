@@ -9,6 +9,22 @@
  * ---------------------------------------------------------------
  */
 
+export interface UpdateUserDto {
+    name?: string
+    email?: string
+    phone?: string
+    password?: string
+    repeatPassword?: string
+    profile?: CreateHorecaProfileDto | CreateProviderProfileDto
+    avatar?: number
+}
+
+export enum UserRole {
+    Admin = 'Admin',
+    Horeca = 'Horeca',
+    Provider = 'Provider',
+}
+
 export interface UploadDto {
     id: number
     name: string
@@ -19,21 +35,6 @@ export interface UploadDto {
     createdAt: string
     /** @format date-time */
     updatedAt: string
-}
-
-export interface UpdateUserDto {
-    name?: string
-    email?: string
-    phone?: string
-    password?: string
-    repeatPassword?: string
-    profile?: CreateHorecaProfileDto | CreateProviderProfileDto
-}
-
-export enum UserRole {
-    Admin = 'Admin',
-    Horeca = 'Horeca',
-    Provider = 'Provider',
 }
 
 export interface UserDto {
@@ -51,6 +52,7 @@ export interface UserDto {
     updatedAt: string
     activationLink: string
     isActivated: boolean
+    avatar?: UploadDto
 }
 
 export interface ErrorDto {
@@ -324,6 +326,7 @@ export interface HorecaRequestDto {
     acceptUntill: string
     name: string
     phone: string
+    categories: string[]
     items: HorecaRequestItemDto[]
     comment: string
     reviewNotificationSent: boolean
@@ -331,6 +334,7 @@ export interface HorecaRequestDto {
     createdAt: string
     /** @format date-time */
     updatedAt: string
+    cover?: number
     images?: UploadDto[]
 }
 
@@ -376,6 +380,7 @@ export interface HorecaRequestWithProviderRequestDto {
     acceptUntill: string
     name: string
     phone: string
+    categories: string[]
     items: HorecaRequestItemDto[]
     comment: string
     reviewNotificationSent: boolean
@@ -383,6 +388,7 @@ export interface HorecaRequestWithProviderRequestDto {
     createdAt: string
     /** @format date-time */
     updatedAt: string
+    cover?: number
     images?: UploadDto[]
     providerRequests: HRProviderRequestDto[]
 }
@@ -454,6 +460,7 @@ export interface ChatMessageDto {
     chatId: number
     message: string
     authorId: number | null
+    author?: UserDto | null
     /** @default false */
     isServer: boolean
     /** @default false */
@@ -508,6 +515,7 @@ export interface ChatHorecaRequestDto {
     name: string
     phone: string
     reviewNotificationSent: boolean
+    categories: string[]
     /** @format date-time */
     createdAt: string
     /** @format date-time */
@@ -623,8 +631,7 @@ export interface SupportRequestSearchDto {
 }
 
 export interface ProviderHorecaRequestSearchDto {
-    /** @default false */
-    includeHiddenAndViewed?: boolean
+    hiddenAndViewed?: boolean
     category?: Categories
 }
 
@@ -1061,8 +1068,111 @@ export class Api<
         /**
          * No description
          *
+         * @tags Users
+         * @name UsersControllerUpdate
+         * @summary Обновить профиль. Роль пользователя: Поставщик/Хорека/Админ
+         * @request PUT:/api/users/me
+         * @secure
+         */
+        usersControllerUpdate: (
+            data: UpdateUserDto,
+            params: RequestParams = {}
+        ) =>
+            this.request<UserDto, ErrorDto>({
+                path: `/api/users/me`,
+                method: 'PUT',
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Users
+         * @name UsersControllerGet
+         * @summary Получить профиль. Роль пользователя: Поставщик/Хорека/Админ
+         * @request GET:/api/users/me
+         * @secure
+         */
+        usersControllerGet: (params: RequestParams = {}) =>
+            this.request<UserDto, ErrorDto>({
+                path: `/api/users/me`,
+                method: 'GET',
+                secure: true,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Authorization
+         * @name AuthorizationControllerRegistrate
+         * @summary Регистрация пользователя
+         * @request POST:/api/auth/registration
+         */
+        authorizationControllerRegistrate: (
+            data: RegistrateUserDto,
+            params: RequestParams = {}
+        ) =>
+            this.request<UserDto, ErrorDto>({
+                path: `/api/auth/registration`,
+                method: 'POST',
+                body: data,
+                type: ContentType.Json,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Authorization
+         * @name AuthorizationControllerLogin
+         * @summary Авторизация пользователя
+         * @request POST:/api/auth/login
+         */
+        authorizationControllerLogin: (
+            data: LoginUserDto,
+            params: RequestParams = {}
+        ) =>
+            this.request<AuthResultDto, ErrorDto>({
+                path: `/api/auth/login`,
+                method: 'POST',
+                body: data,
+                type: ContentType.Json,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Authorization
+         * @name AuthorizationControllerActivateAccount
+         * @summary Ссылка для активации пользователя ( отправляется в письме при регистрации)
+         * @request GET:/api/auth/activate/{uuid}
+         */
+        authorizationControllerActivateAccount: (
+            uuid: string,
+            params: RequestParams = {}
+        ) =>
+            this.request<SuccessDto, ErrorDto>({
+                path: `/api/auth/activate/${uuid}`,
+                method: 'GET',
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
          * @tags Uploads
          * @name UploadsControllerUpload
+         * @summary Загрузить файл. Роль пользователя: Поставщик/Хорека/Админ
          * @request POST:/api/uploads
          * @secure
          */
@@ -1088,6 +1198,7 @@ export class Api<
          *
          * @tags Uploads
          * @name UploadsControllerDelete
+         * @summary Удалить файл. Роль пользователя: Поставщик/Хорека/Админ
          * @request DELETE:/api/uploads/{id}
          * @secure
          */
@@ -1102,111 +1213,9 @@ export class Api<
         /**
          * No description
          *
-         * @tags Users
-         * @name UsersControllerUpdate
-         * @summary Update users profile
-         * @request PUT:/api/users/me
-         * @secure
-         */
-        usersControllerUpdate: (
-            data: UpdateUserDto,
-            params: RequestParams = {}
-        ) =>
-            this.request<UserDto, ErrorDto>({
-                path: `/api/users/me`,
-                method: 'PUT',
-                body: data,
-                secure: true,
-                type: ContentType.Json,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Users
-         * @name UsersControllerGet
-         * @summary Get users profile
-         * @request GET:/api/users/me
-         * @secure
-         */
-        usersControllerGet: (params: RequestParams = {}) =>
-            this.request<UserDto, ErrorDto>({
-                path: `/api/users/me`,
-                method: 'GET',
-                secure: true,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Authorization
-         * @name AuthorizationControllerRegistrate
-         * @summary Registrate user
-         * @request POST:/api/auth/registration
-         */
-        authorizationControllerRegistrate: (
-            data: RegistrateUserDto,
-            params: RequestParams = {}
-        ) =>
-            this.request<UserDto, ErrorDto>({
-                path: `/api/auth/registration`,
-                method: 'POST',
-                body: data,
-                type: ContentType.Json,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Authorization
-         * @name AuthorizationControllerLogin
-         * @summary Authenticate user
-         * @request POST:/api/auth/login
-         */
-        authorizationControllerLogin: (
-            data: LoginUserDto,
-            params: RequestParams = {}
-        ) =>
-            this.request<AuthResultDto, ErrorDto>({
-                path: `/api/auth/login`,
-                method: 'POST',
-                body: data,
-                type: ContentType.Json,
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Authorization
-         * @name AuthorizationControllerActivateAccount
-         * @summary Activate profile by link in the confirmation email
-         * @request GET:/api/auth/activate/{uuid}
-         */
-        authorizationControllerActivateAccount: (
-            uuid: string,
-            params: RequestParams = {}
-        ) =>
-            this.request<SuccessDto, ErrorDto>({
-                path: `/api/auth/activate/${uuid}`,
-                method: 'GET',
-                format: 'json',
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
          * @tags HorecaRequests Template
          * @name HorecaRequestsTemplateControllerCreate
-         * @summary Create template of products(categories) set proposal required for HoReCa to use later
+         * @summary Создать темплейт заявки. Роль пользователя: Хорека
          * @request POST:/api/horeca/requests/templates
          * @secure
          */
@@ -1229,7 +1238,7 @@ export class Api<
          *
          * @tags HorecaRequests Template
          * @name HorecaRequestsTemplateControllerFindAll
-         * @summary Get all templates
+         * @summary Получить все темплейты заявок. Роль пользователя: Хорека
          * @request GET:/api/horeca/requests/templates
          * @secure
          */
@@ -1237,7 +1246,7 @@ export class Api<
             query?: {
                 offset?: number
                 limit?: number
-                search?: string
+                search?: any
                 /** fieldName(numeric)|ASC/DESC */
                 sort?: string
             },
@@ -1263,7 +1272,7 @@ export class Api<
          *
          * @tags HorecaRequests Template
          * @name HorecaRequestsTemplateControllerFind
-         * @summary Get template of products(categories) set proposal required for HoReCa
+         * @summary Получить темплейт заявки. Роль пользователя: Хорека
          * @request GET:/api/horeca/requests/templates/{id}
          * @secure
          */
@@ -1284,7 +1293,7 @@ export class Api<
          *
          * @tags HorecaRequests Template
          * @name HorecaRequestsTemplateControllerUpdate
-         * @summary Update template
+         * @summary Обновить темплейт заявки. Роль пользователя: Хорека
          * @request PUT:/api/horeca/requests/templates/{id}
          * @secure
          */
@@ -1308,7 +1317,7 @@ export class Api<
          *
          * @tags HorecaRequests Template
          * @name HorecaRequestsTemplateControllerDelete
-         * @summary Delete template
+         * @summary Удалить темплейт заявки. Роль пользователя: Хорека
          * @request DELETE:/api/horeca/requests/templates/{id}
          * @secure
          */
@@ -1329,7 +1338,7 @@ export class Api<
          *
          * @tags HorecaRequests
          * @name HorecaRequestsControllerCreate
-         * @summary Create products(categories) set proposal needed for HoReCa
+         * @summary Создать заявку. Роль пользователя: Хорека
          * @request POST:/api/horeca/requests
          * @secure
          */
@@ -1352,7 +1361,7 @@ export class Api<
          *
          * @tags HorecaRequests
          * @name HorecaRequestsControllerFindAll
-         * @summary All Horeca requests
+         * @summary Получить все свои заявки. Роль пользователя: Хорека
          * @request GET:/api/horeca/requests
          * @secure
          */
@@ -1386,7 +1395,7 @@ export class Api<
          *
          * @tags HorecaRequests
          * @name HorecaRequestsControllerGet
-         * @summary Get Horeca request with Provider's requests to compare
+         * @summary Получить заявку хореки включая все отклики от поставщиков для сравнения. Роль пользователя: Хорека
          * @request GET:/api/horeca/requests/{id}
          * @secure
          */
@@ -1404,7 +1413,7 @@ export class Api<
          *
          * @tags HorecaRequests
          * @name HorecaRequestsControllerApproveProviderRequest
-         * @summary Approve one of providers request to be able to start chat with
+         * @summary Подтвердить одну из заявок поставщика. Роль пользователя: Хорека
          * @request POST:/api/horeca/requests/approve
          * @secure
          */
@@ -1427,7 +1436,7 @@ export class Api<
          *
          * @tags HorecaRequests
          * @name HorecaRequestsControllerCancelProviderRequest
-         * @summary Cancel earlier chosen provider request
+         * @summary Отменить раннее выбранную заявку поставщика. Роль пользователя: Хорека
          * @request POST:/api/horeca/requests/cancelProviderRequest
          * @secure
          */
@@ -1450,7 +1459,7 @@ export class Api<
          *
          * @tags HorecaRequests
          * @name HorecaRequestsControllerCancel
-         * @summary Cancel horeca request
+         * @summary Отменить свою заявку. Роль пользователя: Хорека
          * @request GET:/api/horeca/requests/{id}/cancel
          * @secure
          */
@@ -1471,6 +1480,7 @@ export class Api<
          *
          * @tags WS
          * @name NotificationControllerGet
+         * @summary Пометить список нотификаций. Роль пользователя: Админ
          * @request GET:/api/notifications
          * @secure
          */
@@ -1488,7 +1498,7 @@ export class Api<
          *
          * @tags Chats
          * @name ChatsControllerCreateChat
-         * @summary Creates chat
+         * @summary Создать чат. Роль пользователя: Поставщик/Хорека/Админ
          * @request POST:/api/chats
          * @secure
          */
@@ -1511,7 +1521,7 @@ export class Api<
          *
          * @tags Chats
          * @name ChatsControllerFindAll
-         * @summary Get all chats
+         * @summary Получить список чатов. Роль пользователя: Поставщик/Хорека/Админ
          * @request GET:/api/chats
          * @secure
          */
@@ -1519,7 +1529,7 @@ export class Api<
             query?: {
                 offset?: number
                 limit?: number
-                search?: string
+                search?: any
                 /** fieldName(numeric)|ASC/DESC */
                 sort?: string
             },
@@ -1545,7 +1555,7 @@ export class Api<
          *
          * @tags Chats
          * @name ChatsControllerGetChat
-         * @summary Get chat
+         * @summary Получить чат по id. Роль пользователя: Поставщик/Хорека/Админ
          * @request GET:/api/chats/{id}
          * @secure
          */
@@ -1563,7 +1573,7 @@ export class Api<
          *
          * @tags Chats
          * @name ChatsMessageControllerGetChatMessages
-         * @summary Get chat messages
+         * @summary Получить список сообщений чата. Роль пользователя: Поставщик/Хорека/Админ
          * @request GET:/api/messages
          * @secure
          */
@@ -1571,7 +1581,7 @@ export class Api<
             query?: {
                 offset?: number
                 limit?: number
-                search?: string
+                search?: any
                 /** fieldName(numeric)|ASC/DESC */
                 sort?: string
             },
@@ -1597,7 +1607,7 @@ export class Api<
          *
          * @tags Chats
          * @name ChatsMessageControllerViewMessage
-         * @summary Mark message viewed
+         * @summary Пометить сообщение как прочитанное. Роль пользователя: Поставщик/Хорека/Админ
          * @request PUT:/api/messages/{id}/view
          * @secure
          */
@@ -1617,7 +1627,7 @@ export class Api<
          *
          * @tags Favourites
          * @name FavouritesControllerCreate
-         * @summary Add provider in favourites to be able to chat
+         * @summary Добавить поставщика в избранное. Роль пользователя: Хорека
          * @request POST:/api/horeca/favourites
          * @secure
          */
@@ -1640,7 +1650,7 @@ export class Api<
          *
          * @tags Favourites
          * @name FavouritesControllerFindAll
-         * @summary Get all favourite providers/horecas
+         * @summary Получить список избранных. Роль пользователя: Поставщик/Хорека
          * @request GET:/api/horeca/favourites
          * @secure
          */
@@ -1648,7 +1658,7 @@ export class Api<
             query?: {
                 offset?: number
                 limit?: number
-                search?: string
+                search?: any
                 /** fieldName(numeric)|ASC/DESC */
                 sort?: string
             },
@@ -1674,7 +1684,7 @@ export class Api<
          *
          * @tags Favourites
          * @name FavouritesControllerDelete
-         * @summary Delete provider from favourites
+         * @summary Удалить поставщика из избранного. Роль пользователя: Хорека
          * @request DELETE:/api/horeca/favourites/{providerId}
          * @secure
          */
@@ -1695,7 +1705,7 @@ export class Api<
          *
          * @tags SupportRequest
          * @name SupportRequestsControllerCreate
-         * @summary Creates request to support
+         * @summary Создать запрос на поддержку. Роль пользователя: Поставщик/Хорека
          * @request POST:/api/support/requests
          * @secure
          */
@@ -1718,7 +1728,7 @@ export class Api<
          *
          * @tags SupportRequest
          * @name SupportRequestsAdminControllerList
-         * @summary Admin get list of all support requests
+         * @summary Получить список всех запросов на поддержку от Поставщик/Хорека. Роль пользователя: Админ
          * @request GET:/api/support/requests
          * @secure
          */
@@ -1752,7 +1762,7 @@ export class Api<
          *
          * @tags SupportRequest
          * @name SupportRequestsControllerResolve
-         * @summary Marks request to support as resolved
+         * @summary Пометить запрос на поддержку как выполненный. Роль пользователя: Поставщик/Хорека
          * @request POST:/api/support/requests/{id}/resolve
          * @secure
          */
@@ -1773,7 +1783,7 @@ export class Api<
          *
          * @tags SupportRequest
          * @name SupportRequestsControllerList
-         * @summary List of users's support requests
+         * @summary Получить список запросов на поддержку. Роль пользователя: Поставщик/Хорека
          * @request GET:/api/support/requests/mine
          * @secure
          */
@@ -1807,7 +1817,7 @@ export class Api<
          *
          * @tags SupportRequest
          * @name SupportRequestsAdminControllerAssignAdmin
-         * @summary Admin assigns himself to customer support request
+         * @summary Назначить админа на запрос на поддержку от Поставщик/Хорека. Роль пользователя: Админ
          * @request POST:/api/support/requests/{id}/assign
          * @secure
          */
@@ -1828,7 +1838,7 @@ export class Api<
          *
          * @tags ProviderRequests
          * @name ProviderRequestsControllerIncomeHorecaRequests
-         * @summary List of HoReCa proposals that matches with provider's offers
+         * @summary Список запросов хореки, соответствующих выбранным категориям профиля поставщика. Роль пользователя: Поставщик
          * @request GET:/api/provider/requests/income
          * @secure
          */
@@ -1837,7 +1847,7 @@ export class Api<
                 offset?: number
                 limit?: number
                 search?: ProviderHorecaRequestSearchDto
-                /** fieldName(numeric)|ASC/DESC */
+                /** createdAt/cover|ASC/DESC */
                 sort?: string
             },
             params: RequestParams = {}
@@ -1862,7 +1872,7 @@ export class Api<
          *
          * @tags ProviderRequests
          * @name ProviderRequestsControllerSetStatusForIncomeHorecaRequest
-         * @summary Hide or view income request
+         * @summary Пометить запрос хореки как просмотренный или не интересующий пользователя. Роль пользователя: Поставщик
          * @request POST:/api/provider/requests/income/status
          * @secure
          */
@@ -1885,7 +1895,7 @@ export class Api<
          *
          * @tags ProviderRequests
          * @name ProviderRequestsControllerCreate
-         * @summary Create provider request on horeca's one
+         * @summary Создать запрос на запрос хореки. Роль пользователя: Поставщик
          * @request POST:/api/provider/requests
          * @secure
          */
@@ -1908,7 +1918,7 @@ export class Api<
          *
          * @tags ProviderRequests
          * @name ProviderRequestsControllerFindAll
-         * @summary Get all provider requests
+         * @summary Получить все запросы поставщика. Роль пользователя: Поставщик
          * @request GET:/api/provider/requests
          * @secure
          */
@@ -1942,7 +1952,7 @@ export class Api<
          *
          * @tags ProviderRequests
          * @name ProviderRequestsControllerGet
-         * @summary Get provider request
+         * @summary Получить запрос поставщика по id. Роль пользователя: Поставщик
          * @request GET:/api/provider/requests/{id}
          * @secure
          */
@@ -1963,7 +1973,7 @@ export class Api<
          *
          * @tags ProviderRequests
          * @name ProviderRequestsControllerCancel
-         * @summary Cancel request
+         * @summary Отменить запрос поставщика. Роль пользователя: Поставщик
          * @request PUT:/api/provider/requests/{id}
          * @secure
          */
@@ -1987,7 +1997,7 @@ export class Api<
          *
          * @tags Products
          * @name ProductsControllerCreate
-         * @summary Create product from provider's offer
+         * @summary Создать продукт. Роль пользователя: Поставщик
          * @request POST:/api/products/provider
          * @secure
          */
@@ -2010,7 +2020,7 @@ export class Api<
          *
          * @tags Products
          * @name ProductsControllerFindAll
-         * @summary Gat all products from provider's offer
+         * @summary Получить все продукты. Роль пользователя: Поставщик
          * @request GET:/api/products/provider
          * @secure
          */
@@ -2044,7 +2054,7 @@ export class Api<
          *
          * @tags Products
          * @name ProductsControllerGet
-         * @summary Get the specific product
+         * @summary Получить продукт по id. Роль пользователя: Поставщик
          * @request GET:/api/products/provider/{id}
          * @secure
          */
@@ -2062,7 +2072,7 @@ export class Api<
          *
          * @tags Products
          * @name ProductsControllerUpdate
-         * @summary Update the specific product
+         * @summary Обновить продукт. Роль пользователя: Поставщик
          * @request PUT:/api/products/provider/{id}
          * @secure
          */
@@ -2086,7 +2096,7 @@ export class Api<
          *
          * @tags Products
          * @name ProductsControllerDelete
-         * @summary Delete the specific product
+         * @summary Удалить продукт. Роль пользователя: Поставщик
          * @request DELETE:/api/products/provider/{id}
          * @secure
          */
@@ -2103,7 +2113,7 @@ export class Api<
          *
          * @tags Reviews
          * @name ReviewsControllerCreate
-         * @summary Create review on succesfully finished provider request
+         * @summary Создать отзыв на успешно завершенную сделку с поставщиком. Роль пользователя: Хорека
          * @request POST:/api/reviews/horeca
          * @secure
          */
@@ -2126,7 +2136,7 @@ export class Api<
          *
          * @tags HorecaPrivateRequests
          * @name HorecaPrivateRequestsControllerCreatePrivate
-         * @summary Create products(categories) set proposal needed for HoReCa and send to the favourite provider
+         * @summary Создать список необходимых продуктов(категорий), чтобы отправить поставщику, добавленному в фавориты. Роль пользователя: Хорека
          * @request POST:/api/horeca/requests/private
          * @secure
          */
