@@ -3,11 +3,9 @@
 import { useState } from 'react'
 
 import { providerRequest } from '@/entities/provider-request'
-import { handleApplicationsDetailsModals } from '@/views/applications/ui/applicationsDetailsModal'
 import {
     Flex,
     Text,
-    Paper,
     Box,
     Divider,
     SegmentedControl,
@@ -15,20 +13,16 @@ import {
     Card,
     Badge,
     Button,
+    Tooltip,
 } from '@mantine/core'
 import { IconMessage } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 
 import { CategoryLabels } from '@/shared/constants'
 import { applications } from '@/shared/constants/applications'
-import { PaymentMethod } from '@/shared/constants/paymentMethod'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 import {
     Categories,
-    HorecaRequestDto,
-    HorecaRequestSearchDto,
-    HorecaRequestStatus,
-    ProviderRequestDto,
     ProviderRequestSearchDto,
     ProviderRequestStatus,
 } from '@/shared/lib/horekaApi/Api'
@@ -80,7 +74,27 @@ export function ProviderRequests() {
                     onChange={handleTabChange}
                     value={activeTab}
                     color='indigo.4'
-                    data={['В работе', 'Ожидают откликов', 'Завершённые']}
+                    data={[
+                        {
+                            value: 'В работе',
+                            label: 'В работе',
+                        },
+                        {
+                            value: 'Ожидание',
+                            label: (
+                                <Tooltip
+                                    withArrow
+                                    label='Вы откликнулись на эти заявки. Ждем выбора покупателя'
+                                >
+                                    <div>Ожидание</div>
+                                </Tooltip>
+                            ),
+                        },
+                        {
+                            value: 'Завершённые',
+                            label: 'Завершённые',
+                        },
+                    ]}
                     orientation={isMobile ? 'vertical' : 'horizontal'}
                 />
             </Flex>
