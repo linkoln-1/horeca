@@ -1871,6 +1871,27 @@ export class Api<
          * No description
          *
          * @tags ProviderRequests
+         * @name ProviderRequestsControllerGetIncomeHorecaRequest
+         * @summary Конкретный запрос хореки, соответствующий выбранным категориям профиля поставщика. Роль пользователя: Поставщик
+         * @request GET:/api/provider/requests/income/{id}
+         * @secure
+         */
+        providerRequestsControllerGetIncomeHorecaRequest: (
+            id: number,
+            params: RequestParams = {}
+        ) =>
+            this.request<HorecaRequestDto, ErrorDto>({
+                path: `/api/provider/requests/income/${id}`,
+                method: 'GET',
+                secure: true,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ProviderRequests
          * @name ProviderRequestsControllerSetStatusForIncomeHorecaRequest
          * @summary Пометить запрос хореки как просмотренный или не интересующий пользователя. Роль пользователя: Поставщик
          * @request POST:/api/provider/requests/income/status
