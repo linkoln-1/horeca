@@ -29,6 +29,13 @@ export function useProviderRequestIncomeQuery(params: GetProviderRequestIncomeQu
     })
 }
 
+export function useProviderRequestGetIncomeByID(id: number) {
+    return useCustomQuery({
+        queryKey: ['request', id],
+        queryFn: () => api.providerRequestsControllerGetIncomeHorecaRequest(id),
+    })
+}
+
 export function useProviderRequestGetStatusMutation() {
     return useMutation({
         mutationFn: (data: HorecaRequestProviderStatusDto) =>
