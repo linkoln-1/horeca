@@ -43,7 +43,7 @@ type initialMessage = {
     updatedAt: string
 }
 
-export function AdminViews() {
+export function SupportView() {
     const [message, setMessage] = useState<string>('')
     const [isOverlayVisible, setOverlayVisible] = useState<boolean>(false)
     const [chatId, setChatId] = useState<number>(0)

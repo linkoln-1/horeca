@@ -11,7 +11,10 @@ export function Cards() {
     const [hovered2, setHovered2] = useState(false)
 
     return (
-        <div id='clients' className='flex px-[20px] flex-col gap-y-3 py-10 xl:pt-[100px] xl:pb-[180px] lg:flex-row justify-center items-center lg:items-stretch lg:gap-x-4 xl:px-[84px]'>
+        <div
+            id='clients'
+            className='flex px-[20px] flex-col gap-y-3 py-10 xl:pt-[100px] xl:pb-[180px] lg:flex-row justify-center items-center lg:items-stretch lg:gap-x-4 xl:px-[84px]'
+        >
             <Card
                 shadow='sm'
                 padding='lg'

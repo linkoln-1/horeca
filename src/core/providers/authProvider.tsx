@@ -47,12 +47,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 router.replace('/user')
             }
 
-            if (decode?.role === roles[2].role) {
-                router.replace('/user/admin')
-                setIsLoading(false)
-                return
-            }
-
             try {
                 const response = await refetchUser()
 

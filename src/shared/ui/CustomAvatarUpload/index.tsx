@@ -3,10 +3,12 @@ import { ChangeEvent, useRef } from 'react'
 import { Avatar, AvatarProps } from '@mantine/core'
 
 type CustomAvatarUploadProps = {
+    editable?: boolean
     onChange: (payload: File) => void
 } & AvatarProps
 
 export function CustomAvatarUpload({
+    editable = false,
     onChange,
     ...props
 }: CustomAvatarUploadProps) {
@@ -17,6 +19,9 @@ export function CustomAvatarUpload({
     }
 
     const onClick = () => {
+        if (!editable) {
+            return
+        }
         inputRef.current?.click()
     }
 
@@ -30,6 +35,7 @@ export function CustomAvatarUpload({
                 accept='image/*'
             />
             <Avatar
+                style={{ cursor: editable ? 'pointer' : 'default' }}
                 {...props}
                 onClick={onClick}
                 // c='var(--mantine-color-indigo-0)'

@@ -4,6 +4,8 @@ import { userStore } from '@/entities/user/user.model'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { api } from '@/shared/lib/horekaApi'
+import { UsersPaginatedQuery } from '@/shared/lib/horekaApi/types'
+import { useCustomInfiniteQuery } from '@/shared/lib/reactQuery/useCustomInfiniteQuery'
 import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
 
 export function useRegisterUserMutation() {
@@ -45,6 +47,17 @@ export function useGetMeQuery(enabled = true || undefined) {
             return result
         },
         enabled,
+    })
+}
+
+export function useGetUsersInfiniteQuery(query: UsersPaginatedQuery) {
+    return useCustomInfiniteQuery({
+        queryKey: ['users', query],
+        queryFn: ({ pageParam }) =>
+            api.usersAdminControllerGet({
+                ...query,
+                offset: pageParam,
+            }),
     })
 }
 
