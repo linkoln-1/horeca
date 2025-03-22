@@ -34,6 +34,7 @@ export function UsersView() {
     } = userQueries.useGetUsersInfiniteQuery({
         limit: limit,
         search: { role: activeTab as UserRole },
+        sort: 'id|DESC'
     })
 
     if (!users) return <Loader />
@@ -78,8 +79,10 @@ export function UsersView() {
                             <Table w='100%' h='100%'>
                                 <Table.Thead>
                                     <Table.Tr>
+                                        <Table.Th>№</Table.Th>
                                         <Table.Th>Имя</Table.Th>
                                         <Table.Th>Роль</Table.Th>
+                                        {activeTab != UserRole.Admin && <Table.Th>ИНН</Table.Th>}
                                         <Table.Th>Email</Table.Th>
                                         <Table.Th>Телефон</Table.Th>
                                         {activeTab == ProfileType.Horeca && <Table.Th>Адреса</Table.Th>}
@@ -89,8 +92,10 @@ export function UsersView() {
                                 <Table.Tbody>
                                     {users.map(element => (
                                         <Table.Tr key={element.id}>
-                                            <Table.Td>{element.name}</Table.Td>
+                                            <Table.Td>{element.id}</Table.Td>
+                                            <Table.Td><Text truncate="end">{element.name}</Text></Table.Td>
                                             <Table.Td>{element.role}</Table.Td>
+                                            {activeTab != UserRole.Admin && <Table.Td>{element.tin}</Table.Td>}
                                             <Table.Td>{element.email}</Table.Td>
                                             <Table.Td>{element.phone}</Table.Td>
 
