@@ -34,7 +34,7 @@ export function UsersView() {
     } = userQueries.useGetUsersInfiniteQuery({
         limit: limit,
         search: { role: activeTab as UserRole },
-        sort: 'id|DESC'
+        sort: 'id|DESC',
     })
 
     if (!users) return <Loader />
@@ -82,43 +82,67 @@ export function UsersView() {
                                         <Table.Th>№</Table.Th>
                                         <Table.Th>Имя</Table.Th>
                                         <Table.Th>Роль</Table.Th>
-                                        {activeTab != UserRole.Admin && <Table.Th>ИНН</Table.Th>}
+                                        {activeTab != UserRole.Admin && (
+                                            <Table.Th>ИНН</Table.Th>
+                                        )}
                                         <Table.Th>Email</Table.Th>
                                         <Table.Th>Телефон</Table.Th>
-                                        {activeTab == ProfileType.Horeca && <Table.Th>Адреса</Table.Th>}
-                                        {activeTab == ProfileType.Provider && <Table.Th>Категории</Table.Th>}
+                                        {activeTab == ProfileType.Horeca && (
+                                            <Table.Th>Адреса</Table.Th>
+                                        )}
+                                        {activeTab == ProfileType.Provider && (
+                                            <Table.Th>Категории</Table.Th>
+                                        )}
                                     </Table.Tr>
                                 </Table.Thead>
                                 <Table.Tbody>
                                     {users.map(element => (
                                         <Table.Tr key={element.id}>
                                             <Table.Td>{element.id}</Table.Td>
-                                            <Table.Td><Text truncate="end">{element.name}</Text></Table.Td>
+                                            <Table.Td>
+                                                <Text truncate='end'>
+                                                    {element.name}
+                                                </Text>
+                                            </Table.Td>
                                             <Table.Td>{element.role}</Table.Td>
-                                            {activeTab != UserRole.Admin && <Table.Td>{element.tin}</Table.Td>}
+                                            {activeTab != UserRole.Admin && (
+                                                <Table.Td>
+                                                    {element.tin}
+                                                </Table.Td>
+                                            )}
                                             <Table.Td>{element.email}</Table.Td>
                                             <Table.Td>{element.phone}</Table.Td>
 
-                                            {activeTab == ProfileType.Horeca && <Table.Td>
-                                                {(
-                                                    element.profile
-                                                        ?.addresses || []
-                                                ).map((a: any) => a.address).join(', ')}
-                                            </Table.Td>}
-                                            {activeTab == ProfileType.Provider && <Table.Td>
-                                                {(
-                                                    element.profile
-                                                        ?.categories || []
-                                                )
-                                                    .map(
-                                                        cat =>
-                                                            CategoryLabels[
-                                                            cat as keyof typeof CategoryLabels
-                                                            ] || ''
+                                            {activeTab ==
+                                                ProfileType.Horeca && (
+                                                <Table.Td>
+                                                    {(
+                                                        element.profile
+                                                            ?.addresses || []
                                                     )
-                                                    .join(', ')}
-                                            </Table.Td>}
-
+                                                        .map(
+                                                            (a: any) =>
+                                                                a.address
+                                                        )
+                                                        .join(', ')}
+                                                </Table.Td>
+                                            )}
+                                            {activeTab ==
+                                                ProfileType.Provider && (
+                                                <Table.Td>
+                                                    {(
+                                                        element.profile
+                                                            ?.categories || []
+                                                    )
+                                                        .map(
+                                                            cat =>
+                                                                CategoryLabels[
+                                                                    cat as keyof typeof CategoryLabels
+                                                                ] || ''
+                                                        )
+                                                        .join(', ')}
+                                                </Table.Td>
+                                            )}
                                         </Table.Tr>
                                     ))}
                                 </Table.Tbody>

@@ -39,8 +39,7 @@ export function useLoginUserMutation() {
 export function useActivateUserMutation() {
     return useMutation({
         mutationFn: api.authorizationControllerActivateAccount,
-        onSuccess: async () => {
-        },
+        onSuccess: async () => {},
     })
 }
 

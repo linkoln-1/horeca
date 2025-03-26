@@ -69,7 +69,9 @@ export function SupplierManufacturer({
         try {
             if (currentStep === steps.length - 1) {
                 await signUpUser(form.values)
-                toast.success('Вы успешно зарегистрировались! Проверьте почту и подтвердите email по ссылке в письме.')
+                toast.success(
+                    'Вы успешно зарегистрировались! Проверьте почту и подтвердите email по ссылке в письме.'
+                )
             } else {
                 nextStep()
             }
