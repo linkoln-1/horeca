@@ -36,6 +36,14 @@ export function useLoginUserMutation() {
     })
 }
 
+export function useActivateUserMutation() {
+    return useMutation({
+        mutationFn: api.authorizationControllerActivateAccount,
+        onSuccess: async () => {
+        },
+    })
+}
+
 export function useGetMeQuery(enabled = true || undefined) {
     return useCustomQuery({
         queryKey: ['user', 'me'],
