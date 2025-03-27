@@ -26,6 +26,7 @@ import {
     ProviderRequestSearchDto,
     ProviderRequestStatus,
 } from '@/shared/lib/horekaApi/Api'
+import { handleApplicationsDetailsModals } from '../applications/ui/applicationsDetailsModal'
 
 const limit = 10
 
@@ -65,6 +66,8 @@ export function ProviderRequests() {
         setActiveTab(tab)
         setActiveStatus(statusMap[tab])
     }
+
+    console.log(requests)
 
     return (
         <Flex direction='column' gap='lg'>
@@ -136,11 +139,11 @@ export function ProviderRequests() {
                                         style={{
                                             cursor: 'pointer',
                                         }}
-                                        // onClick={() =>
-                                        //     handleApplicationsDetailsModals(
-                                        //         order
-                                        //     )
-                                        // }
+                                        onClick={() =>
+                                            handleApplicationsDetailsModals(
+                                                order.id
+                                            )
+                                        }
                                     >
                                         <Text fw={500}>
                                             № {order.id} от{' '}
@@ -217,22 +220,15 @@ export function ProviderRequests() {
                                                     maw={230}
                                                 >
                                                     <Text size='sm'>
-                                                        Название: Тут будет
-                                                        название
+                                                        Название:{' '}
+                                                        {
+                                                            order.horecaRequest
+                                                                ?.name
+                                                        }
                                                     </Text>
                                                     <Text size='sm'>
                                                         Категории:{' '}
-                                                        {/*TODO БЕЗ ПОНЯТИЯ ЧЕ ЭТО БУДУ РАЗБИАРТЬСЯ */}
-                                                        {Array.from(
-                                                            new Set(
-                                                                order.items.map(
-                                                                    item =>
-                                                                        CategoryLabels[
-                                                                            item.manufacturer as Categories
-                                                                        ]
-                                                                )
-                                                            )
-                                                        ).join(', ')}
+                                                        {order.horecaRequest?.categories}
                                                     </Text>
                                                 </Flex>
 
@@ -242,15 +238,20 @@ export function ProviderRequests() {
                                                     maw={200}
                                                 >
                                                     <Text size='sm'>
-                                                        Адрес доставки: АДРЕС
+                                                        Адрес доставки:{' '}
+                                                        {
+                                                            order.horecaRequest
+                                                                ?.address
+                                                        }
                                                     </Text>
                                                     <Text size='sm'>
                                                         Дата доставки:{' '}
-                                                        {/*{dayjs(*/}
-                                                        {/*    order.deliveryTime*/}
-                                                        {/*).format(*/}
-                                                        {/*    'YYYY-MM-DD HH:mm'*/}
-                                                        {/*)}*/}
+                                                        {dayjs(
+                                                            order.horecaRequest
+                                                                ?.deliveryTime
+                                                        ).format(
+                                                            'YYYY-MM-DD HH:mm'
+                                                        )}
                                                     </Text>
                                                 </Flex>
                                             </Flex>

@@ -13,6 +13,7 @@ import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
 interface GetProviderRequestIncomeQuery {  
     includeHiddenAndViewed?: string
     search?: ProviderHorecaRequestSearchDto 
+    sort?: string
 }
 
 interface GetRequestQueryParams {

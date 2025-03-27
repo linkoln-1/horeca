@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 
 import { role } from '@/shared/helpers/getRole'
 import { groupRequestsByDate } from '@/shared/helpers/groupRequestsByDate'
+import { useProviderRequestGetStatusMutation } from '@/entities/provider-request/request.queries'
 
 export function HiddenApplicationsViews() {
     const user = useUserStore(state => state.user)
@@ -17,16 +18,14 @@ export function HiddenApplicationsViews() {
 
     const { data: incomingRequests } =
         providerRequest.useProviderRequestIncomeQuery({
-            includeHiddenAndViewed: 'false',
+            includeHiddenAndViewed: 'true',
         })
 
     const groupedRequests =
         incomingRequests && groupRequestsByDate(incomingRequests.data || [])
-    console.log(groupedRequests)
-
-    //TODO:возврат заявки из скрытого
-    const onClickRestore = (id: number) => {
-        console.log('id - ', id)
+const { mutate: setStatus } = useProviderRequestGetStatusMutation()
+    const onClickRestore = (requestId: number) => {
+        setStatus({ horecaRequestId: requestId, hidden: false })
     }
 
     if (!user) return <Loader />
@@ -154,7 +153,7 @@ export function HiddenApplicationsViews() {
                                                         <IconRestore
                                                             onClick={() =>
                                                                 onClickRestore(
-                                                                    request.id
+                                                                    request.items[0].horecaRequestId
                                                                 )
                                                             }
                                                             className='cursor-pointer'

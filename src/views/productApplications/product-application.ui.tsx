@@ -4,14 +4,8 @@ import React from 'react'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { providerRequest } from '@/entities/provider-request'
-import {
-    Button,
-    Flex,
-    Select,
-    Text,
-    Image as MantineImage,
-    Table,
-} from '@mantine/core'
+import { useProviderRequestGetStatusMutation } from '@/entities/provider-request/request.queries'
+import { Button, Flex, Select, Text, Table } from '@mantine/core'
 import Link from 'next/link'
 
 import {
@@ -21,13 +15,38 @@ import {
 import { role } from '@/shared/helpers/getRole'
 import { groupRequestsByDate } from '@/shared/helpers/groupRequestsByDate'
 
+function getSortParam(sortValue: string): string | undefined {
+    switch (sortValue) {
+        case 'new':
+            return 'createdAt|DESC'
+        case 'old':
+            return 'createdAt|ASC'
+        case 'max-match':
+            return 'cover|DESC'
+        case 'min-match':
+            return 'cover|ASC'
+        default:
+            return undefined
+    }
+}
+
 export function ProductApplicationViews() {
     const user = useUserStore(state => state.user)
+    const [sortValue, setSortValue] = React.useState('new')
+
     const { data: incomingRequests } =
-        providerRequest.useProviderRequestIncomeQuery()
+        providerRequest.useProviderRequestIncomeQuery({
+            includeHiddenAndViewed: 'false',
+            sort: getSortParam(sortValue),
+        })
 
     const groupedRequests =
         incomingRequests && groupRequestsByDate(incomingRequests.data || [])
+    const { mutate: setStatus } = useProviderRequestGetStatusMutation()
+
+    const handleHideRequest = (requestId: number) => {
+        setStatus({ horecaRequestId: requestId, hidden: true })
+    }
 
     return (
         <Flex direction='column' gap='md'>
@@ -55,6 +74,10 @@ export function ProductApplicationViews() {
                                     label: 'По наименьшему совпадению',
                                 },
                             ]}
+                            value={sortValue}
+                            onChange={value => {
+                                if (value) setSortValue(value)
+                            }}
                             defaultValue='new'
                         />
                     </Flex>
@@ -178,7 +201,11 @@ export function ProductApplicationViews() {
                                                                 c='indigo.4'
                                                                 fw={400}
                                                                 component={Link}
-                                                                href={`/user/${role({ user })}/products/applications/${request.id}`}
+                                                                href={`/user/${role(
+                                                                    {
+                                                                        user,
+                                                                    }
+                                                                )}/products/applications/${request.id}`}
                                                             >
                                                                 Просмотреть
                                                                 заявку
@@ -187,9 +214,13 @@ export function ProductApplicationViews() {
                                                                 p={0}
                                                                 variant='transparent'
                                                                 c='gray'
-                                                                disabled
                                                                 bg='transparent'
                                                                 fw={400}
+                                                                onClick={() =>
+                                                                    handleHideRequest(
+                                                                        request.id
+                                                                    )
+                                                                }
                                                             >
                                                                 Скрыть заявку
                                                             </Button>
