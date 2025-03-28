@@ -13,6 +13,7 @@ import {
     IconTablePlus,
     IconHeart,
     IconMail,
+    IconUsers,
 } from '@tabler/icons-react'
 
 type SidebarLinkItem = {
@@ -157,5 +158,28 @@ export const providerSidebarData: SidebarItem[] = [
         subDescription: 'В разработке',
         link: '/support',
         iconRight: IconMail,
+    },
+]
+
+export const adminSidebarData: SidebarItem[] = [
+    {
+        id: 1,
+        type: 'link',
+        label: 'Служба заботы',
+        icon: IconHelpSquareRounded,
+        description: 'Запросы на поддержку!',
+        link: '/support',
+        button: 'Перейти к запросам',
+        iconRight: IconMail,
+    },
+    {
+        id: 1,
+        type: 'link',
+        label: 'Пользователи',
+        icon: IconUsers,
+        description: 'Список всех пользователей!',
+        link: '/users',
+        button: 'Перейти к списку',
+        iconRight: IconUsers,
     },
 ]

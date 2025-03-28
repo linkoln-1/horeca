@@ -31,13 +31,16 @@ export function ContactUs() {
         }
 
         try {
-            const response = await fetch('https://sphere-horeca.ru/cms/api/forms', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(body),
-            })
+            const response = await fetch(
+                'https://sphere-horeca.ru/cms/api/forms',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(body),
+                }
+            )
 
             if (!response.ok) {
                 throw new Error('Network response was not ok')

@@ -107,7 +107,9 @@ export function PublicCatering({ nextStep, currentStep }: PublicCateringProps) {
         try {
             if (currentStep === 1) {
                 await signUpUser(form.values)
-                toast.success('Вы успешно зарегистрировались!')
+                toast.success(
+                    'Вы успешно зарегистрировались! Проверьте почту и подтвердите email по ссылке в письме.'
+                )
             } else {
                 nextStep()
             }

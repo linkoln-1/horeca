@@ -3,7 +3,10 @@ import Link from 'next/link'
 
 export function Steps() {
     return (
-        <div id='steps' className='hidden lg:flex flex-col pt-[120px] xl:pt-[180px] justify-center items-center'>
+        <div
+            id='steps'
+            className='hidden lg:flex flex-col pt-[120px] xl:pt-[180px] justify-center items-center'
+        >
             <div className='w-full bg-[#FF8787] py-5 flex justify-center items-center text-white text-[22px] xl:text-[32px] font-bold'>
                 Как перестать тратить время и деньги на неэффективную закупку?
             </div>

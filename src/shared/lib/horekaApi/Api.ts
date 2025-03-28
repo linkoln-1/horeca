@@ -221,6 +221,17 @@ export interface SuccessDto {
     status: string
 }
 
+export interface PaginatedDto {
+    /** Data items */
+    data: any[]
+    /** Total number of items */
+    total: number
+}
+
+export interface UsersSearchAdminDto {
+    role?: UserRole
+}
+
 export interface HorecaRequestItemCreateDto {
     name: string
     amount: number
@@ -279,13 +290,6 @@ export interface HorecaRequestUpdateDto {
 export interface HorecaRequestTemplateUpdateDto {
     name: string
     content: HorecaRequestUpdateDto
-}
-
-export interface PaginatedDto {
-    /** Data items */
-    data: any[]
-    /** Total number of items */
-    total: number
 }
 
 export enum PaymentType {
@@ -1163,6 +1167,40 @@ export class Api<
             this.request<SuccessDto, ErrorDto>({
                 path: `/api/auth/activate/${uuid}`,
                 method: 'GET',
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Users
+         * @name UsersAdminControllerGet
+         * @summary Получить список пользователей. Роль пользователя: Админ
+         * @request GET:/api/admin/users
+         * @secure
+         */
+        usersAdminControllerGet: (
+            query?: {
+                offset?: number
+                limit?: number
+                search?: UsersSearchAdminDto
+                /** fieldName(numeric)|ASC/DESC */
+                sort?: string
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<
+                {
+                    data: UserDto[]
+                    total: number
+                },
+                ErrorDto
+            >({
+                path: `/api/admin/users`,
+                method: 'GET',
+                query: query,
+                secure: true,
                 format: 'json',
                 ...params,
             }),
