@@ -265,7 +265,7 @@ export function ProviderRequests() {
                                                     {
                                                         e.preventDefault()
                                                         handleDetailsModal(
-                                                            order.id
+                                                            order.horecaRequestId
                                                         )
                                                     }
                                                 }}
