@@ -103,7 +103,6 @@ export function EditViews() {
 
                 <PasswordInput
                     label='Текущий пароль:'
-                    placeholder='XXX_xx123'
                     className='w-full'
                     leftSection={<IconLock />}
                     {...form.getInputProps('password')}
@@ -111,7 +110,6 @@ export function EditViews() {
 
                 <PasswordInput
                     label='Повторите пароль:'
-                    placeholder='XXX_xx123'
                     className='w-full'
                     leftSection={<IconLock />}
                     {...form.getInputProps('repeatPassword')}
