@@ -24,6 +24,7 @@ import {
     ProviderRequestSearchDto,
     ProviderRequestStatus,
 } from '@/shared/lib/horekaApi/Api'
+import { handleDetailsModal } from './detailsModal/detailsModal.ui'
 
 const limit = 10
 
