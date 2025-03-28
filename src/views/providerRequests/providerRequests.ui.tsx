@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { handleDetailsModal } from './detailsModal/detailsModal.ui'
 import { providerRequest } from '@/entities/provider-request'
 import {
     Flex,
@@ -18,15 +19,12 @@ import {
 import { IconMessage } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 
-import { CategoryLabels } from '@/shared/constants'
 import { applications } from '@/shared/constants/applications'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 import {
-    Categories,
     ProviderRequestSearchDto,
     ProviderRequestStatus,
 } from '@/shared/lib/horekaApi/Api'
-import { handleApplicationsDetailsModals } from '../applications/ui/applicationsDetailsModal'
 
 const limit = 10
 
@@ -66,8 +64,6 @@ export function ProviderRequests() {
         setActiveTab(tab)
         setActiveStatus(statusMap[tab])
     }
-
-    console.log(requests)
 
     return (
         <Flex direction='column' gap='lg'>
@@ -136,14 +132,6 @@ export function ProviderRequests() {
                                         padding='lg'
                                         radius='lg'
                                         withBorder
-                                        style={{
-                                            cursor: 'pointer',
-                                        }}
-                                        onClick={() =>
-                                            handleApplicationsDetailsModals(
-                                                order.id
-                                            )
-                                        }
                                     >
                                         <Text fw={500}>
                                             № {order.id} от{' '}
@@ -228,7 +216,10 @@ export function ProviderRequests() {
                                                     </Text>
                                                     <Text size='sm'>
                                                         Категории:{' '}
-                                                        {order.horecaRequest?.categories}
+                                                        {
+                                                            order.horecaRequest
+                                                                ?.categories
+                                                        }
                                                     </Text>
                                                 </Flex>
 
@@ -256,6 +247,23 @@ export function ProviderRequests() {
                                                 </Flex>
                                             </Flex>
                                         </Flex>
+                                        <Box>
+                                            <Button
+                                                bg='transparent'
+                                                c='indigo.4'
+                                                onClick={e => {
+                                                    {
+                                                        e.preventDefault()
+                                                        handleDetailsModal(
+                                                            order.id
+                                                        )
+                                                    }
+                                                }}
+                                                p={0}
+                                            >
+                                                Посмотреть заявку
+                                            </Button>
+                                        </Box>
                                     </Card>
                                 </Grid.Col>
                             ))}
