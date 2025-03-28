@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { handleApplicationsDetailsModals } from '../applications/ui/applicationsDetailsModal'
 import { providerRequest } from '@/entities/provider-request'
 import {
     Flex,
@@ -26,7 +27,6 @@ import {
     ProviderRequestSearchDto,
     ProviderRequestStatus,
 } from '@/shared/lib/horekaApi/Api'
-import { handleApplicationsDetailsModals } from '../applications/ui/applicationsDetailsModal'
 
 const limit = 10
 
@@ -66,8 +66,6 @@ export function ProviderRequests() {
         setActiveTab(tab)
         setActiveStatus(statusMap[tab])
     }
-
-    console.log(requests)
 
     return (
         <Flex direction='column' gap='lg'>
@@ -194,7 +192,17 @@ export function ProviderRequests() {
                                             </Flex>
 
                                             <Box>
-                                                <IconMessage size={30} />
+                                                <IconMessage
+                                                    size={30}
+                                                    color={
+                                                        (
+                                                            order.status as unknown as ProviderRequestStatus
+                                                        ).toLowerCase() ===
+                                                        'Pending'
+                                                            ? 'gray'
+                                                            : 'black'
+                                                    }
+                                                />
                                             </Box>
                                         </Flex>
                                         <Divider
@@ -228,7 +236,10 @@ export function ProviderRequests() {
                                                     </Text>
                                                     <Text size='sm'>
                                                         Категории:{' '}
-                                                        {order.horecaRequest?.categories}
+                                                        {
+                                                            order.horecaRequest
+                                                                ?.categories
+                                                        }
                                                     </Text>
                                                 </Flex>
 
