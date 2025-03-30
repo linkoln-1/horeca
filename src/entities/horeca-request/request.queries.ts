@@ -17,7 +17,7 @@ interface GetRequestQueryParams {
 
 export function useGetRequestQuery(params: GetRequestQueryParams) {
     return useCustomInfiniteQuery({
-        queryKey: ['horeca-request', params],
+        queryKey: ['horeca-request', params.search?.status],
         queryFn: () => api.horecaRequestsControllerFindAll(params),
     })
 }
@@ -38,7 +38,7 @@ export function useCreateRequestMutation() {
 
         onSuccess: async ({ data }) => {
             await queryClient.invalidateQueries({
-                queryKey: ['horeca-request, horeca'],
+                queryKey: ['horeca-request'],
             })
         },
     })
