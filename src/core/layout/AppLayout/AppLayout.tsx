@@ -1,9 +1,10 @@
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useEffect } from 'react'
 
 import { Footer } from '@/core/layout/AppLayout/Footer'
 import { Header } from '@/core/layout/AppLayout/Header'
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { imageQueries } from '@/entities/uploads'
+import { userQueries } from '@/entities/user'
 import {
     Box,
     Container,
@@ -27,34 +28,33 @@ import {
 import { getImageUrl } from '@/shared/helpers'
 import { role } from '@/shared/helpers/getRole'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
-import { ProfileType } from '@/shared/lib/horekaApi/Api'
+import {
+    ProfileType,
+    UpdateUserDto,
+    UploadDto,
+} from '@/shared/lib/horekaApi/Api'
 import { CustomAvatarUpload } from '@/shared/ui/CustomAvatarUpload'
 
 type AppLayoutProps = {
     children: ReactNode
 }
 
-type Image = {
-    url: string
-}
-
-type profileProps = {
-    avatar?: Image
-}
-
-type DecodeType = {
-    role: string
-}
-
 export function AppLayout({ children }: AppLayoutProps) {
-    const form = useForm<profileProps>({
-        initialValues: {},
+    const form = useForm<UpdateUserDto | UploadDto>({
+        initialValues: {
+            avatar: 0,
+        },
     })
+
     const isMobile = useBreakpoint('xl')
     const path = usePathname()
 
-    const { user, accessToken } = useUserStore(state => state)
+    const { user, accessToken, updateUser } = useUserStore(state => state)
+    const { data } = userQueries.useGetMeQuery()
+
     const { mutateAsync: uploadImage } = imageQueries.useImageUploadMutation()
+    const { mutateAsync: updateUserAvatar, isPending } =
+        userQueries.useUpdateUserMutation()
 
     const decode: any = accessToken && jwtDecode(accessToken)
 
@@ -65,13 +65,29 @@ export function AppLayout({ children }: AppLayoutProps) {
               ? horecaSidebarData
               : adminSidebarData
 
-    const handleAvatarChange = async (payload: File | null) => {
+    const handleAvatarChange = (payload: File | null) => {
         if (payload) {
-            await uploadImage({
-                file: payload,
-            })
+            try {
+                uploadImage({
+                    file: payload,
+                }).then(x => {
+                    updateUserAvatar({
+                        avatar: x.id,
+                    })
+                })
+            } catch (e) {
+                console.log(e)
+            }
         }
     }
+
+    console.log(data)
+
+    // useEffect(() => {
+    //     if (data) {
+    //
+    //     }
+    // }, [data])
 
     return (
         <Container className='min-h-screen flex flex-col justify-between' fluid>
@@ -106,13 +122,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                                         onChange={(payload: File | null) => {
                                             handleAvatarChange(payload)
                                         }}
-                                        src={
-                                            form.values.avatar
-                                                ? getImageUrl(
-                                                      form.values.avatar.url
-                                                  )
-                                                : undefined
-                                        }
+                                        src={undefined}
                                         size='100%'
                                         color='blue'
                                         className='aspect-square cursor-pointer'
