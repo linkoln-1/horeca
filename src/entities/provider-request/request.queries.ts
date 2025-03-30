@@ -53,7 +53,7 @@ export function useProviderRequestMutation() {
 
 export function useGetAllProviderRequestQuery(params: GetRequestQueryParams) {
     return useCustomInfiniteQuery({
-        queryKey: ['request', params],
+        queryKey: ['request', params, params.search?.status],
         queryFn: () => api.providerRequestsControllerFindAll(params),
     })
 }

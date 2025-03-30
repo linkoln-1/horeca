@@ -21,7 +21,6 @@ import dayjs from 'dayjs'
 import { applications } from '@/shared/constants/applications'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 import {
-    ProviderRequestSearchDto,
     ProviderRequestStatus,
 } from '@/shared/lib/horekaApi/Api'
 import { handleDetailsModal } from './detailsModal/detailsModal.ui'
@@ -55,9 +54,9 @@ export function ProviderRequests() {
         isFetching,
     } = providerRequest.useGetAllProviderRequestQuery({
         limit: limit,
-        search: JSON.stringify({
-            status: activeStatus,
-        }) as unknown as ProviderRequestSearchDto,
+        search: {
+            status: activeStatus
+        },
     })
 
     const handleTabChange = (tab: string) => {
