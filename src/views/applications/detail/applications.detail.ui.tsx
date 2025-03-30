@@ -30,26 +30,7 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
     const [opened, setOpened] = useState<number | null>(null)
 
     const { data, isLoading } = requestQueries.useGetRequestByIdQuery(+id)
-
-    // const orders = [
-    //     {
-    //         id: 1,
-    //         title: 'Шаблон №1',
-    //         created: '11.12.2024',
-    //         products: [
-    //             {
-    //                 id: 1,
-    //                 category: 'Безалкогольные напитки, вода, соки',
-    //                 items: ['Вода Эвиан', 'Сок Рич', 'Смузи'],
-    //             },
-    //             {
-    //                 id: 2,
-    //                 category: 'Безалкогольные напитки, вода, соки',
-    //                 items: ['Вода Эвиан', 'Сок Рич', 'Смузи'],
-    //             },
-    //         ],
-    //     },
-    // ]
+    console.log(data)
 
     if (isLoading) return <Loader />
 
@@ -161,10 +142,11 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
 
             <Flex direction='column'>
                 <Title mb='md' order={4} c='pink.7'>
-                    Вы получили 3 отлика на заявку:{' '}
+                    Вы получили {data?.providerRequests.length} отклика на
+                    заявку:{' '}
                 </Title>
 
-                {applicationResponse.map((response, index) => {
+                {data?.providerRequests.map((response, index) => {
                     return (
                         <Paper
                             mb='lg'
@@ -178,9 +160,9 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                 <Box miw={200}>
                                     <Flex
                                         c={
-                                            response.accordance > 80
+                                            response.cover > 80
                                                 ? 'green'
-                                                : response.accordance > 40
+                                                : response.cover > 40
                                                   ? 'yellow'
                                                   : 'red'
                                         }
@@ -190,26 +172,30 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                     >
                                         <IconProgress />
                                         <Text size='lg'>
-                                            {response.accordance}% совпадения
+                                            {response.cover}% совпадения
                                         </Text>
                                     </Flex>
                                     <Divider />
                                     <Box p='lg'>
                                         <Text fw='500' mb='sm' size='lg'>
-                                            Предложение №2323412
+                                            Предложение №{response.id}
                                         </Text>
 
                                         <Box mb='sm'>
                                             <Text c='gray.5'>
                                                 Дата отклика:
                                             </Text>
-                                            <Text c='gray.5'>11.12.2024</Text>
+                                            <Text c='gray.5'>
+                                                {response.createdAt}
+                                            </Text>
                                         </Box>
                                         <Box>
                                             <Text c='gray.5'>
                                                 Время отклика:
                                             </Text>
-                                            <Text c='gray.5'>17:05</Text>
+                                            <Text c='gray.5'>
+                                                {response.createdAt}
+                                            </Text>
                                         </Box>
                                     </Box>
                                 </Box>
@@ -238,23 +224,19 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                     </Flex>
                                     <Text
                                         mb='sm'
-                                        c={
-                                            response.inStock
-                                                ? 'indigo'
-                                                : 'pink.7'
-                                        }
+                                        c={response ? 'indigo' : 'pink.7'}
                                     >
-                                        {response.inStock
+                                        {response
                                             ? 'Есть в наличии'
                                             : 'Нет в наличии'}
                                     </Text>
-                                    {response.products?.map((product: any) => {
+                                    {response.items?.map(product => {
                                         return (
                                             <>
                                                 <Box
                                                     key={product.id}
                                                     onClick={e =>
-                                                        handleOpenOfferModal(e)
+                                                        handleOpenOfferModal(e, response.id)
                                                     }
                                                 >
                                                     <Box mb='sm'>
@@ -266,131 +248,129 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                                             Категории товаров:
                                                         </Text>
                                                         <Text component='span'>
-                                                            {product.category}
+                                                            {
+                                                                CategoryLabels[
+                                                                    // @ts-ignore
+                                                                    data.categories as Categories
+                                                                ]
+                                                            }
                                                         </Text>
                                                     </Box>
-                                                    {product.items?.map(
-                                                        (item: any) => {
-                                                            return (
-                                                                <>
-                                                                    <Box
-                                                                        key={
-                                                                            item.id
-                                                                        }
-                                                                    >
-                                                                        <Box mb='sm'>
-                                                                            <Text
-                                                                                c='gray.5'
-                                                                                mr='xs'
-                                                                                fw='500'
-                                                                                component='span'
-                                                                            >
-                                                                                Наименование:
-                                                                            </Text>
-                                                                            <Text component='span'>
-                                                                                {
-                                                                                    item.name
-                                                                                }
-                                                                            </Text>
-                                                                        </Box>
 
-                                                                        <Box mb='sm'>
-                                                                            <Text
-                                                                                c='gray.5'
-                                                                                mr='xs'
-                                                                                fw='500'
-                                                                                component='span'
-                                                                            >
-                                                                                Цена
-                                                                                за
-                                                                                30
-                                                                                литров:
-                                                                            </Text>
-                                                                            <Text component='span'>
-                                                                                {
-                                                                                    item.price
-                                                                                }
-                                                                            </Text>
-                                                                        </Box>
+                                                    <Box key={product.id}>
+                                                        <Box mb='sm'>
+                                                            <Text
+                                                                c='gray.5'
+                                                                mr='xs'
+                                                                fw='500'
+                                                                component='span'
+                                                            >
+                                                                Наименование:
+                                                            </Text>
+                                                            <Text component='span'>
+                                                                {data.items
+                                                                    .map(
+                                                                        item =>
+                                                                            item.name
+                                                                    )
+                                                                    .join(', ')}
+                                                            </Text>
+                                                        </Box>
 
-                                                                        <Box mb='sm'>
-                                                                            <Text
-                                                                                c='gray.5'
-                                                                                mr='xs'
-                                                                                fw='500'
-                                                                                component='span'
-                                                                            >
-                                                                                Производитель:
-                                                                            </Text>
-                                                                            <Text component='span'>
-                                                                                {
-                                                                                    item.manufacturer
+                                                        <Box mb='sm'>
+                                                            <Text
+                                                                c='gray.5'
+                                                                mr='xs'
+                                                                fw='500'
+                                                                component='span'
+                                                            >
+                                                                Цена:
+                                                            </Text>
+                                                            <Text component='span'>
+                                                                {response.items
+                                                                    .map(item =>
+                                                                        String(
+                                                                            item.cost
+                                                                        )
+                                                                    )
+                                                                    .join(', ')}
+                                                            </Text>
+                                                        </Box>
+
+                                                        <Box mb='sm'>
+                                                            <Text
+                                                                c='gray.5'
+                                                                mr='xs'
+                                                                fw='500'
+                                                                component='span'
+                                                            >
+                                                                Производитель:
+                                                            </Text>
+                                                            <Text component='span'>
+                                                                {
+                                                                    product.manufacturer
+                                                                }
+                                                            </Text>
+                                                        </Box>
+                                                        <Box mb='sm'>
+                                                            <Text
+                                                                c='gray.5'
+                                                                mr='xs'
+                                                                mb='sm'
+                                                                fw='500'
+                                                            >
+                                                                Фотографии:
+                                                            </Text>
+                                                            <Flex
+                                                                mah='100%'
+                                                                gap='sm'
+                                                                style={{
+                                                                    overflowX:
+                                                                        'auto',
+                                                                }}
+                                                            >
+                                                                {data.images?.map(
+                                                                    (
+                                                                        image,
+                                                                        index
+                                                                    ) => {
+                                                                        return (
+                                                                            <Box
+                                                                                key={
+                                                                                    index
                                                                                 }
-                                                                            </Text>
-                                                                        </Box>
-                                                                        <Box mb='sm'>
-                                                                            <Text
-                                                                                c='gray.5'
-                                                                                mr='xs'
-                                                                                mb='sm'
-                                                                                fw='500'
-                                                                            >
-                                                                                Фотографии:
-                                                                            </Text>
-                                                                            <Flex
-                                                                                mah='100%'
-                                                                                gap='sm'
+                                                                                pos='relative'
                                                                                 style={{
-                                                                                    overflowX:
-                                                                                        'auto',
+                                                                                    cursor: 'pointer',
                                                                                 }}
                                                                             >
-                                                                                {item.images?.map(
-                                                                                    (
-                                                                                        image: string,
-                                                                                        index: number
-                                                                                    ) => {
-                                                                                        return (
-                                                                                            <Box
-                                                                                                key={
-                                                                                                    index
-                                                                                                }
-                                                                                                pos='relative'
-                                                                                                style={{
-                                                                                                    cursor: 'pointer',
-                                                                                                }}
-                                                                                            >
-                                                                                                <MantineImage
-                                                                                                    w='110px'
-                                                                                                    h='80px'
-                                                                                                    fit='cover'
-                                                                                                    src={
-                                                                                                        image
-                                                                                                    }
-                                                                                                />
-                                                                                                <IconZoomIn
-                                                                                                    style={{
-                                                                                                        position:
-                                                                                                            'absolute',
-                                                                                                        top: 5,
-                                                                                                        right: 5,
-                                                                                                    }}
-                                                                                                    color='#fff'
-                                                                                                    stroke='2'
-                                                                                                />
-                                                                                            </Box>
-                                                                                        )
+                                                                                <MantineImage
+                                                                                    w='110px'
+                                                                                    h='80px'
+                                                                                    fit='cover'
+                                                                                    src={
+                                                                                        image
                                                                                     }
-                                                                                )}
-                                                                            </Flex>
-                                                                        </Box>
-                                                                    </Box>
-                                                                </>
-                                                            )
-                                                        }
-                                                    )}
+                                                                                />
+                                                                                <IconZoomIn
+                                                                                    style={{
+                                                                                        position:
+                                                                                            'absolute',
+                                                                                        top: 5,
+                                                                                        right: 5,
+                                                                                    }}
+                                                                                    color='#fff'
+                                                                                    stroke='2'
+                                                                                />
+                                                                            </Box>
+                                                                        )
+                                                                    }
+                                                                )}
+                                                            </Flex>
+                                                        </Box>
+                                                    </Box>
                                                 </Box>
-                                                {product.comment && (
+                                                {data.comment && (
                                                     <Box mb='sm'>
                                                         <Text
                                                             c='gray.5'
@@ -401,16 +381,16 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                                             Комментарий:
                                                         </Text>
                                                         <Text component='span'>
-                                                            {product.comment}
+                                                            {data.comment}
                                                         </Text>
                                                     </Box>
                                                 )}
-                                                <Divider my='lg' />
+                                                <Divider my='md' />
                                             </>
                                         )
                                     })}
                                     <Flex
-                                        top='356px'
+                                        top='376px'
                                         right='20px'
                                         pos={
                                             opened !== index
@@ -474,11 +454,11 @@ function handleFinishApplicationModal() {
 //     })
 // }
 
-function handleOpenOfferModal(e: React.MouseEvent<HTMLDivElement>) {
+function handleOpenOfferModal(e: React.MouseEvent<HTMLDivElement>, title: number) {
     e.stopPropagation()
     modals.open({
         modalId: 'openOfferModal',
-        title: 'Предложение № 89777',
+        title: `Предложение №${title}`,
         size: '900px',
         centered: true,
         radius: 'lg',

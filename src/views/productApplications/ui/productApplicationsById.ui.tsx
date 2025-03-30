@@ -104,7 +104,7 @@ export function ProductApplicationsByIdViews() {
 
     const selectedProducts =
         data?.items.filter(item => selectedItems.includes(item.id)) || []
-
+    
     const handleSubmit = () => {
         const items: ProviderRequestItemCreateDto[] = selectedProducts.map(
             product => ({

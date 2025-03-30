@@ -36,7 +36,7 @@ export function ProductApplicationViews() {
 
     const { data: incomingRequests } =
         providerRequest.useProviderRequestIncomeQuery({
-            includeHiddenAndViewed: 'false',
+            search: { hiddenAndViewed: false },
             sort: getSortParam(sortValue),
         })
 

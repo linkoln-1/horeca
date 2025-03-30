@@ -11,7 +11,7 @@ import { useCustomInfiniteQuery } from '@/shared/lib/reactQuery/useCustomInfinit
 import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
 
 interface GetProviderRequestIncomeQuery {  
-    includeHiddenAndViewed?: string
+    hiddenAndViewed?: boolean
     search?: ProviderHorecaRequestSearchDto 
     sort?: string
 }

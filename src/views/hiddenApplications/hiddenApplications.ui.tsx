@@ -4,13 +4,13 @@ import React from 'react'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { providerRequest } from '@/entities/provider-request'
+import { useProviderRequestGetStatusMutation } from '@/entities/provider-request/request.queries'
 import { Flex, Text, Button, Loader, Table } from '@mantine/core'
 import { IconChevronLeft, IconRestore } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 
 import { role } from '@/shared/helpers/getRole'
 import { groupRequestsByDate } from '@/shared/helpers/groupRequestsByDate'
-import { useProviderRequestGetStatusMutation } from '@/entities/provider-request/request.queries'
 
 export function HiddenApplicationsViews() {
     const user = useUserStore(state => state.user)
@@ -18,12 +18,12 @@ export function HiddenApplicationsViews() {
 
     const { data: incomingRequests } =
         providerRequest.useProviderRequestIncomeQuery({
-            includeHiddenAndViewed: 'true',
+            search: { hiddenAndViewed: true },
         })
 
     const groupedRequests =
         incomingRequests && groupRequestsByDate(incomingRequests.data || [])
-const { mutate: setStatus } = useProviderRequestGetStatusMutation()
+    const { mutate: setStatus } = useProviderRequestGetStatusMutation()
     const onClickRestore = (requestId: number) => {
         setStatus({ horecaRequestId: requestId, hidden: false })
     }
@@ -153,7 +153,9 @@ const { mutate: setStatus } = useProviderRequestGetStatusMutation()
                                                         <IconRestore
                                                             onClick={() =>
                                                                 onClickRestore(
-                                                                    request.items[0].horecaRequestId
+                                                                    request
+                                                                        .items[0]
+                                                                        .horecaRequestId
                                                                 )
                                                             }
                                                             className='cursor-pointer'
