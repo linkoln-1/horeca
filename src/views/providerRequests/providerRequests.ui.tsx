@@ -3,11 +3,9 @@
 import { useState } from 'react'
 
 import { providerRequest } from '@/entities/provider-request'
-import { handleApplicationsDetailsModals } from '@/views/applications/ui/applicationsDetailsModal'
 import {
     Flex,
     Text,
-    Paper,
     Box,
     Divider,
     SegmentedControl,
@@ -15,23 +13,17 @@ import {
     Card,
     Badge,
     Button,
+    Tooltip,
 } from '@mantine/core'
 import { IconMessage } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 
-import { CategoryLabels } from '@/shared/constants'
 import { applications } from '@/shared/constants/applications'
-import { PaymentMethod } from '@/shared/constants/paymentMethod'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 import {
-    Categories,
-    HorecaRequestDto,
-    HorecaRequestSearchDto,
-    HorecaRequestStatus,
-    ProviderRequestDto,
-    ProviderRequestSearchDto,
     ProviderRequestStatus,
 } from '@/shared/lib/horekaApi/Api'
+import { handleDetailsModal } from './detailsModal/detailsModal.ui'
 
 const limit = 10
 
@@ -62,9 +54,9 @@ export function ProviderRequests() {
         isFetching,
     } = providerRequest.useGetAllProviderRequestQuery({
         limit: limit,
-        search: JSON.stringify({
-            status: activeStatus,
-        }) as unknown as ProviderRequestSearchDto,
+        search: {
+            status: activeStatus
+        },
     })
 
     const handleTabChange = (tab: string) => {
@@ -80,7 +72,27 @@ export function ProviderRequests() {
                     onChange={handleTabChange}
                     value={activeTab}
                     color='indigo.4'
-                    data={['В работе', 'Ожидают откликов', 'Завершённые']}
+                    data={[
+                        {
+                            value: 'В работе',
+                            label: 'В работе',
+                        },
+                        {
+                            value: 'Ожидание',
+                            label: (
+                                <Tooltip
+                                    withArrow
+                                    label='Вы откликнулись на эти заявки. Ждем выбора покупателя'
+                                >
+                                    <div>Ожидание</div>
+                                </Tooltip>
+                            ),
+                        },
+                        {
+                            value: 'Завершённые',
+                            label: 'Завершённые',
+                        },
+                    ]}
                     orientation={isMobile ? 'vertical' : 'horizontal'}
                 />
             </Flex>
@@ -119,14 +131,6 @@ export function ProviderRequests() {
                                         padding='lg'
                                         radius='lg'
                                         withBorder
-                                        style={{
-                                            cursor: 'pointer',
-                                        }}
-                                        // onClick={() =>
-                                        //     handleApplicationsDetailsModals(
-                                        //         order
-                                        //     )
-                                        // }
                                     >
                                         <Text fw={500}>
                                             № {order.id} от{' '}
@@ -177,7 +181,17 @@ export function ProviderRequests() {
                                             </Flex>
 
                                             <Box>
-                                                <IconMessage size={30} />
+                                                <IconMessage
+                                                    size={30}
+                                                    color={
+                                                        (
+                                                            order.status as unknown as ProviderRequestStatus
+                                                        ).toLowerCase() ===
+                                                        'Pending'
+                                                            ? 'gray'
+                                                            : 'black'
+                                                    }
+                                                />
                                             </Box>
                                         </Flex>
                                         <Divider
@@ -203,22 +217,18 @@ export function ProviderRequests() {
                                                     maw={230}
                                                 >
                                                     <Text size='sm'>
-                                                        Название: Тут будет
-                                                        название
+                                                        Название:{' '}
+                                                        {
+                                                            order.horecaRequest
+                                                                ?.name
+                                                        }
                                                     </Text>
                                                     <Text size='sm'>
                                                         Категории:{' '}
-                                                        {/*TODO БЕЗ ПОНЯТИЯ ЧЕ ЭТО БУДУ РАЗБИАРТЬСЯ */}
-                                                        {Array.from(
-                                                            new Set(
-                                                                order.items.map(
-                                                                    item =>
-                                                                        CategoryLabels[
-                                                                            item.manufacturer as Categories
-                                                                        ]
-                                                                )
-                                                            )
-                                                        ).join(', ')}
+                                                        {
+                                                            order.horecaRequest
+                                                                ?.categories
+                                                        }
                                                     </Text>
                                                 </Flex>
 
@@ -228,19 +238,41 @@ export function ProviderRequests() {
                                                     maw={200}
                                                 >
                                                     <Text size='sm'>
-                                                        Адрес доставки: АДРЕС
+                                                        Адрес доставки:{' '}
+                                                        {
+                                                            order.horecaRequest
+                                                                ?.address
+                                                        }
                                                     </Text>
                                                     <Text size='sm'>
                                                         Дата доставки:{' '}
-                                                        {/*{dayjs(*/}
-                                                        {/*    order.deliveryTime*/}
-                                                        {/*).format(*/}
-                                                        {/*    'YYYY-MM-DD HH:mm'*/}
-                                                        {/*)}*/}
+                                                        {dayjs(
+                                                            order.horecaRequest
+                                                                ?.deliveryTime
+                                                        ).format(
+                                                            'YYYY-MM-DD HH:mm'
+                                                        )}
                                                     </Text>
                                                 </Flex>
                                             </Flex>
                                         </Flex>
+                                        <Box>
+                                            <Button
+                                                bg='transparent'
+                                                c='indigo.4'
+                                                onClick={e => {
+                                                    {
+                                                        e.preventDefault()
+                                                        handleDetailsModal(
+                                                            order.horecaRequestId
+                                                        )
+                                                    }
+                                                }}
+                                                p={0}
+                                            >
+                                                Посмотреть заявку
+                                            </Button>
+                                        </Box>
                                     </Card>
                                 </Grid.Col>
                             ))}

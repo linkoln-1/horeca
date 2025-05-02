@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
     Box,
     Button,
@@ -10,6 +11,7 @@ import {
 import { TimeInput } from '@mantine/dates'
 import { UseFormReturnType } from '@mantine/form'
 import { IconPlus, IconX } from '@tabler/icons-react'
+import { useEffect } from 'react'
 
 import { HorecaFormValues } from '@/shared/constants'
 import { Address, Weekday } from '@/shared/lib/horekaApi/Api'
@@ -37,6 +39,11 @@ export function HorecaStepTwo({ form }: StepProps) {
     const addNewAddress = () => {
         const newAddress = {
             address: '',
+            city: '',
+            street: '',
+            house: '',
+            building: '',
+            office: '',
             weekdays: [],
             moFrom: '',
             moTo: '',
@@ -64,6 +71,30 @@ export function HorecaStepTwo({ form }: StepProps) {
         form.setFieldValue('profile.addresses', newAddresses)
     }
 
+    const combineAddressFields = (addressIndex: number) => {
+        const address = form.values.profile.addresses[addressIndex]
+        const parts = [
+            address.city,
+            address.street,
+            address.house,
+            address.building ? `к${address.building}` : '',
+            address.office ? `оф${address.office}` : '',
+        ].filter(Boolean)
+        
+        return parts.join(', ')
+    }
+
+    useEffect(() => {
+        form.values.profile.addresses.forEach((_, index) => {
+            const combinedAddress = combineAddressFields(index)
+            form.setFieldValue(`profile.addresses.${index}.address`, combinedAddress)
+        })
+    }, [
+        form.values.profile.addresses.map(a => 
+            `${a.city}-${a.street}-${a.house}-${a.building}-${a.office}`
+        ).join('|')
+    ])
+
     return (
         <>
             <TextInput
@@ -75,16 +106,9 @@ export function HorecaStepTwo({ form }: StepProps) {
             />
 
             {form.values.profile.addresses.map((address, addressIndex) => (
-                <div key={addressIndex}>
+                <div key={addressIndex} className='mb-6'>
                     <div className='relative'>
-                        <TextInput
-                            required
-                            label={`Адрес доставки ${addressIndex + 1}`}
-                            placeholder='Адрес доставки'
-                            {...form.getInputProps(
-                                `profile.addresses.${addressIndex}.address`
-                            )}
-                        />
+                        <h4 className='text-sm font-medium mb-2'>Адрес доставки {addressIndex + 1}</h4>
                         {addressIndex > 0 && (
                             <IconX
                                 className='absolute top-[-5px] right-0'
@@ -94,7 +118,48 @@ export function HorecaStepTwo({ form }: StepProps) {
                         )}
                     </div>
 
-                    {weekdays.map(day => (
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
+                        <TextInput
+                            required
+                            label='Город'
+                            placeholder='Например: Москва'
+                            {...form.getInputProps(
+                                `profile.addresses.${addressIndex}.city`
+                            )}
+                        />
+                        <TextInput
+                            required
+                            label='Улица'
+                            placeholder='Например: Ленина'
+                            {...form.getInputProps(
+                                `profile.addresses.${addressIndex}.street`
+                            )}
+                        />
+                        <TextInput
+                            required
+                            label='Дом'
+                            placeholder='Например: 15'
+                            {...form.getInputProps(
+                                `profile.addresses.${addressIndex}.house`
+                            )}
+                        />
+                        <TextInput
+                            label='Корпус/строение'
+                            placeholder='Например: 2'
+                            {...form.getInputProps(
+                                `profile.addresses.${addressIndex}.building`
+                            )}
+                        />
+                        <TextInput
+                            label='Офис/квартира'
+                            placeholder='Например: 305'
+                            {...form.getInputProps(
+                                `profile.addresses.${addressIndex}.office`
+                            )}
+                        />
+                    </div>
+
+                    {/* {weekdays.map(day => (
                         <Group key={day.value} grow align='center' my='lg'>
                             <Checkbox
                                 label={day.label}
@@ -138,7 +203,7 @@ export function HorecaStepTwo({ form }: StepProps) {
                                 )}
                             />
                         </Group>
-                    ))}
+                    ))} */}
                 </div>
             ))}
 

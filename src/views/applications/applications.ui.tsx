@@ -62,11 +62,11 @@ export function ApplicationsViews() {
         isFetching,
     } = requestQueries.useGetRequestQuery({
         limit: limit,
-        search: JSON.stringify({
-            status: activeStatus,
-        }) as unknown as HorecaRequestSearchDto,
+        search: {
+            status: activeStatus as HorecaRequestStatus,
+        },
     })
-
+    
     const user = useUserStore(state => state.user)
 
     const handleTabChange = (tab: string) => {

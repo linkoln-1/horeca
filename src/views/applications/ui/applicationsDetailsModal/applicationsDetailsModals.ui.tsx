@@ -56,7 +56,7 @@ export function ApplicationsDetailsModals({ id }: { id: number }) {
     const { data, isLoading } = requestQueries.useGetRequestByIdQuery(id)
 
     const [images, setImages] = useState<UploadDto[]>([])
-
+    
     const updateFormValuesFromTemplate = () => {
         if (data) {
             const transformedItems = data.items?.map(item => ({

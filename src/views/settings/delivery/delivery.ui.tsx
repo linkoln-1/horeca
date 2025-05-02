@@ -37,6 +37,10 @@ type DeliveryFormType = Omit<
     | 'updatedAt'
 > & {
     categories: { value: string; label: string }[]
+    selfPickup: boolean
+    deliveryBySupplier: boolean
+    sameDayDelivery: boolean
+    weekends: boolean
 }
 
 function transformCategories(
@@ -62,11 +66,39 @@ export function DeliveryViews() {
             categories: [],
             minOrderAmount: 0,
             deliveryMethods: [] as DeliveryMethods[],
+            selfPickup: false,
+            deliveryBySupplier: false,
+            sameDayDelivery: false,
+            weekends: false,
         },
         validate: {
             categories: value =>
-                value.length > 0 ? null : 'категория не может быть пустой',
+                value.length > 0 ? null : 'Выберите хотя бы одну категорию',
+            minOrderAmount: value => {
+                
+                if (
+                    value === null ||
+                    value === undefined ||
+                    isNaN(value) ||
+                    // @ts-ignore
+                    value === ''
+                ) {
+                    return 'Укажите минимальную сумму заказа'
+                }
+                if (Number(value) < 0) {
+                    return 'Сумма не может быть отрицательной'
+                }
+                return null
+            },
+            selfPickup: (value, values) =>
+                !value &&
+                !values.deliveryBySupplier &&
+                !values.sameDayDelivery &&
+                !values.weekends
+                    ? 'Выберите способ доставки'
+                    : null,
         },
+        validateInputOnBlur: true,
     })
 
     const { data } = userQueries.useGetMeQuery()
@@ -75,40 +107,54 @@ export function DeliveryViews() {
 
     useEffect(() => {
         if (data) {
+            const profile = data.profile as ProviderProfileDto
             form.setValues({
                 categories: transformCategories(
-                    (data.profile as ProviderProfileDto).categories,
+                    profile.categories,
                     CategoryLabels
                 ),
-                minOrderAmount: (data.profile as ProviderProfileDto)
-                    .minOrderAmount,
-                deliveryMethods: (data.profile as ProviderProfileDto)
-                    .deliveryMethods,
+                minOrderAmount: profile.minOrderAmount,
+                selfPickup: profile.deliveryMethods.includes(
+                    DeliveryMethods.SelfPickup
+                ),
+                deliveryBySupplier: profile.deliveryMethods.includes(
+                    DeliveryMethods.DeliveryBySupplier
+                ),
+                sameDayDelivery: profile.deliveryMethods.includes(
+                    DeliveryMethods.SameDayDelivery
+                ),
+                weekends: profile.deliveryMethods.includes(
+                    DeliveryMethods.Weekends
+                ),
             })
         }
     }, [data])
 
-    const handleSubmit = async () => {
-        if (form.validate().hasErrors) {
-            return
-        }
-
+    const handleSubmit = async (values: DeliveryFormType) => {
         try {
-            if (data && (data.profile as ProviderProfileDto)) {
-                const updateUserDto: UpdateUserDto = {
-                    profile: {
-                        ...form.values,
-                        profileType: data.profile
-                            .profileType as ProfileType.Provider,
-                        categories: form.values.categories.map(
-                            x => x.value as Categories
-                        ),
-                    },
-                }
+            const deliveryMethods: DeliveryMethods[] = []
+            if (values.selfPickup)
+                deliveryMethods.push(DeliveryMethods.SelfPickup)
+            if (values.deliveryBySupplier)
+                deliveryMethods.push(DeliveryMethods.DeliveryBySupplier)
+            if (values.sameDayDelivery)
+                deliveryMethods.push(DeliveryMethods.SameDayDelivery)
+            if (values.weekends) deliveryMethods.push(DeliveryMethods.Weekends)
 
-                await updateUser(updateUserDto)
-                toast.success('Данные успешно обновлены!')
+            const updateUserDto: UpdateUserDto = {
+                profile: {
+                    ...values,
+                    profileType: data?.profile
+                        .profileType as ProfileType.Provider,
+                    categories: values.categories.map(
+                        x => x.value as Categories
+                    ),
+                    deliveryMethods,
+                },
             }
+
+            await updateUser(updateUserDto)
+            toast.success('Данные успешно обновлены!')
         } catch (e: any) {
             const errorKey = e?.error?.error
             const errorMessage =
@@ -119,6 +165,8 @@ export function DeliveryViews() {
             toast.error(errorMessage)
         }
     }
+
+    const hasDeliveryError = !!form.errors.selfPickup
 
     return (
         <Page>
@@ -143,42 +191,56 @@ export function DeliveryViews() {
                             label: CategoryLabels[v as Categories],
                         }))
                         form.setFieldValue('categories', transformedValue)
-                        form.validateField('categories')
                     }}
+                    error={form.errors.categories}
                     searchable
+                    required
                 />
 
                 <NumberInput
                     label='Минимальная сумма заказа'
-                    placeholder='Например, 3000 руб.'
                     {...form.getInputProps('minOrderAmount')}
+                    error={form.errors.minOrderAmount}
+                    allowNegative={false}
+                    required
                 />
 
                 <Flex direction='column' gap='md'>
                     <Text size='md' fw={600}>
                         Возможный способ доставки
                     </Text>
+                    {hasDeliveryError && (
+                        <Text size='sm' color='red' mt={-10} mb={5}>
+                            {form.errors.selfPickup}
+                        </Text>
+                    )}
                     <Checkbox
                         label='Самовывоз'
-                        {...form.getInputProps('pickup', { type: 'checkbox' })}
+                        {...form.getInputProps('selfPickup', {
+                            type: 'checkbox',
+                        })}
+                        error={hasDeliveryError}
                     />
                     <Checkbox
                         label='Доставка транспортом поставщика'
-                        {...form.getInputProps('supplierDelivery', {
+                        {...form.getInputProps('deliveryBySupplier', {
                             type: 'checkbox',
                         })}
+                        error={hasDeliveryError}
                     />
                     <Checkbox
                         label='Доставка в день заказа'
                         {...form.getInputProps('sameDayDelivery', {
                             type: 'checkbox',
                         })}
+                        error={hasDeliveryError}
                     />
                     <Checkbox
                         label='Выходные/праздничные дни'
                         {...form.getInputProps('weekends', {
                             type: 'checkbox',
                         })}
+                        error={hasDeliveryError}
                     />
                 </Flex>
 

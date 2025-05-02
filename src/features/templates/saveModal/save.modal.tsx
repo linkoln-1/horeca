@@ -65,6 +65,7 @@ export function SaveModal({ forms }: SaveModalProps) {
                     content: contentData,
                 },
             })
+            close()
             toast.success('Шаблон успешно сохранен!')
         } catch (e: any) {
             const errorKey = e?.error?.error

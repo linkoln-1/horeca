@@ -434,8 +434,8 @@ export function ChatView() {
                                                             chat.authorId &&
                                                             chat.authorId ===
                                                                 userId
-                                                                ? 'speech-bubble-to-me'
-                                                                : 'speech-bubble-from-me'
+                                                                ? 'speech-bubble-from-me'
+                                                                : 'speech-bubble-to-me'
                                                         }
                                                         c={
                                                             chat.authorId &&
