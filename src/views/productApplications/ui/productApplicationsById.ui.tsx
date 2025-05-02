@@ -1,14 +1,13 @@
 'use client'
 
 import React, { useState } from 'react'
-
 import { ProductTable } from './productTable'
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { providerRequest } from '@/entities/provider-request'
 import { useProviderRequestMutation } from '@/entities/provider-request/request.queries'
+import { imageQueries } from '@/entities/uploads'
 import { Button, Flex, Text, Textarea, Modal } from '@mantine/core'
 import { useParams, useRouter } from 'next/navigation'
-
 import { role } from '@/shared/helpers/getRole'
 import {
     ProviderRequestCreateDto,
@@ -21,7 +20,8 @@ export function ProductApplicationsByIdViews() {
     const { id } = params
     const user = useUserStore(state => state.user)
     const { data } = providerRequest.useProviderRequestGetIncomeByID(Number(id))
-
+    const { mutateAsync: uploadImage, isPending: isPendingImage } =
+        imageQueries.useImageUploadMutation()
     const [selectedItems, setSelectedItems] = useState<number[]>([])
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isExitConfirmModalOpen, setIsExitConfirmModalOpen] = useState(false)
@@ -30,7 +30,7 @@ export function ProductApplicationsByIdViews() {
         Record<number, { manufacturer: string; price: string }>
     >({})
     const [comment, setComment] = useState<string>('')
-    const [photos, setPhotos] = useState<Record<number, string[]>>({})
+    const [photos, setPhotos] = useState<Record<number, number[]>>({}) // Изменено на number[]
 
     const { mutate: createProviderRequest, isPending } =
         useProviderRequestMutation()
@@ -63,42 +63,60 @@ export function ProductApplicationsByIdViews() {
         }))
     }
 
-    const handlePhotoUpload = (productId: number, files: FileList) => {
+    const handlePhotoUpload = async (productId: number, files: FileList) => {
         const currentPhotos = photos[productId] || []
         if (currentPhotos.length >= 3) {
             alert('Максимальное количество фотографий (3) уже загружено')
             return
         }
 
-        const newPhotos: string[] = []
-        for (
-            let i = 0;
-            i < Math.min(files.length, 3 - currentPhotos.length);
-            i++
-        ) {
+        const uploadPromises: Promise<number>[] = [] // Изменено на Promise<number>[]
+
+        for (let i = 0; i < Math.min(files.length, 3 - currentPhotos.length); i++) {
             const file = files[i]
-            const reader = new FileReader()
-            reader.onload = e => {
-                const img = new window.Image()
-                img.src = e.target?.result as string
-                img.onload = () => {
-                    if (img.width <= 200 && img.height <= 200) {
-                        newPhotos.push(e.target?.result as string)
-                        if (
-                            newPhotos.length ===
-                            Math.min(files.length, 3 - currentPhotos.length)
-                        ) {
-                            setPhotos(prev => ({
-                                ...prev,
-                                [productId]: [...currentPhotos, ...newPhotos],
-                            }))
+            
+            const imgCheckPromise = new Promise<File>((resolve, reject) => {
+                const reader = new FileReader()
+                reader.onload = e => {
+                    const img = new window.Image()
+                    img.src = e.target?.result as string
+                    img.onload = () => {
+                        if (img.width <= 200 && img.height <= 200) {
+                            resolve(file)
+                        } else {
+                            reject(new Error('Фото должно быть размером 200x200 пикселей'))
                         }
-                    } else {
-                        alert('Фото должно быть размером 200x200 пикселей')
                     }
                 }
+                reader.readAsDataURL(file)
+            })
+
+            const uploadPromise = imgCheckPromise.then(async (validatedFile) => {
+                try {
+                    const response = await uploadImage({ file: validatedFile })
+                    return Number(response.id)
+                } catch (error) {
+                    console.error('Ошибка при загрузке изображения:', error)
+                    throw error
+                }
+            })
+
+            uploadPromises.push(uploadPromise)
+        }
+
+        try {
+            const imageIds = await Promise.all(uploadPromises)
+            
+            setPhotos(prev => ({
+                ...prev,
+                [productId]: [...(prev[productId] || []), ...imageIds],
+            }))
+        } catch (error) {
+            if (error instanceof Error && error.message === 'Фото должно быть размером 200x200 пикселей') {
+                alert(error.message)
+            } else {
+                alert('Произошла ошибка при загрузке фотографий')
             }
-            reader.readAsDataURL(file)
         }
     }
 
@@ -112,7 +130,7 @@ export function ProductApplicationsByIdViews() {
                 available: true,
                 manufacturer: inputData[product.id]?.manufacturer || '',
                 cost: parseFloat(inputData[product.id]?.price),
-                imageIds: [],
+                imageIds: photos[product.id] || [],
             })
         )
 

@@ -304,7 +304,7 @@ export function ProductsModal({
                             </Flex>
 
                             <Text size='sm' mt='xs' c='gray.6'>
-                                Можно добавить не более 5 фотографии
+                                Можно добавить не более 5 фотографий
                             </Text>
                         </Box>
                     </Grid.Col>

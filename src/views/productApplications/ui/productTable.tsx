@@ -29,7 +29,7 @@ interface ProductTableProps {
     isModal?: boolean
     onManufacturerChange?: (itemId: number, value: string) => void
     onPriceChange?: (itemId: number, value: string) => void
-    photos: Record<number, string[]>
+    photos: Record<number, number[]>
     onPhotoUpload?: (productId: number, files: FileList) => void
 }
 

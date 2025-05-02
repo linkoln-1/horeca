@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react'
+import React, { ReactNode } from 'react'
 
 import { Footer } from '@/core/layout/AppLayout/Footer'
 import { Header } from '@/core/layout/AppLayout/Header'
@@ -11,7 +11,6 @@ import {
     Divider,
     Flex,
     Grid,
-    Loader,
     Paper,
     Text,
 } from '@mantine/core'
@@ -50,7 +49,6 @@ export function AppLayout({ children }: AppLayoutProps) {
     const path = usePathname()
 
     const { user, accessToken, updateUser } = useUserStore(state => state)
-    const { data } = userQueries.useGetMeQuery()
 
     const { mutateAsync: uploadImage } = imageQueries.useImageUploadMutation()
     const { mutateAsync: updateUserAvatar, isPending } =
@@ -80,15 +78,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             }
         }
     }
-
-    console.log(data)
-
-    // useEffect(() => {
-    //     if (data) {
-    //
-    //     }
-    // }, [data])
-
+    
     return (
         <Container className='min-h-screen flex flex-col justify-between' fluid>
             <Grid>
@@ -106,6 +96,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                     h='calc(100vh - 235px)'
                     pos='sticky'
                     top={20}
+                    visibleFrom='xl'
                 >
                     <Paper
                         bg='var(--mantine-color-indigo-0)'
@@ -122,7 +113,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                                         onChange={(payload: File | null) => {
                                             handleAvatarChange(payload)
                                         }}
-                                        src={undefined}
+                                        src={getImageUrl(user?.avatar?.path)}
                                         size='100%'
                                         color='blue'
                                         className='aspect-square cursor-pointer'

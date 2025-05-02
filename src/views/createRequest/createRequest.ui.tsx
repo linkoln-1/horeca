@@ -18,26 +18,27 @@ import {
     Button,
     Image as MantineImage,
     Textarea,
-    Autocomplete,
     Radio,
     Group,
     CheckIcon,
     Loader,
     LoadingOverlay,
-    Container,
+    Tooltip,
 } from '@mantine/core'
 import { DateTimePicker, DateInput } from '@mantine/dates'
+import { DatesProvider } from '@mantine/dates'
 import { FileWithPath } from '@mantine/dropzone'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { IconPlus, IconX } from '@tabler/icons-react'
+import 'dayjs/locale/ru'
+import 'dayjs/locale/ru'
 import { useRouter } from 'next/navigation'
 
 import { CategoryLabels, errors, HorecaTemplateDto } from '@/shared/constants'
 import { HorecaRequestForm } from '@/shared/constants'
 import { PaymentMethod } from '@/shared/constants/paymentMethod'
 import { getImageUrl } from '@/shared/helpers'
-import { isFormFilled } from '@/shared/helpers/isForEmpty'
 import {
     Categories,
     HorecaRequestCreateDto,
@@ -61,6 +62,11 @@ export function CreateRequestView() {
                 },
             ],
             address: '',
+            city: '',
+            street: '',
+            house: '',
+            building: '',
+            office: '',
             deliveryTime: new Date(),
             acceptUntill: new Date(),
             paymentType: PaymentMethod.Prepayment,
@@ -169,10 +175,19 @@ export function CreateRequestView() {
     }
 
     const handleFormSubmit = async (values: HorecaRequestForm) => {
-        console.log(values)
         try {
+            const addressParts = [
+                values.city,
+                values.street,
+                `д. ${values.house}`,
+                values.building ? `корпус ${values.building}` : null,
+                values.office ? `офис ${values.office}` : null,
+            ]
+                .filter(Boolean)
+                .join(', ')
+
             const formattedData: HorecaRequestCreateDto = {
-                ...values,
+                address: addressParts,
                 items: values.items.flatMap(item =>
                     item.products.map(product => ({
                         category: item.category,
@@ -187,12 +202,12 @@ export function CreateRequestView() {
                 name: values.name,
                 phone: values.phone,
                 comment: values.comment || undefined,
+                imageIds: values.imageIds,
             }
 
             await createRequest(formattedData)
 
             toast.success('Заявка успешно создана!')
-
             handleModal('thanksTemplateModal', '', 'md', <ThanksModal />)
             router.push('/user/horeca/applications')
         } catch (e: any) {
@@ -462,18 +477,60 @@ export function CreateRequestView() {
                         />
                     </Box>
 
-                    <Box mb='sm'>
-                        <Autocomplete
-                            label='Адрес доставки'
-                            {...form.getInputProps('address')}
+                    <Flex gap='md' direction='column'>
+                        <TextInput
+                            label='Город'
+                            placeholder='Введите город'
+                            {...form.getInputProps('city')}
+                            required
                         />
-                    </Box>
+                        <TextInput
+                            label='Улица'
+                            placeholder='Введите улицу'
+                            {...form.getInputProps('street')}
+                            required
+                        />
+                        <Flex gap='md'>
+                            <TextInput
+                                label='Дом'
+                                placeholder='Номер дома'
+                                {...form.getInputProps('house')}
+                                required
+                            />
+                            <TextInput
+                                label='Корпус / строение'
+                                placeholder='(опционально)'
+                                {...form.getInputProps('building')}
+                            />
+                            <TextInput
+                                label='Офис'
+                                placeholder='(опционально)'
+                                {...form.getInputProps('office')}
+                            />
+                        </Flex>
+                    </Flex>
 
                     <Flex mb='md' gap='xl'>
-                        <DateInput
-                            valueFormat='DD/MM/YY'
-                            label='Принимать заявки до:'
-                            placeholder='ДД.ММ.ГГ'
+                        <DateTimePicker
+                            w='fit-content'
+                            valueFormat='DD/MM/YY HH:mm'
+                            locale='ru'
+                            label={
+                                <Tooltip
+                                    label='Это срок отправки заявок. Укажите дату и время, до которого поставщики могут отправлять свои отклики на эту заявку. После этого времени новые заявки не принимаются.'
+                                    withArrow
+                                    position='top-start'
+                                    color='gray'
+                                >
+                                    <Text
+                                        component='span'
+                                        className='cursor-help'
+                                    >
+                                        Принимать заявки до:
+                                    </Text>
+                                </Tooltip>
+                            }
+                            placeholder='Например, 13/01/25 18:00'
                             value={form.values.acceptUntill}
                             size='md'
                             {...form.getInputProps('acceptUntill')}
@@ -482,8 +539,23 @@ export function CreateRequestView() {
                         <DateTimePicker
                             w='fit-content'
                             valueFormat='DD/MM/YYYY HH:mm'
-                            label='Привезите товар не позднее:'
-                            placeholder='ДД/ММ/ГГГГ ЧЧ:ММ'
+                            locale='ru'
+                            label={
+                                <Tooltip
+                                    label='Это срок доставки товара. Укажите дату и время, к которому товар должен быть доставлен'
+                                    withArrow
+                                    position='top-start'
+                                    color='gray'
+                                >
+                                    <Text
+                                        component='span'
+                                        className='cursor-help'
+                                    >
+                                        Привезите товар не позднее:
+                                    </Text>
+                                </Tooltip>
+                            }
+                            placeholder='Например, 14/01/25 20:00'
                             value={form.values.deliveryTime}
                             size='md'
                             {...form.getInputProps('deliveryTime')}
@@ -545,7 +617,6 @@ export function CreateRequestView() {
                                     backgroundColor: '#fff',
                                 },
                             }}
-                            disabled={!isFormFilled(form.values)}
                         >
                             Сохранить шаблон
                         </Button>
