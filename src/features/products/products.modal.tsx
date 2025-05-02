@@ -155,7 +155,8 @@ export function ProductsModal({
                     >
                         <TextInput
                             label='Наименование'
-                            placeholder='Введите наименование'
+                            placeholder='Введите наименование, максимум 50 символов с пробелами'
+                            maxLength={50}
                             required
                             {...form.getInputProps('name')}
                         />
@@ -168,7 +169,8 @@ export function ProductsModal({
                     >
                         <TextInput
                             label='Производитель'
-                            placeholder='Введите производителя'
+                            placeholder='Введите производителя, максимум 50 символов с пробелами'
+                            maxLength={50}
                             required
                             {...form.getInputProps('producer')}
                         />
@@ -176,8 +178,9 @@ export function ProductsModal({
                 </Grid>
                 <Textarea
                     label='Характеристики товара'
-                    placeholder='Максимум 500 символов (с пробелами)'
+                    placeholder='Максимум 1500 символов (с пробелами)'
                     required
+                    maxLength={1500}
                     minRows={4}
                     maxRows={4}
                     {...form.getInputProps('description')}
@@ -213,8 +216,8 @@ export function ProductsModal({
                         required
                         {...form.getInputProps('cost')}
                     />
-                    <NumberInput
-                        label='Кол-во'
+                    <TextInput
+                        label='Кол-во (в наличии)'
                         placeholder='Введите количество'
                         required
                         {...form.getInputProps('count')}
@@ -301,7 +304,7 @@ export function ProductsModal({
                             </Flex>
 
                             <Text size='sm' mt='xs' c='gray.6'>
-                                Можно добавить не более 5 фотографии
+                                Можно добавить не более 5 фотографий
                             </Text>
                         </Box>
                     </Grid.Col>

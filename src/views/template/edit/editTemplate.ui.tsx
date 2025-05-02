@@ -330,7 +330,7 @@ export function EditTemplateViews({ id }: { id: string }) {
                                                         />
                                                         <NumberInput
                                                             placeholder='456'
-                                                            label='Кол-во'
+                                                            label='Количество'
                                                             value={x.amount}
                                                             {...form.getInputProps(
                                                                 `items.${categoryIndex}.products.${productIndex}.amount`
@@ -338,7 +338,7 @@ export function EditTemplateViews({ id }: { id: string }) {
                                                         />
                                                         <TextInput
                                                             placeholder='штук'
-                                                            label='Ед. измерения'
+                                                            label='Ед. изм.'
                                                             value={x.unit}
                                                             {...form.getInputProps(
                                                                 `items.${categoryIndex}.products.${productIndex}.unit`
@@ -500,6 +500,25 @@ export function EditTemplateViews({ id }: { id: string }) {
                                     justify='space-between'
                                     gap='sm'
                                 >
+                                    <DateInput
+                                        flex={1}
+                                        size='md'
+                                        placeholder='ДД.ММ.ГГ'
+                                        minDate={new Date()}
+                                        valueFormat='DD/MM/YYYY HH:mm:ss'
+                                        rightSection={
+                                            <IconCalendar
+                                                color={
+                                                    'var(--mantine-color-indigo-6)'
+                                                }
+                                            />
+                                        }
+                                        label='Принимать заявки до:'
+                                        value={
+                                            new Date(form.values.acceptUntill)
+                                        }
+                                        {...form.getInputProps('acceptUntill')}
+                                    />
                                     <DateTimePicker
                                         flex={1}
                                         size='md'
@@ -518,25 +537,7 @@ export function EditTemplateViews({ id }: { id: string }) {
                                         }
                                         {...form.getInputProps('deliveryTime')}
                                     />
-                                    <DateInput
-                                        flex={1}
-                                        size='md'
-                                        placeholder='ДД.ММ.ГГ'
-                                        valueFormat='DD.MM.YY'
-                                        minDate={new Date()}
-                                        rightSection={
-                                            <IconCalendar
-                                                color={
-                                                    'var(--mantine-color-indigo-6)'
-                                                }
-                                            />
-                                        }
-                                        label='Принимать заявки до'
-                                        value={
-                                            new Date(form.values.acceptUntill)
-                                        }
-                                        {...form.getInputProps('acceptUntill')}
-                                    />
+                                    
                                 </Flex>
                                 <Flex>
                                     <Radio.Group

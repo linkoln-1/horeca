@@ -111,6 +111,16 @@ export function Header() {
                                             </Link>
                                         )
                                     })}
+                                <Flex gap='sm' align='center'>
+                                    <Button
+                                        color='#385191'
+                                        size='compact-sm'
+                                        variant='transparent'
+                                        onClick={logOut}
+                                    >
+                                        Выйти
+                                    </Button>
+                                </Flex>
                             </Flex>
                         </Drawer>
 

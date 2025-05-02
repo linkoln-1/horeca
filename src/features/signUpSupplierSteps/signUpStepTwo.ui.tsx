@@ -37,14 +37,16 @@ export function SignUpStepTwo({ form }: StepTwoProps) {
         <>
             <NumberInput
                 label='Контактный номер для связи с покупателем'
-                placeholder='Номер мобильного телефона (Пример: 79635929876)'
+                placeholder='Номер мобильного телефона (Пример: 89530890553)'
                 {...form.getInputProps('phone')}
+                required
             />
 
             <MultiSelect
                 label='Категория товара'
                 placeholder='Выберите категорию'
                 data={categoryOptions}
+                required
                 value={form.values.profile.categories.map(category =>
                     category.toString()
                 )}
@@ -59,11 +61,12 @@ export function SignUpStepTwo({ form }: StepTwoProps) {
             <NumberInput
                 label='Минимальная сумма заказа'
                 placeholder='Например, 3000 руб.'
+                required
                 {...form.getInputProps('profile.minOrderAmount')}
             />
 
             <Flex direction='column' gap='md'>
-                <Text size='md' fw={600}>
+                <Text size='md' fw={600} aria-required>
                     Возможные способы доставки
                 </Text>
                 {deliveryMethodOptions.map(option => (

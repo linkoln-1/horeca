@@ -21,4 +21,9 @@ export type HorecaRequestForm = {
     name: string
     phone: string
     comment?: string
+    city: string
+    street: string
+    house: string
+    building: string
+    office: string
 }

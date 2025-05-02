@@ -7,7 +7,7 @@ import { providerMenu } from '@/shared/constants'
 
 export function ProviderMenuList() {
     const user = useUserStore(state => state.user)
-
+    
     return (
         <>
             {providerMenu.map(x => {
