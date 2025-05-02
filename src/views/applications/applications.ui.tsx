@@ -66,7 +66,7 @@ export function ApplicationsViews() {
             status: activeStatus as HorecaRequestStatus,
         },
     })
-
+    
     const user = useUserStore(state => state.user)
 
     const handleTabChange = (tab: string) => {

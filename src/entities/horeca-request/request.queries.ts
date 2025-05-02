@@ -4,6 +4,7 @@ import { api } from '@/shared/lib/horekaApi'
 import {
     HorecaRequestCreateDto,
     HorecaRequestSearchDto,
+    HorecaRequestSetStatusDto,
 } from '@/shared/lib/horekaApi/Api'
 import { useCustomInfiniteQuery } from '@/shared/lib/reactQuery/useCustomInfiniteQuery'
 import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
@@ -37,6 +38,20 @@ export function useCreateRequestMutation() {
             api.horecaRequestsControllerCreate(data),
 
         onSuccess: async ({ data }) => {
+            await queryClient.invalidateQueries({
+                queryKey: ['horeca-request'],
+            })
+        },
+    })
+}
+
+export function useApproveRequestMutation() {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: (data: HorecaRequestSetStatusDto) =>
+            api.horecaRequestsControllerApproveProviderRequest(data),
+        onSuccess: async () => {
             await queryClient.invalidateQueries({
                 queryKey: ['horeca-request'],
             })
