@@ -42,6 +42,7 @@ export interface UserDto {
     profile: HorecaProfileDto | ProviderProfileDto
     id: number
     name: string
+    rating: number
     tin: string
     email: string
     phone: string
@@ -221,6 +222,11 @@ export interface SuccessDto {
     status: string
 }
 
+export interface ChangePasswordDto {
+    password?: string
+    repeatPassword?: string
+}
+
 export interface PaginatedDto {
     /** Data items */
     data: any[]
@@ -318,6 +324,12 @@ export interface HorecaRequestItemDto {
     updatedAt: string
 }
 
+export interface HorecaRequestProviderStatusDto {
+    horecaRequestId: number
+    viewed?: boolean
+    hidden?: boolean
+}
+
 export interface HorecaRequestDto {
     paymentType: PaymentType
     status: HorecaRequestStatus
@@ -334,12 +346,19 @@ export interface HorecaRequestDto {
     items: HorecaRequestItemDto[]
     comment: string
     reviewNotificationSent: boolean
+    horecaRequestProviderStatus?: HorecaRequestProviderStatusDto
     /** @format date-time */
     createdAt: string
     /** @format date-time */
     updatedAt: string
     cover?: number
     images?: UploadDto[]
+}
+
+export interface HRProviderUserDto {
+    avatar?: UploadDto
+    name: string
+    rating: number
 }
 
 export interface ProviderRequestItemDto {
@@ -358,6 +377,7 @@ export interface ProviderRequestItemDto {
 
 export interface HRProviderRequestDto {
     cover: number
+    user: HRProviderUserDto
     id: number
     userId: number
     horecaRequest?: HorecaRequestDto
@@ -370,6 +390,7 @@ export interface HRProviderRequestDto {
     chatId: number | null
     items: ProviderRequestItemDto[]
     status: object
+    images?: UploadDto[]
 }
 
 export interface HorecaRequestWithProviderRequestDto {
@@ -388,6 +409,7 @@ export interface HorecaRequestWithProviderRequestDto {
     items: HorecaRequestItemDto[]
     comment: string
     reviewNotificationSent: boolean
+    horecaRequestProviderStatus?: HorecaRequestProviderStatusDto
     /** @format date-time */
     createdAt: string
     /** @format date-time */
@@ -639,12 +661,6 @@ export interface ProviderHorecaRequestSearchDto {
     category?: Categories
 }
 
-export interface HorecaRequestProviderStatusDto {
-    horecaRequestId: number
-    viewed?: boolean
-    hidden?: boolean
-}
-
 export interface ProviderRequestItemCreateDto {
     /** @default [] */
     imageIds?: number[]
@@ -674,6 +690,7 @@ export interface ProviderRequestDto {
     chatId: number | null
     items: ProviderRequestItemDto[]
     status: object
+    images?: UploadDto[]
 }
 
 export interface ProviderRequestSearchDto {
@@ -1167,6 +1184,48 @@ export class Api<
             this.request<SuccessDto, ErrorDto>({
                 path: `/api/auth/activate/${uuid}`,
                 method: 'GET',
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Authorization
+         * @name AuthorizationControllerPasswordRecovery
+         * @request GET:/api/auth/password/recovery
+         */
+        authorizationControllerPasswordRecovery: (
+            query: {
+                email: string
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<SuccessDto, ErrorDto>({
+                path: `/api/auth/password/recovery`,
+                method: 'GET',
+                query: query,
+                format: 'json',
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Authorization
+         * @name AuthorizationControllerPasswordChange
+         * @request POST:/api/auth/password/change/{uuid}
+         */
+        authorizationControllerPasswordChange: (
+            uuid: string,
+            data: ChangePasswordDto,
+            params: RequestParams = {}
+        ) =>
+            this.request<SuccessDto, ErrorDto>({
+                path: `/api/auth/password/change/${uuid}`,
+                method: 'POST',
+                body: data,
+                type: ContentType.Json,
                 format: 'json',
                 ...params,
             }),
