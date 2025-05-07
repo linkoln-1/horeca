@@ -46,13 +46,10 @@ export interface UserDto {
     tin: string
     email: string
     phone: string
-    password: string
     /** @format date-time */
     createdAt: string
     /** @format date-time */
     updatedAt: string
-    activationLink: string
-    isActivated: boolean
     avatar?: UploadDto
 }
 
@@ -121,9 +118,6 @@ export interface HorecaProfileDto {
     createdAt: string
     /** @format date-time */
     updatedAt: string
-    categories: string[]
-    deliveryMethods: string[]
-    minOrderAmount: number
 }
 
 export enum Categories {
@@ -172,8 +166,6 @@ export interface ProviderProfileDto {
     createdAt: string
     /** @format date-time */
     updatedAt: string
-    info: string | null
-    addresses: string[]
 }
 
 export enum ProfileType {
@@ -345,7 +337,6 @@ export interface HorecaRequestDto {
     categories: string[]
     items: HorecaRequestItemDto[]
     comment: string
-    reviewNotificationSent: boolean
     horecaRequestProviderStatus?: HorecaRequestProviderStatusDto
     /** @format date-time */
     createdAt: string
@@ -355,15 +346,8 @@ export interface HorecaRequestDto {
     images?: UploadDto[]
 }
 
-export interface HRProviderUserDto {
-    avatar?: UploadDto
-    name: string
-    rating: number
-}
-
-export interface ProviderRequestItemDto {
+export interface IncomeProviderRequestItemDto {
     id: number
-    providerRequestId: number
     horecaRequestItemId: number
     available: boolean
     manufacturer: string
@@ -375,25 +359,27 @@ export interface ProviderRequestItemDto {
     images?: UploadDto[]
 }
 
-export interface HRProviderRequestDto {
-    cover: number
-    user: HRProviderUserDto
+export interface IncomeProviderUserDto {
+    avatar?: UploadDto
+    name: string
+    rating: number
+}
+
+export interface IncomeProviderRequestDto {
     id: number
-    userId: number
-    horecaRequest?: HorecaRequestDto
-    horecaRequestId: number
     comment: string
+    status: object
+    chatId: number
     /** @format date-time */
     createdAt: string
     /** @format date-time */
     updatedAt: string
-    chatId: number | null
-    items: ProviderRequestItemDto[]
-    status: object
-    images?: UploadDto[]
+    items: IncomeProviderRequestItemDto[]
+    cover: number
+    user: IncomeProviderUserDto
 }
 
-export interface HorecaRequestWithProviderRequestDto {
+export interface HorecaRequestWithProviderRequestsDto {
     paymentType: PaymentType
     status: HorecaRequestStatus
     id: number
@@ -408,7 +394,6 @@ export interface HorecaRequestWithProviderRequestDto {
     categories: string[]
     items: HorecaRequestItemDto[]
     comment: string
-    reviewNotificationSent: boolean
     horecaRequestProviderStatus?: HorecaRequestProviderStatusDto
     /** @format date-time */
     createdAt: string
@@ -416,7 +401,45 @@ export interface HorecaRequestWithProviderRequestDto {
     updatedAt: string
     cover?: number
     images?: UploadDto[]
-    providerRequests: HRProviderRequestDto[]
+    providerRequests: IncomeProviderRequestDto[]
+}
+
+export interface ActiveProviderRequestDto {
+    id: number
+    comment: string
+    userId: number
+    horecaRequestId: number
+    status: object
+    chatId: number
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+}
+
+export interface HorecaRequestWithActiveProviderRequestDto {
+    paymentType: PaymentType
+    status: HorecaRequestStatus
+    id: number
+    userId: number
+    address: string
+    /** @format date-time */
+    deliveryTime: string
+    /** @format date-time */
+    acceptUntill: string
+    name: string
+    phone: string
+    categories: string[]
+    items: HorecaRequestItemDto[]
+    comment: string
+    horecaRequestProviderStatus?: HorecaRequestProviderStatusDto
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+    cover?: number
+    images?: UploadDto[]
+    providerRequests: ActiveProviderRequestDto[]
 }
 
 export interface HorecaRequestSearchDto {
@@ -613,6 +636,10 @@ export interface WsMessageCreateDto {
     authorId: number
 }
 
+export interface ChatMessageSearchDto {
+    chatId: number
+}
+
 export interface FavouritesCreateDto {
     providerId: number
 }
@@ -656,6 +683,28 @@ export interface SupportRequestSearchDto {
     isNew?: boolean
 }
 
+export interface IncomeHorecaRequestDto {
+    id: number
+    userId: number
+    categories: string[]
+    address: string
+    /** @format date-time */
+    deliveryTime: string
+    /** @format date-time */
+    acceptUntill: string
+    paymentType: object
+    comment: string
+    name: string
+    phone: string
+    reviewNotificationSent: boolean
+    status: object
+    /** @format date-time */
+    createdAt: string
+    /** @format date-time */
+    updatedAt: string
+    cover?: number
+}
+
 export interface ProviderHorecaRequestSearchDto {
     hiddenAndViewed?: boolean
     category?: Categories
@@ -677,20 +726,30 @@ export interface ProviderRequestCreateDto {
     items: ProviderRequestItemCreateDto[]
 }
 
+export interface ProviderRequestItemDto {
+    id: number
+    horecaRequestItemId: number
+    available: boolean
+    manufacturer: string
+    cost: number
+    /** @format date-time */
+    createdAt: string
+    images?: UploadDto[]
+}
+
 export interface ProviderRequestDto {
     id: number
-    userId: number
-    horecaRequest?: HorecaRequestDto
-    horecaRequestId: number
     comment: string
+    userId: number
+    horecaRequestId: number
+    status: object
+    chatId: number
     /** @format date-time */
     createdAt: string
     /** @format date-time */
     updatedAt: string
-    chatId: number | null
     items: ProviderRequestItemDto[]
-    status: object
-    images?: UploadDto[]
+    horecaRequest?: IncomeHorecaRequestDto
 }
 
 export interface ProviderRequestSearchDto {
@@ -1474,7 +1533,7 @@ export class Api<
         ) =>
             this.request<
                 {
-                    data: HorecaRequestDto[]
+                    data: HorecaRequestWithActiveProviderRequestDto[]
                     total: number
                 },
                 ErrorDto
@@ -1497,7 +1556,7 @@ export class Api<
          * @secure
          */
         horecaRequestsControllerGet: (id: number, params: RequestParams = {}) =>
-            this.request<HorecaRequestWithProviderRequestDto, ErrorDto>({
+            this.request<HorecaRequestWithProviderRequestsDto, ErrorDto>({
                 path: `/api/horeca/requests/${id}`,
                 method: 'GET',
                 secure: true,
@@ -1678,7 +1737,7 @@ export class Api<
             query?: {
                 offset?: number
                 limit?: number
-                search?: any
+                search?: ChatMessageSearchDto
                 /** fieldName(numeric)|ASC/DESC */
                 sort?: string
             },
@@ -1951,7 +2010,7 @@ export class Api<
         ) =>
             this.request<
                 {
-                    data: HorecaRequestDto[]
+                    data: IncomeHorecaRequestDto[]
                     total: number
                 },
                 ErrorDto
@@ -1977,7 +2036,7 @@ export class Api<
             id: number,
             params: RequestParams = {}
         ) =>
-            this.request<HorecaRequestDto, ErrorDto>({
+            this.request<IncomeHorecaRequestDto, ErrorDto>({
                 path: `/api/provider/requests/income/${id}`,
                 method: 'GET',
                 secure: true,
