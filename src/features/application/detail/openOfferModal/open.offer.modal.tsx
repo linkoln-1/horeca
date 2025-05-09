@@ -60,7 +60,7 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
 
             const createdChat = await chatCreateMutation.mutateAsync({
                 data: {
-                    opponentId: requestData.providerRequests[0].userId,
+                    opponentId: requestData.providerRequests[0].user.profile.id,
                     horecaRequestId: requestData.id,
                     providerRequestId: requestData.providerRequests[0].id,
                     type: 'Order',
@@ -109,7 +109,9 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
                     <Table.Td
                         className={`border-b-${isAvailable ? 'green' : 'red'}-800 border-b-2 bg-${isAvailable ? 'green' : 'red'}-200`}
                     >
-                        {providerItem?.manufacturer ? providerItem.manufacturer : 'Нет'}
+                        {providerItem?.manufacturer
+                            ? providerItem.manufacturer
+                            : 'Нет'}
                     </Table.Td>
                     <Table.Td
                         className={`border-b-${isAvailable ? 'green' : 'red'}-800 border-b-2 bg-${isAvailable ? 'green' : 'red'}-200`}

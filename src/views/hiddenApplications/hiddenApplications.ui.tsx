@@ -72,7 +72,6 @@ export function HiddenApplicationsViews() {
                                     'Адрес и дата доставки',
                                     'Комментарий',
                                     'Отсрочка',
-                                    'Почему скрыта',
                                 ].map((tab, index) => (
                                     <Table.Th key={index} c='#FFF' p='md'>
                                         <Flex justify='center'>{tab}</Flex>
@@ -137,14 +136,6 @@ export function HiddenApplicationsViews() {
                                                         p='md'
                                                     >
                                                         {request.acceptUntill}
-                                                    </Table.Td>
-                                                    <Table.Td
-                                                        align='center'
-                                                        p='md'
-                                                    >
-                                                        {
-                                                            request.reviewNotificationSent
-                                                        }
                                                     </Table.Td>
                                                     <Table.Td
                                                         align='center'
