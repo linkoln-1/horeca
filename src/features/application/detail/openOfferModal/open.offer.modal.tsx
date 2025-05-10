@@ -8,15 +8,20 @@ import {
     Divider,
     Table,
     Image as MantineImage,
+    Avatar,
 } from '@mantine/core'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/navigation'
 
+import { CategoryLabels } from '@/shared/constants'
 import { getImageUrl } from '@/shared/helpers'
-import { HorecaRequestWithProviderRequestDto } from '@/shared/lib/horekaApi/Api'
+import {
+    Categories,
+    HorecaRequestWithProviderRequestsDto,
+} from '@/shared/lib/horekaApi/Api'
 
 interface OpenOfferModalProps {
-    requestData: HorecaRequestWithProviderRequestDto
+    requestData: HorecaRequestWithProviderRequestsDto
     onClose: () => void
 }
 
@@ -60,6 +65,7 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
 
             const createdChat = await chatCreateMutation.mutateAsync({
                 data: {
+                    // @ts-ignore
                     opponentId: requestData.providerRequests[0].user.profile.id,
                     horecaRequestId: requestData.id,
                     providerRequestId: requestData.providerRequests[0].id,
@@ -68,7 +74,6 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
             })
 
             onClose()
-
             if (createdChat?.data.id) {
                 router.push(
                     `/user/horeca/providerChatRequest/${createdChat.data.id}`
@@ -78,7 +83,6 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
             console.error('Ошибка при подтверждении запроса', error)
         }
     }
-    console.log(requestData)
 
     const renderTableRows = (
         items: typeof requestData.items,
@@ -148,19 +152,29 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
             <Text w='100%' c='gray.6'>
                 Дата и время отклика:{' '}
                 {dayjs(requestData.createdAt).format('DD.MM.YYYY')}{' '}
-                {dayjs(requestData.createdAt).format('HH:mm')},
+                {dayjs(requestData.createdAt).format('HH:mm')}
             </Text>
             <Flex w='100%' gap='xl'>
-                <MantineImage
+                <Avatar
                     w='120px'
                     h='120px'
                     radius='lg'
-                    src='/assets/images/bg-5.png'
+                    src={getImageUrl(
+                        requestData.providerRequests[0].user.avatar?.path
+                    )}
                 />
                 <Flex direction='column' gap='md'>
-                    <Text>Поставщик: </Text>
-                    <Text>Рейтинг: 4.9 / 5.0</Text>
-                    <Text>Совпадение по заявке: {requestData.cover}</Text>
+                    <Text>
+                        Поставщик: {requestData.providerRequests[0].user.name}
+                    </Text>
+                    <Text>
+                        Рейтинг: {requestData.providerRequests[0].user.rating} /
+                        5.0
+                    </Text>
+                    <Text>
+                        Совпадение по заявке:{' '}
+                        {requestData.providerRequests[0].cover}%
+                    </Text>
                 </Flex>
             </Flex>
 
@@ -182,7 +196,11 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
                         new Set(requestData.items.map(item => item.category))
                     ).map(category => (
                         <Box key={category}>
-                            <Text mt='lg'>{category}</Text>
+                            <Text mt='lg'>
+                                {category in CategoryLabels
+                                    ? CategoryLabels[category as Categories]
+                                    : category}
+                            </Text>
 
                             {unavailableItems.filter(
                                 item => item.category === category

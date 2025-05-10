@@ -1,10 +1,9 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 
 import { requestQueries } from '@/entities/horeca-request'
 import { FinishApplicationModal } from '@/features/application/detail/finishApplicationModal'
-import { OpenApplicationModal } from '@/features/application/detail/openApplicationModal'
 import { OpenOfferModal } from '@/features/application/detail/openOfferModal'
 import { handleApplicationsDetailsModals } from '@/views/applications/ui/applicationsDetailsModal'
 import {
@@ -27,15 +26,14 @@ import { CategoryLabels } from '@/shared/constants'
 import { getImageUrl } from '@/shared/helpers'
 import {
     Categories,
-    HorecaRequestWithProviderRequestDto,
+    HorecaRequestWithProviderRequestsDto,
 } from '@/shared/lib/horekaApi/Api'
 
 export function ApplicationsDetailViews({ id }: { id: string }) {
-    const [opened, setOpened] = useState<number | null>(null)
     const { data, isLoading } = requestQueries.useGetRequestByIdQuery(+id)
 
     if (isLoading) return <Loader />
-    
+
     return (
         <Flex direction='column' gap='md'>
             <Flex direction='column' mb='xl' gap='md'>
@@ -216,7 +214,10 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                         radius='md'
                                         src='/assets/images/bg-5.png'
                                     />
-                                    <Text size='lg'>4.9 / 5.0</Text>
+                                    <Text size='lg'>
+                                        {data.providerRequests[0].user.rating} /
+                                        5.0
+                                    </Text>
                                 </Flex>
 
                                 <Text
@@ -422,7 +423,7 @@ function handleFinishApplicationModal() {
 function handleOpenOfferModal(
     e: React.MouseEvent<HTMLDivElement>,
     title: number,
-    data: HorecaRequestWithProviderRequestDto
+    data: HorecaRequestWithProviderRequestsDto
 ) {
     e.stopPropagation()
     modals.open({
