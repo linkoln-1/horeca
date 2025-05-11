@@ -29,7 +29,6 @@ export function SaveModal({ forms }: SaveModalProps) {
 
     const { mutateAsync: createTemplate } =
         templateQueries.useCreateHorecaTemplateMutation()
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
@@ -47,7 +46,12 @@ export function SaveModal({ forms }: SaveModalProps) {
 
             const contentData: HorecaRequestCreateDto = {
                 items,
-                address: forms.values.address,
+                address:
+                    forms.values.city +
+                    forms.values.street +
+                    forms.values.house +
+                    forms.values.building +
+                    forms.values.office,
                 deliveryTime: dayjs(forms.values.deliveryTime).format(
                     'YYYY-MM-DD'
                 ),
@@ -57,6 +61,8 @@ export function SaveModal({ forms }: SaveModalProps) {
                 paymentType: forms.values.paymentType,
                 name: forms.values.name,
                 phone: forms.values.phone,
+                comment: forms.values.comment,
+                imageIds: forms.values.imageIds,
             }
 
             await createTemplate({

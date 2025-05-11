@@ -26,6 +26,7 @@ import { DateInput, DateTimePicker } from '@mantine/dates'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { IconCalendar, IconPlus, IconX } from '@tabler/icons-react'
+import 'dayjs/locale/ru'
 
 import { CategoryLabels, errors, HorecaRequestForm } from '@/shared/constants'
 import { PaymentMethod } from '@/shared/constants/paymentMethod'
@@ -501,6 +502,7 @@ export function EditTemplateViews({ id }: { id: string }) {
                                     gap='sm'
                                 >
                                     <DateInput
+                                        locale='ru'
                                         flex={1}
                                         size='md'
                                         placeholder='ДД.ММ.ГГ'
@@ -521,6 +523,7 @@ export function EditTemplateViews({ id }: { id: string }) {
                                     />
                                     <DateTimePicker
                                         flex={1}
+                                        locale='ru'
                                         size='md'
                                         valueFormat='DD/MM/YYYY HH:mm:ss'
                                         label='Привезите товар не позднее:'
@@ -537,7 +540,6 @@ export function EditTemplateViews({ id }: { id: string }) {
                                         }
                                         {...form.getInputProps('deliveryTime')}
                                     />
-                                    
                                 </Flex>
                                 <Flex>
                                     <Radio.Group
