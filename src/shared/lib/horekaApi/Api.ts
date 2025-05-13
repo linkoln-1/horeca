@@ -706,7 +706,8 @@ export interface IncomeHorecaRequestDto {
 }
 
 export interface ProviderHorecaRequestSearchDto {
-    hiddenAndViewed?: boolean
+    hidden?: boolean
+    viewed?: boolean
     category?: Categories
 }
 
