@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { handleDetailsModal } from './detailsModal/detailsModal.ui'
 import { providerRequest } from '@/entities/provider-request'
 import {
     Flex,
@@ -17,13 +18,11 @@ import {
 } from '@mantine/core'
 import { IconMessage } from '@tabler/icons-react'
 import dayjs from 'dayjs'
+import Link from 'next/link'
 
 import { applications } from '@/shared/constants/applications'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
-import {
-    ProviderRequestStatus,
-} from '@/shared/lib/horekaApi/Api'
-import { handleDetailsModal } from './detailsModal/detailsModal.ui'
+import { ProviderRequestStatus } from '@/shared/lib/horekaApi/Api'
 
 const limit = 10
 
@@ -55,7 +54,7 @@ export function ProviderRequests() {
     } = providerRequest.useGetAllProviderRequestQuery({
         limit: limit,
         search: {
-            status: activeStatus
+            status: activeStatus,
         },
     })
 
@@ -78,7 +77,7 @@ export function ProviderRequests() {
                             label: 'В работе',
                         },
                         {
-                            value: 'Ожидание',
+                            value: 'Ожидают откликов',
                             label: (
                                 <Tooltip
                                     withArrow
@@ -181,17 +180,21 @@ export function ProviderRequests() {
                                             </Flex>
 
                                             <Box>
-                                                <IconMessage
-                                                    size={30}
-                                                    color={
-                                                        (
-                                                            order.status as unknown as ProviderRequestStatus
-                                                        ).toLowerCase() ===
-                                                        'Pending'
-                                                            ? 'gray'
-                                                            : 'black'
-                                                    }
-                                                />
+                                                <Link
+                                                    href={`/user/provider/horecaChatRequest/${order?.chatId}`}
+                                                >
+                                                    <IconMessage
+                                                        size={30}
+                                                        color={
+                                                            (
+                                                                order.status as unknown as ProviderRequestStatus
+                                                            ).toLowerCase() ===
+                                                            'pending'
+                                                                ? 'gray'
+                                                                : 'black'
+                                                        }
+                                                    />
+                                                </Link>
                                             </Box>
                                         </Flex>
                                         <Divider

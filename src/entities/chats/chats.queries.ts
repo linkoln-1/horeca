@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import {
     useInfiniteQuery,
     useMutation,
@@ -12,8 +10,8 @@ import {
     ChatCreateDto,
     ChatMessageDto,
     ErrorDto,
+    ReviewCreateDto,
 } from '@/shared/lib/horekaApi/Api'
-import { useCustomInfiniteQuery } from '@/shared/lib/reactQuery/useCustomInfiniteQuery'
 import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
 
 export function useGetChatQuery() {
@@ -103,3 +101,17 @@ export function useGetUserSupportListQuery() {
         queryFn: () => api.supportRequestsControllerList(),
     })
 }
+
+export function useCreateReviewMutation() {
+    const queryClient = useQueryClient()
+    
+    return useMutation({
+      mutationFn: (data: ReviewCreateDto) => 
+        api.reviewsControllerCreate(data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ 
+          queryKey: ['chat', 'reviews'] 
+        })
+      }
+    })
+  }

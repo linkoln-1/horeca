@@ -62,8 +62,16 @@ export function UpdateModal({ id }: { id: number }) {
     })
 
     const { data: products } = productsQueries.useGetProductByIdQuery(id)
-    const { mutate: productsUpdate } =
-        productsQueries.useUpdateProductMutation(id)
+    const { mutate: productsUpdate } = productsQueries.useUpdateProductMutation(
+        id,
+        {
+            onSuccess: () => {
+                modals.close('product-update-modal')
+                toast.success('Товар успешно отредактирован')
+            },
+        }
+    )
+    
     const { mutateAsync: uploadImage, isPending: isImagePending } =
         imageQueries.useImageUploadMutation()
 
@@ -121,7 +129,6 @@ export function UpdateModal({ id }: { id: number }) {
             }
 
             productsUpdate({ data: updateDto })
-            toast.success('Товар успешно отредактирован')
         } catch (e: any) {
             const errorKey = e?.error?.error
 
@@ -277,57 +284,42 @@ export function UpdateModal({ id }: { id: number }) {
                                             Добавить фотографии
                                         </Button>
                                     )}
-
-                                {form.values.images &&
-                                    form.values.images.length > 0 && (
-                                        <Flex mt='md' gap='sm'>
-                                            {form.values.images &&
-                                                form.values.images.map(
-                                                    (x, index) => {
-                                                        return (
-                                                            <Box
-                                                                pos='relative'
-                                                                key={index}
-                                                            >
-                                                                <Tooltip label='Удалить картинку'>
-                                                                    <ActionIcon
-                                                                        onClick={() =>
-                                                                            handleDeleteImage(
-                                                                                index
-                                                                            )
-                                                                        }
-                                                                        color='gray'
-                                                                        pos='absolute'
-                                                                        right={rem(
-                                                                            8 +
-                                                                                10
-                                                                        )}
-                                                                        top={rem(
-                                                                            8 +
-                                                                                10
-                                                                        )}
-                                                                    >
-                                                                        <IconTrash
-                                                                            size={
-                                                                                20
-                                                                            }
-                                                                        />
-                                                                    </ActionIcon>
-                                                                </Tooltip>
-                                                                <MantineImage
-                                                                    radius='md'
-                                                                    src={getImageUrl(
-                                                                        x.path
-                                                                    )}
-                                                                    alt='portfolio'
-                                                                    className='aspect-square'
-                                                                />
-                                                            </Box>
-                                                        )
-                                                    }
-                                                )}
-                                        </Flex>
-                                    )}
+                                (
+                                <Flex mt='md' gap='sm'>
+                                    {form.values.images &&
+                                        form.values.images.map((x, index) => {
+                                            return (
+                                                <Box pos='relative' key={index}>
+                                                    <Tooltip label='Удалить картинку'>
+                                                        <ActionIcon
+                                                            onClick={() =>
+                                                                handleDeleteImage(
+                                                                    index
+                                                                )
+                                                            }
+                                                            color='gray'
+                                                            pos='absolute'
+                                                            right={rem(8 + 10)}
+                                                            top={rem(8 + 10)}
+                                                        >
+                                                            <IconTrash
+                                                                size={20}
+                                                            />
+                                                        </ActionIcon>
+                                                    </Tooltip>
+                                                    <MantineImage
+                                                        radius='md'
+                                                        src={getImageUrl(
+                                                            x.path
+                                                        )}
+                                                        alt='portfolio'
+                                                        className='aspect-square'
+                                                    />
+                                                </Box>
+                                            )
+                                        })}
+                                </Flex>
+                                )
                             </Flex>
 
                             <Text size='sm' mt='xs' c='gray.6'>
