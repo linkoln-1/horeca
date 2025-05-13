@@ -18,6 +18,7 @@ import {
     ActionIcon,
     Tooltip,
 } from '@mantine/core'
+import { modals } from '@mantine/modals'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 
 import { CategoryLabels } from '@/shared/constants'
@@ -28,6 +29,7 @@ const limit = 10
 
 export function Catalog() {
     const user = useUserStore(state => state.user)
+    const deleteProductMutation = productsQueries.useDeleteProductMutation()
 
     const { data, hasNextPage, isFetching, fetchNextPage } =
         productsQueries.useGetProductsInfiniteQuery({
@@ -105,9 +107,10 @@ export function Catalog() {
                                             <Table.Td align='center' p='md'>
                                                 {product.description === 'beer'
                                                     ? 'Пиво'
-                                                    : product.description.length > 50
-                                                    ? `${product.description.slice(0, 50)}...`
-                                                    : product.description}
+                                                    : product.description
+                                                            .length > 50
+                                                      ? `${product.description.slice(0, 50)}...`
+                                                      : product.description}
                                             </Table.Td>
 
                                             <Table.Td align='center' p='md'>
@@ -186,7 +189,50 @@ export function Catalog() {
                                                         bg='pink.5'
                                                         c='white'
                                                     >
-                                                        <ActionIcon bg='red'>
+                                                        <ActionIcon
+                                                            bg='red'
+                                                            onClick={() => {
+                                                                modals.openConfirmModal(
+                                                                    {
+                                                                        title: 'Подтверждение удаления',
+                                                                        centered:
+                                                                            true,
+                                                                        children:
+                                                                            (
+                                                                                <Text size='sm'>
+                                                                                    Вы
+                                                                                    уверены,
+                                                                                    что
+                                                                                    хотите
+                                                                                    удалить
+                                                                                    товар{' '}
+                                                                                    <b>
+                                                                                        {
+                                                                                            product.name
+                                                                                        }
+                                                                                    </b>
+
+                                                                                    ?
+                                                                                </Text>
+                                                                            ),
+                                                                        labels: {
+                                                                            confirm:
+                                                                                'Удалить',
+                                                                            cancel: 'Отмена',
+                                                                        },
+                                                                        confirmProps:
+                                                                            {
+                                                                                color: 'red',
+                                                                            },
+                                                                        onConfirm:
+                                                                            () =>
+                                                                                deleteProductMutation.mutate(
+                                                                                    product.id
+                                                                                ),
+                                                                    }
+                                                                )
+                                                            }}
+                                                        >
                                                             <IconTrash
                                                                 size={18}
                                                             />

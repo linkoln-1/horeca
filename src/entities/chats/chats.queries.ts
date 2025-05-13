@@ -1,10 +1,17 @@
-import { useState } from 'react'
-
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+    useInfiniteQuery,
+    useMutation,
+    useQuery,
+    useQueryClient,
+} from '@tanstack/react-query'
 
 import { api } from '@/shared/lib/horekaApi'
-import { ChatCreateDto } from '@/shared/lib/horekaApi/Api'
-import { useCustomInfiniteQuery } from '@/shared/lib/reactQuery/useCustomInfiniteQuery'
+import {
+    ChatCreateDto,
+    ChatMessageDto,
+    ErrorDto,
+    ReviewCreateDto,
+} from '@/shared/lib/horekaApi/Api'
 import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
 
 export function useGetChatQuery() {
@@ -27,8 +34,8 @@ export function useGetChatsByIdQuery({
             const res = await api.chatsControllerGetChat(id)
             return res
         },
-
         enabled,
+        refetchOnMount: 'always',
     })
 }
 
@@ -45,15 +52,33 @@ export function useChatCreateMutation() {
     })
 }
 
-export function useInfiniteGetAllMessagesQuery(query?: {
-    offset: number
-    limit: number
-    search: string
-    sort: string
-}) {
-    return useCustomInfiniteQuery({
-        queryKey: ['chat-messages'],
-        queryFn: () => api.chatsMessageControllerGetChatMessages(query),
+export function useInfiniteGetAllMessagesQuery({ chatId }: { chatId: number }) {
+    return useInfiniteQuery<
+        { data: ChatMessageDto[]; total: number },
+        ErrorDto,
+        { data: ChatMessageDto[]; total: number },
+        (string | number)[],
+        number
+    >({
+        queryKey: ['chat-messages', chatId],
+        queryFn: async ({ pageParam = 0 }) => {
+            const response = await api.chatsMessageControllerGetChatMessages({
+                search: { chatId },
+                offset: pageParam,
+            })
+            return response.data
+        },
+        initialPageParam: 0,
+        getNextPageParam: (lastPage, allPages) => {
+            const totalFetched = allPages.reduce(
+                (acc, page) => acc + page.data.length,
+                0
+            )
+            const hasMore = lastPage.data.length === 10
+            return hasMore ? totalFetched : undefined
+        },
+        refetchOnMount: 'always',
+        staleTime: 0,
     })
 }
 
@@ -76,3 +101,17 @@ export function useGetUserSupportListQuery() {
         queryFn: () => api.supportRequestsControllerList(),
     })
 }
+
+export function useCreateReviewMutation() {
+    const queryClient = useQueryClient()
+    
+    return useMutation({
+      mutationFn: (data: ReviewCreateDto) => 
+        api.reviewsControllerCreate(data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ 
+          queryKey: ['chat', 'reviews'] 
+        })
+      }
+    })
+  }

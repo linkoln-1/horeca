@@ -66,7 +66,7 @@ export function ApplicationsViews() {
             status: activeStatus as HorecaRequestStatus,
         },
     })
-    
+
     const user = useUserStore(state => state.user)
 
     const handleTabChange = (tab: string) => {
@@ -174,15 +174,17 @@ export function ApplicationsViews() {
                                             </Flex>
 
                                             <Box>
-                                                <IconMessage
-                                                    size={30}
-                                                    color={
-                                                        order.status.toLowerCase() ===
-                                                        'pending'
-                                                            ? 'gray'
-                                                            : 'black'
-                                                    }
-                                                />
+                                                <Link href={`/user/horeca/providerChatRequest/${order?.providerRequests[0]?.chatId}`}>
+                                                    <IconMessage
+                                                        size={30}
+                                                        color={
+                                                            order.status.toLowerCase() ===
+                                                            'pending'
+                                                                ? 'gray'
+                                                                : 'black'
+                                                        }
+                                                    />
+                                                </Link>
                                             </Box>
                                         </Flex>
                                         <Divider

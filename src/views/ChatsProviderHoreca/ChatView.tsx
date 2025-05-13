@@ -3,7 +3,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 import { useChatHorecaStore } from '@/entities/chats/chat.users.model'
-import { useGetChatsByIdQuery } from '@/entities/chats/chats.queries'
+import {
+    useGetChatsByIdQuery,
+    useInfiniteGetAllMessagesQuery,
+} from '@/entities/chats/chats.queries'
 import { userQueries } from '@/entities/user'
 import { Loader } from '@mantine/core'
 import { IconSend2, IconArrowDown } from '@tabler/icons-react'
@@ -15,7 +18,8 @@ import { useWebSocketChat } from '@/shared/hooks/useWebsocketChat'
 export function ChatView() {
     const { id } = useParams() as { id: string }
     const chatId = Number(id)
-    const ref = useRef<HTMLDivElement>(null)
+    const scrollContainerRef = useRef<HTMLDivElement>(null)
+    const bottomRef = useRef<HTMLDivElement>(null)
     const [message, setMessage] = useState<string>('')
     const [isAtBottom, setIsAtBottom] = useState(true)
     const { data: userData } = userQueries.useGetMeQuery()
@@ -23,7 +27,14 @@ export function ChatView() {
         id: chatId,
         enabled: chatId > 0,
     })
-
+    
+    const {
+        data: allChatMessages,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        refetch,
+    } = useInfiniteGetAllMessagesQuery({ chatId })
     const { chats, addMessage, setChatMessagesWithInitial } =
         useChatHorecaStore()
     const messages = chats[chatId] || []
@@ -34,18 +45,14 @@ export function ChatView() {
     })
 
     const scrollToBottom = useCallback(() => {
-        if (ref.current) {
-            ref.current.scrollTo({
-                top: ref.current.scrollHeight,
-                behavior: 'smooth',
-            })
-        }
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, [])
 
     const handleScroll = () => {
-        if (!ref.current) return
+        if (!scrollContainerRef.current) return
 
-        const { scrollTop, scrollHeight, clientHeight } = ref.current
+        const { scrollTop, scrollHeight, clientHeight } =
+            scrollContainerRef.current
         const isBottom = scrollHeight - scrollTop - clientHeight < 100
         setIsAtBottom(isBottom)
 
@@ -56,7 +63,8 @@ export function ChatView() {
 
     useEffect(() => {
         if (!data) return
-        const chatMessages = data.data?.messages || []
+        // @ts-ignore
+        const chatMessages = allChatMessages?.pages[0]?.data || []
         setChatMessagesWithInitial(chatId, undefined, chatMessages)
     }, [data])
 
@@ -102,6 +110,9 @@ export function ChatView() {
         })
 
         setMessage('')
+        setTimeout(() => {
+            scrollToBottom()
+        }, 0)
     }
 
     if (isLoading || !userData) return <Loader />
@@ -120,9 +131,9 @@ export function ChatView() {
     const opponentBubbleStyles = 'bg-gray-200 text-black'
 
     return (
-        <div className='relative flex flex-col p-4'>
+        <div className='relative flex flex-col p-4 h-[800px]'>
             <div
-                ref={ref}
+                ref={scrollContainerRef}
                 onScroll={handleScroll}
                 className='flex-1 overflow-y-auto bg-white p-6 rounded-xl shadow-inner space-y-4 custom-scrollbar'
             >
@@ -166,6 +177,7 @@ export function ChatView() {
                         </div>
                     )
                 })}
+                <div ref={bottomRef} />
             </div>
 
             {!isAtBottom && (

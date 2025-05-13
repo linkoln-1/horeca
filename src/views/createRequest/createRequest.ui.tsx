@@ -134,39 +134,43 @@ export function CreateRequestView() {
     }
 
     const handleAddMainImage = async (files: File[] | null) => {
-        if (files && files.length > 0) {
-            try {
-                const uploadedImageDtos: UploadDto[] = await Promise.all(
-                    files.map(async file => {
-                        const response = await uploadImage({ file })
-                        return response
-                    })
-                )
-
-                const uploadedImageIds = uploadedImageDtos.map(dto => dto.id)
-
-                form.setValues(prevState => ({
-                    ...prevState,
-                    imageIds: [
-                        ...(prevState.imageIds ?? []),
-                        ...uploadedImageIds,
-                    ],
-                }))
-
-                setImages(prevImages => [
-                    ...(prevImages ?? []),
-                    ...uploadedImageDtos,
-                ])
-
-                toast.success('Картинка успешно загружена!')
-            } catch (e) {
-                console.error('Error uploading images:', e)
-                toast.error(
-                    'Ошибка при загрузке изображений. Попробуйте ещё раз.'
-                )
-            }
-        } else {
+        if (!files || files.length === 0) {
             toast.error('Не выбрано ни одного файла для загрузки.')
+            return
+        }
+
+        const remainingSlots = 5 - images.length
+        if (remainingSlots <= 0) {
+            toast.error('Можно загрузить не более 5 фотографий.')
+            return
+        }
+
+        const filesToUpload = files.slice(0, remainingSlots)
+
+        try {
+            const uploadedImageDtos: UploadDto[] = await Promise.all(
+                filesToUpload.map(async file => {
+                    const response = await uploadImage({ file })
+                    return response
+                })
+            )
+
+            const uploadedImageIds = uploadedImageDtos.map(dto => dto.id)
+
+            form.setValues(prevState => ({
+                ...prevState,
+                imageIds: [...(prevState.imageIds ?? []), ...uploadedImageIds],
+            }))
+
+            setImages(prevImages => [
+                ...(prevImages ?? []),
+                ...uploadedImageDtos,
+            ])
+
+            toast.success('Картинка успешно загружена!')
+        } catch (e) {
+            console.error('Error uploading images:', e)
+            toast.error('Ошибка при загрузке изображений. Попробуйте ещё раз.')
         }
     }
 

@@ -45,7 +45,7 @@ export function Header() {
         user?.profile?.profileType === roles[0].role
             ? providerSidebarData
             : horecaSidebarData
-
+    
     return (
         <Paper w='100%' bg='var(--mantine-color-indigo-0)' p='sm'>
             <Container fluid>
@@ -125,7 +125,7 @@ export function Header() {
                         </Drawer>
 
                         <Link
-                            href={`/user${user && role({ user })}/applications`}
+                            href={`/user${user && role({ user })}/`}
                         >
                             <MantineImage
                                 src='/assets/icons/logo.svg'

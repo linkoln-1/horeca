@@ -5,7 +5,8 @@ import React from 'react'
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { providerRequest } from '@/entities/provider-request'
 import { useProviderRequestGetStatusMutation } from '@/entities/provider-request/request.queries'
-import { Button, Flex, Select, Text, Table } from '@mantine/core'
+import { Button, Flex, Select, Text, Table, Modal } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import Link from 'next/link'
 
 import {
@@ -34,7 +35,7 @@ export function ProductApplicationViews() {
     const user = useUserStore(state => state.user)
     const [sortValue, setSortValue] = React.useState('new')
 
-    const { data: incomingRequests } =
+    const { data: incomingRequests, refetch } =
         providerRequest.useProviderRequestIncomeQuery({
             search: { hiddenAndViewed: false },
             sort: getSortParam(sortValue),
@@ -44,8 +45,23 @@ export function ProductApplicationViews() {
         incomingRequests && groupRequestsByDate(incomingRequests.data || [])
     const { mutate: setStatus } = useProviderRequestGetStatusMutation()
 
-    const handleHideRequest = (requestId: number) => {
-        setStatus({ horecaRequestId: requestId, hidden: true })
+    const [opened, { open, close }] = useDisclosure(false)
+    const [selectedRequestId, setSelectedRequestId] = React.useState<
+        number | null
+    >(null)
+
+    const confirmHideRequest = () => {
+        if (selectedRequestId !== null) {
+            setStatus({ horecaRequestId: selectedRequestId, hidden: true })
+            close()
+            setSelectedRequestId(null)
+            refetch()
+        }
+    }
+
+    const openHideModal = (id: number) => {
+        setSelectedRequestId(id)
+        open()
     }
 
     return (
@@ -217,7 +233,7 @@ export function ProductApplicationViews() {
                                                                 bg='transparent'
                                                                 fw={400}
                                                                 onClick={() =>
-                                                                    handleHideRequest(
+                                                                    openHideModal(
                                                                         request.id
                                                                     )
                                                                 }
@@ -262,6 +278,23 @@ export function ProductApplicationViews() {
                         </Text>
                     </Flex>
                 ))}
+
+            <Modal
+                opened={opened}
+                onClose={close}
+                title='Подтверждение'
+                centered
+            >
+                <Text mb='md'>Отправить заявку в скрытые?</Text>
+                <Flex justify='end' gap='sm'>
+                    <Button color='gray' variant='light' onClick={close}>
+                        Отменить
+                    </Button>
+                    <Button color='red' onClick={confirmHideRequest}>
+                        Скрыть заявку
+                    </Button>
+                </Flex>
+            </Modal>
         </Flex>
     )
 }

@@ -37,15 +37,35 @@ export function useGetProductByIdQuery(id: number) {
     })
 }
 
-export function useUpdateProductMutation(id: number) {
+export function useUpdateProductMutation(
+    id: number,
+    options?: {
+        onSuccess?: () => void
+        onError?: (error: unknown) => void
+        onSettled?: () => void
+    }
+) {
+    const queryClient = useQueryClient()
+
     return useMutation({
         mutationFn: ({ data }: { data: ProductUpdateDto }) =>
             api.productsControllerUpdate(id, data),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['product'] })
+            options?.onSuccess?.()
+        },
+        onError: options?.onError,
+        onSettled: options?.onSettled,
     })
 }
 
-export function useDeleteProductMutation(id: number) {
+export function useDeleteProductMutation() {
+    const queryClient = useQueryClient()
+
     return useMutation({
-        mutationFn: () => api.productsControllerDelete(id),
+        mutationFn: (id: number) => api.productsControllerDelete(id),
+        onSettled: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['product'] })
+        },
     })
 }
