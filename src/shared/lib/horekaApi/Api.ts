@@ -705,8 +705,14 @@ export interface IncomeHorecaRequestDto {
     cover?: number
 }
 
+export enum ProviderHorecaRequestStatus {
+    All = 'All',
+    Actual = 'Actual',
+    Hidden = 'Hidden',
+}
+
 export interface ProviderHorecaRequestSearchDto {
-    hiddenAndViewed?: boolean
+    status?: ProviderHorecaRequestStatus
     category?: Categories
 }
 
