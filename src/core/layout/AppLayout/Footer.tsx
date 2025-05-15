@@ -1,3 +1,4 @@
+import { useUserStore } from '@/core/providers/userStoreContext'
 import {
     Box,
     Button,
@@ -22,6 +23,7 @@ export function Footer(props: FooterProps) {
             <IconBrandTelegram size={19} color='#fff' />
         </div>
     )
+    const { user } = useUserStore(state => state)
     return (
         <Paper w='100%' bg='var(--mantine-color-indigo-0)' {...props}>
             <Container my='md' fluid>
@@ -69,11 +71,18 @@ export function Footer(props: FooterProps) {
                             <div className='rounded-full bg-blue-800 p-0.5'>
                                 <IconBrandTelegram size={19} color='#fff' />
                             </div>
-                            <Box className='text-[12px]'>Telegram</Box>
+
+                            <Link href={'https://t.me/sphere_horeca'}>
+                                <Box className='text-[12px]'>Telegram</Box>
+                            </Link>
                         </Button>
 
                         <Box className='text-[12px]  text-[#2F49A6]'>
-                            Свяжитесь с нами
+                            <Link
+                                href={`/user/${user?.role.toLowerCase()}/support`}
+                            >
+                                Свяжитесь с нами
+                            </Link>
                         </Box>
                     </Flex>
                 </Flex>

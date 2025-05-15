@@ -31,7 +31,23 @@ import {
 
 export function ApplicationsDetailViews({ id }: { id: string }) {
     const { data, isLoading } = requestQueries.useGetRequestByIdQuery(+id)
-
+    function handleImageZoom(imagePath: string) {
+        modals.open({
+            modalId: 'imageZoomModal',
+            size: 'auto',
+            centered: true,
+            padding: 0,
+            withCloseButton: false,
+            children: (
+                <Box>
+                    <MantineImage
+                        src={getImageUrl(imagePath)}
+                        style={{ maxWidth: '100vw', maxHeight: '100vh' }}
+                    />
+                </Box>
+            ),
+        })
+    }
     if (isLoading) return <Loader />
 
     return (
@@ -61,7 +77,7 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                     <Text>Создан:</Text>
                                     <Text>
                                         {dayjs(order.createdAt).format(
-                                            'YYYY-MM-DD HH:mm'
+                                            'DD.MM.YYYY'
                                         )}
                                     </Text>
                                 </Flex>
@@ -341,6 +357,12 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                                                             pos='relative'
                                                                             style={{
                                                                                 cursor: 'pointer',
+                                                                            }}
+                                                                            onClick={e => {
+                                                                                e.stopPropagation()
+                                                                                handleImageZoom(
+                                                                                    image.path
+                                                                                )
                                                                             }}
                                                                         >
                                                                             <MantineImage
