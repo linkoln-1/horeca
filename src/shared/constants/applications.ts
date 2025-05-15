@@ -15,4 +15,8 @@ export const applications = [
         label: 'Завершённые',
         status: 'COMPLETED',
     },
+    {
+        label: 'Завершённые неуспешно',
+        status: 'CompletedUnsuccessfully',
+    },
 ]

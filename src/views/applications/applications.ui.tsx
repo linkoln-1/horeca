@@ -27,7 +27,6 @@ import { role } from '@/shared/helpers/getRole'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
 import {
     Categories,
-    HorecaRequestSearchDto,
     HorecaRequestStatus,
     UserRole,
 } from '@/shared/lib/horekaApi/Api'
@@ -38,6 +37,7 @@ const statusMap: Record<string, HorecaRequestStatus> = {
     'В работе': HorecaRequestStatus.Active,
     'Ожидают откликов': HorecaRequestStatus.Pending,
     Завершённые: HorecaRequestStatus.CompletedSuccessfully,
+    'Завершённые неуспешно': HorecaRequestStatus.CompletedUnsuccessfully
 }
 
 export function ApplicationsViews() {

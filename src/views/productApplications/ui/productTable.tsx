@@ -1,15 +1,23 @@
-import React, { useState } from 'react'
+import React from 'react'
+
 import {
-    Checkbox,
     Table,
     Text,
     TextInput,
+    Checkbox,
     Flex,
     Image,
-    Modal,
-    SimpleGrid,
-    Button,
+    Group,
+    ActionIcon,
+    Paper,
+    Tooltip,
+    Badge,
 } from '@mantine/core'
+import { IconX, IconUpload } from '@tabler/icons-react'
+
+import { CategoryLabels } from '@/shared/constants'
+import { getImageUrl } from '@/shared/helpers'
+import { Categories } from '@/shared/lib/horekaApi/Api'
 
 interface Product {
     id: number
@@ -29,8 +37,9 @@ interface ProductTableProps {
     isModal?: boolean
     onManufacturerChange?: (itemId: number, value: string) => void
     onPriceChange?: (itemId: number, value: string) => void
-    photos: Record<number, number[]>
+    photos?: Record<number, { id: number; path: string }[]>
     onPhotoUpload?: (productId: number, files: FileList) => void
+    onPhotoRemove?: (productId: number, index: number) => void
 }
 
 export function ProductTable({
@@ -41,106 +50,85 @@ export function ProductTable({
     isModal = false,
     onManufacturerChange,
     onPriceChange,
-    photos,
+    photos = {},
     onPhotoUpload,
+    onPhotoRemove,
 }: ProductTableProps) {
-    const [modalOpened, setModalOpened] = useState(false)
-    const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
-
-    const openModal = (productId: number) => {
-        setSelectedProductId(productId)
-        setModalOpened(true)
-    }
-
     return (
-        <>
-            <Table withRowBorders withColumnBorders>
-                <Table.Thead bg='indigo.4'>
+        <Paper shadow='sm' p='md' radius='md' withBorder>
+            <Table
+                striped
+                highlightOnHover
+                verticalSpacing='md'
+                withColumnBorders
+            >
+                <Table.Thead>
                     <Table.Tr>
-                        {[
-                            '№',
-                            'Наименование',
-                            'Количество',
-                            !isModal && 'В наличии',
-                            'Производитель',
-                            'Цена',
-                            'Фото',
-                        ]
-                            .filter(Boolean)
-                            .map((tab, index) => (
-                                <Table.Th key={index} c='#FFF' p='md'>
-                                    <Flex justify='center'>{tab}</Flex>
-                                </Table.Th>
-                            ))}
+                        <Table.Th>#</Table.Th>
+                        <Table.Th>Наименование</Table.Th>
+                        <Table.Th>Количество</Table.Th>
+                        {!isModal && <Table.Th>В наличии</Table.Th>}
+                        <Table.Th>Производитель</Table.Th>
+                        <Table.Th>Цена</Table.Th>
+                        <Table.Th>Фото</Table.Th>
                     </Table.Tr>
                 </Table.Thead>
 
-                {data.categories.length === 0 && (
-                    <Flex direction='column' gap='md' pos='relative'>
-                        <Flex
-                            direction='column'
-                            justify='center'
-                            align='center'
-                            h='50vh'
-                            pos='absolute'
-                            w='78vw'
-                        >
-                            <Text fw={600} size='xl'>
-                                Скоро здесь появятся новые заявки! А пока вы
-                                можете заполнить свой каталог
-                            </Text>
-                            <Text c='gray'>
-                                Перейдите к заполнению каталога в левом меню,
-                                нажав на раздел «Мой каталог»
-                            </Text>
-                        </Flex>
-                    </Flex>
-                )}
-
-                {data.categories.map(date => (
-                    <React.Fragment key={date}>
+                {data.categories.map(category => (
+                    <React.Fragment key={category}>
                         <Table.Tbody>
                             <Table.Tr>
-                                <Table.Td colSpan={5} align='left' p='md'>
-                                    <Text
-                                        size='sm'
-                                        c='#909090'
-                                    >{`${date}`}</Text>
+                                <Table.Td colSpan={7}>
+                                    <Badge
+                                        variant='light'
+                                        color='indigo'
+                                        size='lg'
+                                    >
+                                        {category in CategoryLabels
+                                            ? CategoryLabels[
+                                                  category as Categories
+                                              ]
+                                            : category}
+                                    </Badge>
                                 </Table.Td>
                             </Table.Tr>
 
-                            {data.items.map((product, index) =>
-                                date === product.category ? (
-                                    <Table.Tr key={product.id} bg='#F5F7FD'>
-                                        <Table.Td align='center' p='md'>
-                                            {index}
-                                        </Table.Td>
-                                        <Table.Td align='center' p='md'>
+                            {data.items
+                                .filter(
+                                    product => product.category === category
+                                )
+                                .map((product, index) => (
+                                    <Table.Tr key={product.id}>
+                                        <Table.Td>{index + 1}</Table.Td>
+                                        <Table.Td>
                                             <Text size='sm'>
                                                 {product.name}
                                             </Text>
                                         </Table.Td>
-                                        <Table.Td align='center' p='md'>
+                                        <Table.Td>
                                             <Text size='sm'>
                                                 {product.amount} {product.unit}
                                             </Text>
                                         </Table.Td>
+
                                         {!isModal && (
-                                            <Table.Td align='center' p='md'>
-                                                <Checkbox
-                                                    className='flex justify-center'
-                                                    checked={selectedItems.includes(
-                                                        product.id
-                                                    )}
-                                                    onChange={() =>
-                                                        onCheckboxChange?.(
+                                            <Table.Td>
+                                                <Flex justify='center'>
+                                                    <Checkbox
+                                                        checked={selectedItems.includes(
                                                             product.id
-                                                        )
-                                                    }
-                                                />
+                                                        )}
+                                                        onChange={() =>
+                                                            onCheckboxChange?.(
+                                                                product.id
+                                                            )
+                                                        }
+                                                    />
+                                                </Flex>
                                             </Table.Td>
                                         )}
-                                        <Table.Td align='center' p='md'>
+
+                                        <Table.Td>
                                             {isModal ? (
                                                 <Text size='sm'>
                                                     {inputData?.[product.id]
@@ -148,8 +136,8 @@ export function ProductTable({
                                                 </Text>
                                             ) : (
                                                 <TextInput
-                                                    className='flex justify-center'
-                                                    placeholder='Наименование'
+                                                    size='xs'
+                                                    placeholder='Производитель'
                                                     value={
                                                         inputData?.[product.id]
                                                             ?.manufacturer || ''
@@ -160,11 +148,11 @@ export function ProductTable({
                                                             e.target.value
                                                         )
                                                     }
-                                                    required
                                                 />
                                             )}
                                         </Table.Td>
-                                        <Table.Td align='center' p='md'>
+
+                                        <Table.Td>
                                             {isModal ? (
                                                 <Text size='sm'>
                                                     {inputData?.[product.id]
@@ -172,8 +160,8 @@ export function ProductTable({
                                                 </Text>
                                             ) : (
                                                 <TextInput
-                                                    className='flex justify-center'
-                                                    placeholder='Цена за всё (руб)'
+                                                    size='xs'
+                                                    placeholder='Цена'
                                                     value={
                                                         inputData?.[product.id]
                                                             ?.price || ''
@@ -184,106 +172,130 @@ export function ProductTable({
                                                             e.target.value
                                                         )
                                                     }
-                                                    required
                                                 />
                                             )}
                                         </Table.Td>
-                                        <Table.Td align='center' p='md'>
-                                            {isModal ? (
-                                                <SimpleGrid
-                                                    cols={3}
-                                                    spacing='sm'
-                                                >
-                                                    {photos[product.id]?.map(
-                                                        (photo, index) => (
-                                                            <Image
-                                                                key={index}
-                                                                src={photo}
-                                                                width={50}
-                                                                height={50}
-                                                                alt={`Photo ${index}`}
+
+                                        <Table.Td>
+                                            <Group>
+                                                {(photos[product.id] || []).map(
+                                                    (imageObj, i) => (
+                                                        <Tooltip
+                                                            label='Удалить фото'
+                                                            key={`${imageObj.id}-${i}`}
+                                                        >
+                                                            <div
                                                                 style={{
-                                                                    objectFit:
-                                                                        'cover',
+                                                                    position:
+                                                                        'relative',
+                                                                }}
+                                                            >
+                                                                <Image
+                                                                    src={getImageUrl(
+                                                                        imageObj.path
+                                                                    )}
+                                                                    alt={`product-${product.id}-photo-${i}`}
+                                                                    width={70}
+                                                                    height={70}
+                                                                    radius='sm'
+                                                                    style={{
+                                                                        objectFit:
+                                                                            'cover',
+                                                                        borderRadius: 8,
+                                                                        border: '1px solid #ccc',
+                                                                        width: '70px',
+                                                                        height: '70px',
+                                                                    }}
+                                                                />
+                                                                {!isModal && (
+                                                                    <ActionIcon
+                                                                        color='red'
+                                                                        size='xs'
+                                                                        radius='xl'
+                                                                        style={{
+                                                                            position:
+                                                                                'absolute',
+                                                                            top: -6,
+                                                                            right: -6,
+                                                                            background:
+                                                                                'white',
+                                                                        }}
+                                                                        onClick={() =>
+                                                                            onPhotoRemove?.(
+                                                                                product.id,
+                                                                                i
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <IconX
+                                                                            size={
+                                                                                14
+                                                                            }
+                                                                            color='red'
+                                                                        />
+                                                                    </ActionIcon>
+                                                                )}
+                                                            </div>
+                                                        </Tooltip>
+                                                    )
+                                                )}
+
+                                                {!isModal &&
+                                                    (photos[product.id]
+                                                        ?.length || 0) < 3 && (
+                                                        <>
+                                                            <input
+                                                                type='file'
+                                                                accept='image/*'
+                                                                multiple
+                                                                id={`upload-${product.id}`}
+                                                                style={{
+                                                                    display:
+                                                                        'none',
+                                                                }}
+                                                                onChange={e => {
+                                                                    if (
+                                                                        e.target
+                                                                            .files
+                                                                    ) {
+                                                                        onPhotoUpload?.(
+                                                                            product.id,
+                                                                            e
+                                                                                .target
+                                                                                .files
+                                                                        )
+                                                                        e.target.value =
+                                                                            ''
+                                                                    }
                                                                 }}
                                                             />
-                                                        )
+                                                            <label
+                                                                htmlFor={`upload-${product.id}`}
+                                                            >
+                                                                <Tooltip label='Загрузить фото'>
+                                                                    <ActionIcon
+                                                                        variant='light'
+                                                                        color='blue'
+                                                                        component='span'
+                                                                    >
+                                                                        <IconUpload
+                                                                            size={
+                                                                                18
+                                                                            }
+                                                                        />
+                                                                    </ActionIcon>
+                                                                </Tooltip>
+                                                            </label>
+                                                        </>
                                                     )}
-                                                </SimpleGrid>
-                                            ) : (
-                                                <>
-                                                    <input
-                                                        type='file'
-                                                        accept='image/*'
-                                                        multiple
-                                                        onChange={e => {
-                                                            if (
-                                                                e.target.files
-                                                            ) {
-                                                                onPhotoUpload?.(
-                                                                    product.id,
-                                                                    e.target
-                                                                        .files
-                                                                )
-                                                            }
-                                                        }}
-                                                        style={{
-                                                            display: 'none',
-                                                        }}
-                                                        id={`file-input-${product.id}`}
-                                                        disabled={(photos[product.id] || []).length >= 3}
-                                                    />
-                                                    <label
-                                                        htmlFor={`file-input-${product.id}`}
-                                                    >
-                                                        <Button
-                                                            variant='outline'
-                                                            size='sm'
-                                                            component='span'
-                                                            disabled={(photos[product.id] || []).length >= 3}
-                                                        >
-                                                            Загрузить фото
-                                                        </Button>
-                                                    </label>
-                                                    {(photos[product.id] || []).length >= 3 && (
-                                                        <Text size='sm' c='red' mt='sm'>
-                                                            Максимальное количество фотографий (3) загружено
-                                                        </Text>
-                                                    )}
-                                                </>
-                                            )}
+                                            </Group>
                                         </Table.Td>
                                     </Table.Tr>
-                                ) : (
-                                    ''
-                                )
-                            )}
+                                ))}
                         </Table.Tbody>
                     </React.Fragment>
                 ))}
             </Table>
-
-            <Modal
-                opened={modalOpened}
-                onClose={() => setModalOpened(false)}
-                title='Фотографии'
-                size='lg'
-            >
-                {selectedProductId && (
-                    <SimpleGrid cols={3} spacing='md'>
-                        {photos[selectedProductId]?.map((photo, index) => (
-                            <Image
-                                key={index}
-                                src={photo}
-                                width={200}
-                                height={200}
-                                alt={`Photo ${index}`}
-                                style={{ objectFit: 'cover' }}
-                            />
-                        ))}
-                    </SimpleGrid>
-                )}
-            </Modal>
-        </>
+        </Paper>
     )
 }

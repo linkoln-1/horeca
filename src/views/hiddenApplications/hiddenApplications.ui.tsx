@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 
 import { role } from '@/shared/helpers/getRole'
 import { groupRequestsByDate } from '@/shared/helpers/groupRequestsByDate'
+import { ProviderHorecaRequestStatus } from '@/shared/lib/horekaApi/Api'
 
 export function HiddenApplicationsViews() {
     const user = useUserStore(state => state.user)
@@ -18,7 +19,7 @@ export function HiddenApplicationsViews() {
 
     const { data: incomingRequests } =
         providerRequest.useProviderRequestIncomeQuery({
-            search: { hiddenAndViewed: true },
+            search: { status: ProviderHorecaRequestStatus.Hidden },
         })
 
     const groupedRequests =
@@ -135,7 +136,9 @@ export function HiddenApplicationsViews() {
                                                         align='center'
                                                         p='md'
                                                     >
-                                                        {request.acceptUntill}
+                                                        {new Date(
+                                                            request.acceptUntill
+                                                        ).toLocaleDateString()}
                                                     </Table.Td>
                                                     <Table.Td
                                                         align='center'

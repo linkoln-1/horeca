@@ -122,8 +122,10 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                             fw='500'
                                             px='0'
                                             variant='transparent'
-                                            onClick={
-                                                handleFinishApplicationModal
+                                            onClick={() =>
+                                                handleFinishApplicationModal(
+                                                    order.id
+                                                )
                                             }
                                         >
                                             Завершить
@@ -409,14 +411,22 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
     )
 }
 
-function handleFinishApplicationModal() {
+function handleFinishApplicationModal(requestId: number) {
     modals.open({
         modalId: 'finishApplicationModal',
         size: 'lg',
         centered: true,
         radius: 'lg',
         padding: 'md',
-        children: <FinishApplicationModal />,
+        children: (
+            <FinishApplicationModal
+                requestId={requestId}
+                onCancel={() => modals.close('finishApplicationModal')}
+                onSuccess={() => {
+                    modals.close('finishApplicationModal')
+                }}
+            />
+        ),
     })
 }
 
