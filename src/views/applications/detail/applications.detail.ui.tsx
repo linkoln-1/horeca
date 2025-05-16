@@ -31,7 +31,23 @@ import {
 
 export function ApplicationsDetailViews({ id }: { id: string }) {
     const { data, isLoading } = requestQueries.useGetRequestByIdQuery(+id)
-
+    function handleImageZoom(imagePath: string) {
+        modals.open({
+            modalId: 'imageZoomModal',
+            size: 'auto',
+            centered: true,
+            padding: 0,
+            withCloseButton: false,
+            children: (
+                <Box>
+                    <MantineImage
+                        src={getImageUrl(imagePath)}
+                        style={{ maxWidth: '100vw', maxHeight: '100vh' }}
+                    />
+                </Box>
+            ),
+        })
+    }
     if (isLoading) return <Loader />
 
     return (
@@ -61,7 +77,7 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                     <Text>Создан:</Text>
                                     <Text>
                                         {dayjs(order.createdAt).format(
-                                            'YYYY-MM-DD HH:mm'
+                                            'DD.MM.YYYY'
                                         )}
                                     </Text>
                                 </Flex>
@@ -122,8 +138,10 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                             fw='500'
                                             px='0'
                                             variant='transparent'
-                                            onClick={
-                                                handleFinishApplicationModal
+                                            onClick={() =>
+                                                handleFinishApplicationModal(
+                                                    order.id
+                                                )
                                             }
                                         >
                                             Завершить
@@ -340,6 +358,12 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                                                             style={{
                                                                                 cursor: 'pointer',
                                                                             }}
+                                                                            onClick={e => {
+                                                                                e.stopPropagation()
+                                                                                handleImageZoom(
+                                                                                    image.path
+                                                                                )
+                                                                            }}
                                                                         >
                                                                             <MantineImage
                                                                                 w='110px'
@@ -409,14 +433,22 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
     )
 }
 
-function handleFinishApplicationModal() {
+function handleFinishApplicationModal(requestId: number) {
     modals.open({
         modalId: 'finishApplicationModal',
         size: 'lg',
         centered: true,
         radius: 'lg',
         padding: 'md',
-        children: <FinishApplicationModal />,
+        children: (
+            <FinishApplicationModal
+                requestId={requestId}
+                onCancel={() => modals.close('finishApplicationModal')}
+                onSuccess={() => {
+                    modals.close('finishApplicationModal')
+                }}
+            />
+        ),
     })
 }
 

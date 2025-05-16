@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+
 import { ProductTable } from './productTable'
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { providerRequest } from '@/entities/provider-request'
@@ -8,6 +9,7 @@ import { useProviderRequestMutation } from '@/entities/provider-request/request.
 import { imageQueries } from '@/entities/uploads'
 import { Button, Flex, Text, Textarea, Modal } from '@mantine/core'
 import { useParams, useRouter } from 'next/navigation'
+
 import { role } from '@/shared/helpers/getRole'
 import {
     ProviderRequestCreateDto,
@@ -22,15 +24,17 @@ export function ProductApplicationsByIdViews() {
     const { data } = providerRequest.useProviderRequestGetIncomeByID(Number(id))
     const { mutateAsync: uploadImage, isPending: isPendingImage } =
         imageQueries.useImageUploadMutation()
+
     const [selectedItems, setSelectedItems] = useState<number[]>([])
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const [isExitConfirmModalOpen, setIsExitConfirmModalOpen] = useState(false)
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
     const [inputData, setInputData] = useState<
         Record<number, { manufacturer: string; price: string }>
     >({})
     const [comment, setComment] = useState<string>('')
-    const [photos, setPhotos] = useState<Record<number, number[]>>({}) // Изменено на number[]
+    const [photos, setPhotos] = useState<
+        Record<number, { id: number; path: string }[]>
+    >({})
 
     const { mutate: createProviderRequest, isPending } =
         useProviderRequestMutation()
@@ -41,6 +45,18 @@ export function ProductApplicationsByIdViews() {
                 ? prev.filter(id => id !== itemId)
                 : [...prev, itemId]
         )
+    }
+
+    const handlePhotoRemove = (productId: number, index: number) => {
+        setPhotos(prev => {
+            const updatedPhotos = [...(prev[productId] || [])]
+            updatedPhotos.splice(index, 1)
+
+            return {
+                ...prev,
+                [productId]: updatedPhotos,
+            }
+        })
     }
 
     const handleManufacturerChange = (itemId: number, value: string) => {
@@ -70,11 +86,14 @@ export function ProductApplicationsByIdViews() {
             return
         }
 
-        const uploadPromises: Promise<number>[] = [] // Изменено на Promise<number>[]
+        const uploadPromises: Promise<{ id: number; path: string }>[] = []
 
-        for (let i = 0; i < Math.min(files.length, 3 - currentPhotos.length); i++) {
+        for (
+            let i = 0;
+            i < Math.min(files.length, 3 - currentPhotos.length);
+            i++
+        ) {
             const file = files[i]
-            
             const imgCheckPromise = new Promise<File>((resolve, reject) => {
                 const reader = new FileReader()
                 reader.onload = e => {
@@ -84,35 +103,33 @@ export function ProductApplicationsByIdViews() {
                         if (img.width <= 200 && img.height <= 200) {
                             resolve(file)
                         } else {
-                            reject(new Error('Фото должно быть размером 200x200 пикселей'))
+                            reject(
+                                new Error(
+                                    'Фото должно быть размером 200x200 пикселей'
+                                )
+                            )
                         }
                     }
                 }
                 reader.readAsDataURL(file)
             })
 
-            const uploadPromise = imgCheckPromise.then(async (validatedFile) => {
-                try {
-                    const response = await uploadImage({ file: validatedFile })
-                    return Number(response.id)
-                } catch (error) {
-                    console.error('Ошибка при загрузке изображения:', error)
-                    throw error
-                }
+            const uploadPromise = imgCheckPromise.then(async validatedFile => {
+                const response = await uploadImage({ file: validatedFile })
+                return { id: Number(response.id), path: response.path }
             })
 
             uploadPromises.push(uploadPromise)
         }
 
         try {
-            const imageIds = await Promise.all(uploadPromises)
-            
+            const uploaded = await Promise.all(uploadPromises)
             setPhotos(prev => ({
                 ...prev,
-                [productId]: [...(prev[productId] || []), ...imageIds],
+                [productId]: [...(prev[productId] || []), ...uploaded],
             }))
         } catch (error) {
-            if (error instanceof Error && error.message === 'Фото должно быть размером 200x200 пикселей') {
+            if (error instanceof Error && error.message.includes('200x200')) {
                 alert(error.message)
             } else {
                 alert('Произошла ошибка при загрузке фотографий')
@@ -122,7 +139,7 @@ export function ProductApplicationsByIdViews() {
 
     const selectedProducts =
         data?.items.filter(item => selectedItems.includes(item.id)) || []
-    
+
     const handleSubmit = () => {
         const items: ProviderRequestItemCreateDto[] = selectedProducts.map(
             product => ({
@@ -130,7 +147,7 @@ export function ProductApplicationsByIdViews() {
                 available: true,
                 manufacturer: inputData[product.id]?.manufacturer || '',
                 cost: parseFloat(inputData[product.id]?.price),
-                imageIds: photos[product.id] || [],
+                imageIds: (photos[product.id] || []).map(p => p.id),
             })
         )
 
@@ -149,17 +166,7 @@ export function ProductApplicationsByIdViews() {
                 setComment('')
                 setPhotos({})
             },
-            onError: () => {},
         })
-    }
-
-    const handleSuccessModalClose = () => {
-        setIsSuccessModalOpen(false)
-        router.push(`/user/${user && role({ user })}/products/applications`)
-    }
-
-    const handleBackClick = () => {
-        setIsExitConfirmModalOpen(true)
     }
 
     return (
@@ -174,6 +181,7 @@ export function ProductApplicationsByIdViews() {
                     onPriceChange={handlePriceChange}
                     photos={photos}
                     onPhotoUpload={handlePhotoUpload}
+                    onPhotoRemove={handlePhotoRemove}
                 />
             )}
 
@@ -182,16 +190,12 @@ export function ProductApplicationsByIdViews() {
                 value={comment}
                 onChange={e => setComment(e.target.value)}
                 placeholder='Введите ваш комментарий'
-                styles={{
-                    label: {
-                        color: '#748ffc',
-                    },
-                }}
+                styles={{ label: { color: '#748ffc' } }}
             />
 
             <Flex justify='center' gap='xl' w='70%' className='mx-auto'>
-                <Button fullWidth bg='indigo.4' onClick={handleBackClick}>
-                    Вернуться к списку заявок
+                <Button fullWidth onClick={() => router.back()}>
+                    Вернуться к списку
                 </Button>
                 <Button
                     fullWidth
@@ -206,8 +210,8 @@ export function ProductApplicationsByIdViews() {
             <Modal
                 opened={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title='Предпросмотр вашего ответа на заявку'
                 size='xl'
+                title='Предпросмотр ответа'
             >
                 {data && (
                     <ProductTable
@@ -217,75 +221,52 @@ export function ProductApplicationsByIdViews() {
                         }}
                         selectedItems={selectedItems}
                         inputData={inputData}
-                        isModal={true}
+                        isModal
                         photos={photos}
                         onPhotoUpload={handlePhotoUpload}
                     />
                 )}
-
                 <Text mt='md' fw={500}>
                     Комментарий к заявке:
                 </Text>
                 <Text mt='sm' c='dimmed'>
                     {comment || 'Комментарий не указан'}
                 </Text>
-
                 <Flex justify='space-between' mt='xl'>
                     <Button
                         variant='outline'
                         onClick={() => setIsModalOpen(false)}
                     >
-                        Вернуться к редактированию
+                        Редактировать
                     </Button>
-                    <Button loading={isPending} onClick={handleSubmit}>
-                        Отправить предложение
-                    </Button>
-                </Flex>
-            </Modal>
-
-            <Modal
-                opened={isExitConfirmModalOpen}
-                onClose={() => setIsExitConfirmModalOpen(false)}
-                title='Подтверждение'
-                centered
-            >
-                <Text mb='xl'>
-                    Вы уверены, что хотите вернуться к списку заявок? Внесенные
-                    изменения не сохранятся
-                </Text>
-                <Flex justify='flex-end' gap='md'>
-                    <Button
-                        variant='outline'
-                        onClick={() => setIsExitConfirmModalOpen(false)}
-                    >
-                        Нет
-                    </Button>
-                    <Button
-                        color='red'
-                        onClick={() =>
-                            router.push(
-                                `/user/${user && role({ user })}/products/applications`
-                            )
-                        }
-                    >
-                        Да
+                    <Button loading={false} onClick={handleSubmit}>
+                        Отправить
                     </Button>
                 </Flex>
             </Modal>
 
             <Modal
                 opened={isSuccessModalOpen}
-                onClose={handleSuccessModalClose}
-                title='Предложение отправлено'
+                onClose={() =>
+                    router.push(
+                        `/user/${user && role({ user })}/products/applications`
+                    )
+                }
                 centered
                 withCloseButton={false}
+                title='Готово'
             >
-                <Text mb='xl'>
-                    Спасибо! Ваше предложение направлено покупателю. О его
-                    решении узнаете в Истории заявок
-                </Text>
+                <Text mb='xl'>Ваше предложение отправлено. Спасибо!</Text>
                 <Flex justify='flex-end'>
-                    <Button onClick={handleSuccessModalClose}>Закрыть</Button>
+                    <Button
+                        onClick={() =>
+                            router.push(
+                                `/user/${user && role({ user })}/products/applications`
+                            )
+                        }
+                    >
+                        Закрыть
+                    </Button>
                 </Flex>
             </Modal>
         </Flex>

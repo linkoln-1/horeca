@@ -29,6 +29,21 @@ export function useGetRequestByIdQuery(id: number) {
         queryFn: () => api.horecaRequestsControllerGet(id),
     })
 }
+export function useDeleteRequestByIdMutation() {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: (id: number) => api.horecaRequestsControllerCancel(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['horeca-request'],
+            })
+            queryClient.invalidateQueries({
+                queryKey: ['horeca-request-id'],
+            })
+        },
+    })
+}
 
 export function useCreateRequestMutation() {
     const queryClient = useQueryClient()

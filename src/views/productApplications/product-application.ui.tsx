@@ -15,6 +15,7 @@ import {
 } from '@/shared/constants/paymentMethod'
 import { role } from '@/shared/helpers/getRole'
 import { groupRequestsByDate } from '@/shared/helpers/groupRequestsByDate'
+import { ProviderHorecaRequestStatus } from '@/shared/lib/horekaApi/Api'
 
 function getSortParam(sortValue: string): string | undefined {
     switch (sortValue) {
@@ -37,7 +38,7 @@ export function ProductApplicationViews() {
 
     const { data: incomingRequests, refetch } =
         providerRequest.useProviderRequestIncomeQuery({
-            search: { hiddenAndViewed: false },
+            search: { status: ProviderHorecaRequestStatus.Actual },
             sort: getSortParam(sortValue),
         })
 
