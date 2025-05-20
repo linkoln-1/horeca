@@ -267,6 +267,7 @@ export interface HorecaRequestTemplateDto {
     createdAt: string
     /** @format date-time */
     updatedAt: string
+    images?: UploadDto[]
 }
 
 export interface HorecaRequestUpdateDto {
