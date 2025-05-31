@@ -180,21 +180,35 @@ export function ProviderRequests() {
                                             </Flex>
 
                                             <Box>
-                                                <Link
-                                                    href={`/user/provider/horecaChatRequest/${order?.chatId}`}
-                                                >
-                                                    <IconMessage
-                                                        size={30}
-                                                        color={
-                                                            (
-                                                                order.status as unknown as ProviderRequestStatus
-                                                            ).toLowerCase() ===
-                                                            'pending'
-                                                                ? 'gray'
-                                                                : 'black'
-                                                        }
-                                                    />
-                                                </Link>
+                                                {(
+                                                    order.status as unknown as ProviderRequestStatus
+                                                ) !== 'Active' ? (
+                                                    <Box
+                                                        style={{
+                                                            opacity: 0.5,
+                                                            cursor: 'not-allowed',
+                                                        }}
+                                                    >
+                                                        <IconMessage
+                                                            size={30}
+                                                            color='black'
+                                                        />
+                                                    </Box>
+                                                ) : (
+                                                    <Link
+                                                        href={`/user/provider/horecaChatRequest/${order?.chatId}`}
+                                                    >
+                                                        <IconMessage
+                                                            size={30}
+                                                            color={
+                                                                order.status as unknown as ProviderRequestStatus ===
+                                                                'Pending'
+                                                                    ? 'gray'
+                                                                    : 'black'
+                                                            }
+                                                        />
+                                                    </Link>
+                                                )}
                                             </Box>
                                         </Flex>
                                         <Divider

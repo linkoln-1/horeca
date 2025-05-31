@@ -13,7 +13,7 @@ export const applications = [
     },
     {
         label: 'Завершённые',
-        status: 'COMPLETED',
+        status: 'FINISHED',
     },
     {
         label: 'Завершённые неуспешно',

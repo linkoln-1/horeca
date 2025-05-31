@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useRef, useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 
@@ -27,13 +28,13 @@ import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { IconCalendar, IconPlus, IconX } from '@tabler/icons-react'
 import 'dayjs/locale/ru'
+import { useRouter } from 'next/navigation'
 
-import { CategoryLabels, errors, HorecaRequestForm } from '@/shared/constants'
+import { errors, HorecaRequestForm, CategoryLabels } from '@/shared/constants'
 import { PaymentMethod } from '@/shared/constants/paymentMethod'
 import { getImageUrl } from '@/shared/helpers'
 import {
     Categories,
-    HorecaRequestCreateDto,
     HorecaRequestTemplateUpdateDto,
     UploadDto,
 } from '@/shared/lib/horekaApi/Api'
@@ -49,26 +50,18 @@ const categoryOptions = Object.values(Categories)
 export function EditTemplateViews({ id }: { id: string }) {
     const form = useForm<HorecaRequestForm>({
         initialValues: {
-            items: [
-                {
-                    category: CategoryLabels.alcoholicDrinks as Categories,
-                    products: [
-                        {
-                            name: '',
-                            amount: 0,
-                            unit: '',
-                        },
-                    ],
-                },
-            ],
-            address: '',
-            deliveryTime: new Date(),
-            acceptUntill: new Date(),
-            paymentType: PaymentMethod.Prepayment,
             name: '',
-            phone: '',
-            comment: '',
-            imageIds: [],
+            content: {
+                address: '',
+                deliveryTime: new Date(),
+                acceptUntill: new Date(),
+                paymentType: PaymentMethod.Prepayment,
+                name: '',
+                phone: '',
+                comment: '',
+                imageIds: [],
+                items: [],
+            },
         },
     })
 
@@ -83,7 +76,7 @@ export function EditTemplateViews({ id }: { id: string }) {
 
     const dropzone = useRef<() => void>(null)
     const [images, setImages] = useState<UploadDto[]>([])
-
+    const router = useRouter()
     const handleAddMainImage = async (files: File[] | null) => {
         if (files && files.length > 0) {
             try {
@@ -98,10 +91,13 @@ export function EditTemplateViews({ id }: { id: string }) {
 
                 form.setValues(prevState => ({
                     ...prevState,
-                    imageIds: [
-                        ...(prevState.imageIds ?? []),
-                        ...uploadedImageIds,
-                    ],
+                    content: {
+                        ...prevState.content,
+                        imageIds: [
+                            ...(prevState.content.imageIds ?? []),
+                            ...uploadedImageIds,
+                        ],
+                    },
                 }))
 
                 setImages(prevImages => [
@@ -123,70 +119,43 @@ export function EditTemplateViews({ id }: { id: string }) {
 
     const handleDeleteImage = (index: number) => {
         setImages(prevImages => prevImages.filter((_, i) => i !== index))
+        form.setFieldValue(
+            'content.imageIds',
+            form.values.content.imageIds.filter((_, i) => i !== index)
+        )
     }
 
-    const addNewProduct = (index: number) => {
-        const newProduct = {
-            name: '',
-            amount: 0,
-            unit: '',
-        }
-        form.setFieldValue(`items.${index}.products`, [
-            ...form.values.items[index].products,
-            newProduct,
+    const addNewProduct = () => {
+        form.setFieldValue('content.items', [
+            ...form.values.content.items,
+            {
+                name: '',
+                amount: 0,
+                unit: '',
+                category: 'alcoholicDrinks',
+            },
         ])
     }
 
-    const addNewCategory = () => {
-        const newCategory = {
-            category: '' as Categories,
-            products: [
-                {
-                    name: '',
-                    amount: 0,
-                    unit: '',
-                },
-            ],
-        }
-
-        form.setFieldValue('items', [...form.values.items, newCategory])
-    }
-
-    const removeCategory = (categoryIndex: number) => {
-        const updatedCategories = form.values.items.filter(
-            (_, index) => index !== categoryIndex
+    const removeProduct = (index: number) => {
+        form.setFieldValue(
+            'content.items',
+            form.values.content.items.filter((_, i) => i !== index)
         )
-
-        form.setFieldValue('items', updatedCategories)
-    }
-
-    const removeProduct = (categoryIndex: number, productIndex: number) => {
-        const updatedProducts = form.values.items[
-            categoryIndex
-        ].products.filter((_, index) => index !== productIndex)
-
-        form.setFieldValue(`items.${categoryIndex}.products`, updatedProducts)
     }
 
     const handleFormSubmit = async (values: HorecaRequestForm) => {
         try {
             const formattedData: HorecaRequestTemplateUpdateDto = {
-                ...values,
                 name: values.name,
                 content: {
-                    items: values.items.flatMap(item =>
-                        item.products.map(product => ({
-                            category: item.category,
-                            name: product.name,
-                            amount: product.amount,
-                            unit: product.unit,
-                        }))
-                    ),
-                    deliveryTime: new Date(values.deliveryTime).toISOString(),
-                    acceptUntill: new Date(values.acceptUntill).toISOString(),
-                    paymentType: values.paymentType,
-                    phone: values.phone,
-                    comment: values.comment || undefined,
+                    ...values.content,
+                    items: values.content.items.map(item => ({
+                        ...item,
+                        amount: Number(item.amount),
+                    })),
+                    deliveryTime: values.content.deliveryTime.toISOString(),
+                    acceptUntill: values.content.acceptUntill.toISOString(),
                 },
             }
 
@@ -195,6 +164,7 @@ export function EditTemplateViews({ id }: { id: string }) {
             })
 
             toast.success('Шаблон успешно изменен!')
+            router.push('/user/horeca/template/application')
         } catch (e: any) {
             const errorKey = e?.error?.error
 
@@ -207,65 +177,59 @@ export function EditTemplateViews({ id }: { id: string }) {
         }
     }
 
+    const handlePageLeaveModal = () => {
+        modals.open({
+            centered: true,
+            modalId: 'pageLeave',
+            radius: 'lg',
+            size: 'xl',
+            children: (
+                <PageLeaveModal
+                    onSave={() => {
+                        modals.close('pageLeave')
+                        handleFormSubmit(form.values)
+                    }}
+                    onLeave={() => {
+                        modals.close('pageLeave')
+                        form.reset()
+                    }}
+                />
+            ),
+        })
+    }
+
     const updateFormValuesFromTemplateEdit = () => {
         if (!selectedTemplate) return
 
-        const content: HorecaRequestCreateDto =
+        const content =
             typeof selectedTemplate.content === 'string'
                 ? JSON.parse(selectedTemplate.content)
                 : selectedTemplate.content
 
         if (!content || !content.items) return
 
-        type GroupedItem = {
-            category: Categories
-            products: { name: string; amount: number; unit: string }[]
-        }
-
-        const groupedItems = content.items.reduce<GroupedItem[]>(
-            (acc, item) => {
-                const existingCategory = acc.find(
-                    category => category.category === item.category
-                )
-
-                if (existingCategory) {
-                    existingCategory.products.push({
-                        name: item.name,
-                        amount: item.amount,
-                        unit: item.unit,
-                    })
-                } else {
-                    acc.push({
-                        category: item.category as Categories,
-                        products: [
-                            {
-                                name: item.name,
-                                amount: item.amount,
-                                unit: item.unit,
-                            },
-                        ],
-                    })
-                }
-
-                return acc
-            },
-            []
-        )
-
         form.setValues({
-            items: groupedItems,
-            address: content.address || '',
-            deliveryTime: content.deliveryTime
-                ? new Date(content.deliveryTime)
-                : new Date(),
-            acceptUntill: content.acceptUntill
-                ? new Date(content.acceptUntill)
-                : new Date(),
-            paymentType: content.paymentType || PaymentMethod.Prepayment,
-            name: content.name || '',
-            phone: content.phone || '',
-            comment: content.comment || '',
+            name: selectedTemplate.name,
+            content: {
+                items: content.items,
+                address: content.address || '',
+                deliveryTime: content.deliveryTime
+                    ? new Date(content.deliveryTime)
+                    : new Date(),
+                acceptUntill: content.acceptUntill
+                    ? new Date(content.acceptUntill)
+                    : new Date(),
+                paymentType: content.paymentType || PaymentMethod.Prepayment,
+                name: content.name || '',
+                phone: content.phone || '',
+                comment: content.comment || '',
+                imageIds: content.imageIds || [],
+            },
         })
+
+        if (Array.isArray(content.imageIds) && content.imageIds.length > 0) {
+            setImages([])
+        }
     }
 
     useEffect(() => {
@@ -286,100 +250,100 @@ export function EditTemplateViews({ id }: { id: string }) {
                         className='mb-8'
                         onSubmit={form.onSubmit(handleFormSubmit)}
                     >
-                        {form.values.items.map((item, categoryIndex) => {
-                            return (
-                                <Flex
-                                    direction='column'
-                                    gap='md'
-                                    key={`category-${categoryIndex}`}
-                                >
-                                    <Flex gap='lg' justify='space-between'>
-                                        <Flex
-                                            direction='column'
-                                            justify='space-between'
-                                        >
-                                            <Select
-                                                miw={300}
-                                                placeholder='Выберите категорию'
-                                                label='Категория товаров'
-                                                data={categoryOptions}
-                                                value={item.category}
-                                                {...form.getInputProps(
-                                                    `items.${categoryIndex}.category`
-                                                )}
-                                            />
-                                        </Flex>
-                                        <Flex direction='column'>
-                                            {item.products.map(
-                                                (x, productIndex) => (
-                                                    <Flex
-                                                        key={`category-${categoryIndex}-product-${productIndex}`}
-                                                        mb='xl'
-                                                        gap='md'
-                                                        w='100%'
-                                                        pos='relative'
-                                                        justify='space-between'
-                                                    >
-                                                        <TextInput
-                                                            w='280px'
-                                                            placeholder='Например: Горький шоколад'
-                                                            label='Наименование'
-                                                            value={x.name}
-                                                            {...form.getInputProps(
-                                                                `items.${categoryIndex}.products.${productIndex}.name`
-                                                            )}
-                                                        />
-                                                        <NumberInput
-                                                            placeholder='456'
-                                                            label='Количество'
-                                                            value={x.amount}
-                                                            {...form.getInputProps(
-                                                                `items.${categoryIndex}.products.${productIndex}.amount`
-                                                            )}
-                                                        />
-                                                        <TextInput
-                                                            placeholder='штук'
-                                                            label='Ед. изм.'
-                                                            value={x.unit}
-                                                            {...form.getInputProps(
-                                                                `items.${categoryIndex}.products.${productIndex}.unit`
-                                                            )}
-                                                        />
-                                                    </Flex>
-                                                )
-                                            )}
+                        <TextInput
+                            label='Название шаблона'
+                            value={form.values.name}
+                            onChange={e =>
+                                form.setFieldValue(
+                                    'name',
+                                    e.currentTarget.value
+                                )
+                            }
+                            mb='md'
+                        />
 
-                                            <Button
-                                                leftSection={<IconPlus />}
-                                                w='fit-content'
-                                                variant='transparent'
-                                                fw='500'
-                                                size='md'
-                                                onClick={() =>
-                                                    addNewProduct(categoryIndex)
-                                                }
-                                            >
-                                                Добавить товар в категорию
-                                            </Button>
-                                        </Flex>
-                                    </Flex>
-                                    <Divider my='md' />
-                                </Flex>
-                            )
-                        })}
-
-                        <Flex justify='flex-end'>
-                            <Button
-                                my='xl'
-                                fw='500'
-                                size='md'
-                                radius='xl'
-                                bg='indigo'
-                                onClick={addNewCategory}
+                        {form.values.content.items.map((item, index) => (
+                            <Flex
+                                key={`item-${index}`}
+                                mb='xl'
+                                gap='md'
+                                w='100%'
+                                pos='relative'
+                                justify='space-between'
                             >
-                                Добавить новую категорию
-                            </Button>
-                        </Flex>
+                                <Select
+                                    w='280px'
+                                    placeholder='Выберите категорию'
+                                    label='Категория'
+                                    data={categoryOptions}
+                                    value={item.category}
+                                    onChange={value =>
+                                        form.setFieldValue(
+                                            `content.items.${index}.category`,
+                                            value || 'alcoholicDrinks'
+                                        )
+                                    }
+                                />
+                                <TextInput
+                                    w='280px'
+                                    placeholder='Например: Горький шоколад'
+                                    label='Наименование'
+                                    value={item.name}
+                                    onChange={e =>
+                                        form.setFieldValue(
+                                            `content.items.${index}.name`,
+                                            e.currentTarget.value
+                                        )
+                                    }
+                                />
+                                <NumberInput
+                                    placeholder='456'
+                                    label='Количество'
+                                    value={item.amount}
+                                    onChange={value =>
+                                        form.setFieldValue(
+                                            `content.items.${index}.amount`,
+                                            Number(value)
+                                        )
+                                    }
+                                />
+                                <TextInput
+                                    placeholder='штук'
+                                    label='Ед. изм.'
+                                    value={item.unit}
+                                    onChange={e =>
+                                        form.setFieldValue(
+                                            `content.items.${index}.unit`,
+                                            e.currentTarget.value
+                                        )
+                                    }
+                                />
+                                <Button
+                                    type='button'
+                                    style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        right: -40,
+                                    }}
+                                    onClick={() => removeProduct(index)}
+                                    bg='transparent'
+                                >
+                                    <IconX cursor='pointer' color='red' />
+                                </Button>
+                            </Flex>
+                        ))}
+
+                        <Button
+                            leftSection={<IconPlus />}
+                            w='fit-content'
+                            variant='transparent'
+                            fw='500'
+                            size='md'
+                            onClick={addNewProduct}
+                            mb='xl'
+                        >
+                            Добавить товар
+                        </Button>
 
                         <Divider my='lg' />
 
@@ -410,6 +374,7 @@ export function EditTemplateViews({ id }: { id: string }) {
                                         justify='center'
                                         py='md'
                                         px='md'
+                                        onClick={() => dropzone.current?.()}
                                     >
                                         <Button
                                             mx='auto'
@@ -419,7 +384,6 @@ export function EditTemplateViews({ id }: { id: string }) {
                                             c='indigo.6'
                                             variant='transparent'
                                             leftSection={<IconPlus />}
-                                            onClick={() => dropzone.current?.()}
                                         >
                                             Добавить фотографии
                                         </Button>
@@ -485,16 +449,28 @@ export function EditTemplateViews({ id }: { id: string }) {
                                     description='До 400 символов'
                                     label='Комментарий к заявке'
                                     placeholder='Вас встретит наш сотрудник, Виталий, менеджер по закупкам'
-                                    value={form.values.comment}
-                                    {...form.getInputProps('comment')}
+                                    value={form.values.content.comment}
+                                    onChange={e =>
+                                        form.setFieldValue(
+                                            'content.comment',
+                                            e.currentTarget.value
+                                        )
+                                    }
                                 />
+
                                 <Autocomplete
                                     label='Адрес доставки'
                                     placeholder='Г. Сочи, ул. Курортный пр-т, 109'
-                                    value={form.values.address}
-                                    {...form.getInputProps('address')}
+                                    value={form.values.content.address}
+                                    onChange={value =>
+                                        form.setFieldValue(
+                                            'content.address',
+                                            value
+                                        )
+                                    }
                                 />
                             </Flex>
+
                             <Flex direction='column' gap='xl' w='50%'>
                                 <Flex
                                     align='flex-end'
@@ -517,9 +493,16 @@ export function EditTemplateViews({ id }: { id: string }) {
                                         }
                                         label='Принимать заявки до:'
                                         value={
-                                            new Date(form.values.acceptUntill)
+                                            new Date(
+                                                form.values.content.acceptUntill
+                                            )
                                         }
-                                        {...form.getInputProps('acceptUntill')}
+                                        onChange={date =>
+                                            form.setFieldValue(
+                                                'content.acceptUntill',
+                                                date || new Date()
+                                            )
+                                        }
                                     />
                                     <DateTimePicker
                                         flex={1}
@@ -536,18 +519,32 @@ export function EditTemplateViews({ id }: { id: string }) {
                                             />
                                         }
                                         value={
-                                            new Date(form.values.deliveryTime)
+                                            new Date(
+                                                form.values.content.deliveryTime
+                                            )
                                         }
-                                        {...form.getInputProps('deliveryTime')}
+                                        onChange={date =>
+                                            form.setFieldValue(
+                                                'content.deliveryTime',
+                                                date || new Date()
+                                            )
+                                        }
                                     />
                                 </Flex>
+
                                 <Flex>
                                     <Radio.Group
                                         name='paymentMethod'
                                         mb='md'
                                         label='Способ оплаты'
                                         w='100%'
-                                        {...form.getInputProps('paymentType')}
+                                        value={form.values.content.paymentType}
+                                        onChange={value =>
+                                            form.setFieldValue(
+                                                'content.paymentType',
+                                                value as PaymentMethod
+                                            )
+                                        }
                                     >
                                         <Group justify='space-between' mt='xs'>
                                             <Radio
@@ -570,37 +567,46 @@ export function EditTemplateViews({ id }: { id: string }) {
                                         </Group>
                                     </Radio.Group>
                                 </Flex>
+
                                 <Flex justify='space-between' gap='sm'>
                                     <TextInput
                                         label='Наименование заказчика'
                                         placeholder='ООО "РОМАШКА"'
-                                        value={form.values.name}
-                                        {...form.getInputProps('name')}
+                                        value={form.values.content.name}
+                                        onChange={e =>
+                                            form.setFieldValue(
+                                                'content.name',
+                                                e.currentTarget.value
+                                            )
+                                        }
                                     />
                                     <TextInput
                                         flex={1}
                                         label='Телефон для связи'
                                         placeholder='+7 (986) 860 90 56'
-                                        value={form.values.phone}
-                                        {...form.getInputProps('phone')}
+                                        value={form.values.content.phone}
+                                        onChange={e =>
+                                            form.setFieldValue(
+                                                'content.phone',
+                                                e.currentTarget.value
+                                            )
+                                        }
                                     />
                                 </Flex>
                             </Flex>
                         </Flex>
+
                         <Divider />
 
                         <Flex mt='xl' justify='flex-end' gap='md'>
-                            <Button fw='500' size='md' radius='xl' bg='indigo'>
-                                Сохранить изменения
-                            </Button>
                             <Button
                                 fw='500'
                                 size='md'
                                 radius='xl'
-                                bg='#CC2C79'
-                                type='submit'
+                                bg='indigo'
+                                onClick={handlePageLeaveModal}
                             >
-                                Отправить заявку
+                                Сохранить изменения
                             </Button>
                         </Flex>
                     </form>
@@ -608,24 +614,4 @@ export function EditTemplateViews({ id }: { id: string }) {
             )}
         </Box>
     )
-}
-
-// const handleSendRequestModal = () => {
-//     modals.open({
-//         centered: true,
-//         modalId: 'sendRequest',
-//         radius: 'lg',
-//         size: 'lg',
-//         children: <SendRequestModal />,
-//     })
-// }
-
-const handlePageLeaveModal = () => {
-    modals.open({
-        centered: true,
-        modalId: 'pageLeave',
-        radius: 'lg',
-        size: 'xl',
-        children: <PageLeaveModal />,
-    })
 }

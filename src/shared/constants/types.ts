@@ -70,4 +70,5 @@ export type HorecaTemplateDto = {
     paymentType: string
     name: string
     phone: string
+    comment: string
 }

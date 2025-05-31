@@ -10,6 +10,7 @@ import {
     Image as MantineImage,
     Avatar,
 } from '@mantine/core'
+import { IconPhotoOff } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/navigation'
 
@@ -88,58 +89,69 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
         items: typeof requestData.items,
         isAvailable: boolean
     ) => {
+        const rowBg = isAvailable ? 'green.0' : 'red.0'
+        const borderColor = isAvailable ? 'green.4' : 'red.4'
+        const textColor = isAvailable ? 'green.9' : 'red.9'
+
         return items.map((item, index) => {
             const providerItem = requestData.providerRequests
                 .flatMap(pr => pr.items)
                 .find(pi => pi.horecaRequestItemId === item.id)
 
             return (
-                <Table.Tr key={item.id}>
-                    <Table.Td
-                        className={`border-b-${isAvailable ? 'green' : 'red'}-800 border-b-2 bg-${isAvailable ? 'green' : 'red'}-200`}
-                    >
-                        {index + 1}
+                <Table.Tr
+                    key={item.id}
+                    bg={rowBg}
+                    style={{
+                        borderBottom: `2px solid var(--mantine-color-${borderColor})`,
+                    }}
+                >
+                    <Table.Td>
+                        <Text c={textColor} fw={500}>
+                            {index + 1}
+                        </Text>
                     </Table.Td>
-                    <Table.Td
-                        className={`border-b-${isAvailable ? 'green' : 'red'}-800 border-b-2 bg-${isAvailable ? 'green' : 'red'}-200`}
-                    >
-                        {item.name}
+                    <Table.Td>
+                        <Text c={textColor}>{item.name}</Text>
                     </Table.Td>
-                    <Table.Td
-                        className={`border-b-${isAvailable ? 'green' : 'red'}-800 border-b-2 bg-${isAvailable ? 'green' : 'red'}-200`}
-                    >
-                        {item.amount} {item.unit}
+                    <Table.Td>
+                        <Text c={textColor}>
+                            {item.amount} {item.unit}
+                        </Text>
                     </Table.Td>
-                    <Table.Td
-                        className={`border-b-${isAvailable ? 'green' : 'red'}-800 border-b-2 bg-${isAvailable ? 'green' : 'red'}-200`}
-                    >
-                        {providerItem?.manufacturer
-                            ? providerItem.manufacturer
-                            : 'Нет'}
+                    <Table.Td>
+                        <Text c={textColor}>
+                            {providerItem?.manufacturer || '—'}
+                        </Text>
                     </Table.Td>
-                    <Table.Td
-                        className={`border-b-${isAvailable ? 'green' : 'red'}-800 border-b-2 bg-${isAvailable ? 'green' : 'red'}-200`}
-                    >
-                        {providerItem?.cost ? providerItem.cost : 0}
+                    <Table.Td>
+                        <Text c={textColor}>
+                            {providerItem?.cost
+                                ? `${providerItem.cost} ₽`
+                                : '—'}
+                        </Text>
                     </Table.Td>
-                    <Table.Td
-                        className={`border-b-${isAvailable ? 'green' : 'red'}-800 border-b-2 bg-${isAvailable ? 'green' : 'red'}-200`}
-                    >
+                    <Table.Td>
                         {providerItem?.images?.length ? (
-                            <Flex wrap='wrap' gap='5px'>
+                            <Flex wrap='wrap' gap={6}>
                                 {providerItem.images.map((img, i) => (
                                     <MantineImage
                                         key={i}
                                         src={getImageUrl(img.path)}
-                                        w='50px'
-                                        h='50px'
-                                        radius='lg'
+                                        w={50}
+                                        h={50}
+                                        radius='md'
                                         fit='cover'
+                                        alt={`Фото ${item.name}`}
+                                        style={{ border: '1px solid #e0e0e0' }}
                                     />
                                 ))}
                             </Flex>
                         ) : (
-                            'Нет фотографий'
+                            <Flex align='center' gap={4} c='gray.6'>
+                                <IconPhotoOff size={18} />
+                                <Text size='sm'>Нет фото</Text>
+                            </Flex>
                         )}
                     </Table.Td>
                 </Table.Tr>

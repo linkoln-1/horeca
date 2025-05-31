@@ -41,7 +41,7 @@ export function ProductApplicationViews() {
             search: { status: ProviderHorecaRequestStatus.Actual },
             sort: getSortParam(sortValue),
         })
-
+    
     const groupedRequests =
         incomingRequests && groupRequestsByDate(incomingRequests.data || [])
     const { mutate: setStatus } = useProviderRequestGetStatusMutation()
@@ -56,7 +56,6 @@ export function ProductApplicationViews() {
             setStatus({ horecaRequestId: selectedRequestId, hidden: true })
             close()
             setSelectedRequestId(null)
-            refetch()
         }
     }
 

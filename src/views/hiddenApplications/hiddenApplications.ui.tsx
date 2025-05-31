@@ -5,7 +5,8 @@ import React from 'react'
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { providerRequest } from '@/entities/provider-request'
 import { useProviderRequestGetStatusMutation } from '@/entities/provider-request/request.queries'
-import { Flex, Text, Button, Loader, Table } from '@mantine/core'
+import { Flex, Text, Button, Loader, Table, Modal } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import { IconChevronLeft, IconRestore } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 
@@ -25,12 +26,25 @@ export function HiddenApplicationsViews() {
     const groupedRequests =
         incomingRequests && groupRequestsByDate(incomingRequests.data || [])
     const { mutate: setStatus } = useProviderRequestGetStatusMutation()
-    const onClickRestore = (requestId: number) => {
-        setStatus({ horecaRequestId: requestId, hidden: false })
-    }
 
     if (!user) return <Loader />
+    const [opened, { open, close }] = useDisclosure(false)
+    const [selectedRequestId, setSelectedRequestId] = React.useState<
+        number | null
+    >(null)
 
+    const confirmRequest = () => {
+        if (selectedRequestId !== null) {
+            setStatus({ horecaRequestId: selectedRequestId, hidden: false })
+            close()
+            setSelectedRequestId(null)
+        }
+    }
+
+    const openModal = (id: number) => {
+        setSelectedRequestId(id)
+        open()
+    }
     return (
         <Flex direction='column' gap='md'>
             <Flex justify='start'>
@@ -146,7 +160,7 @@ export function HiddenApplicationsViews() {
                                                     >
                                                         <IconRestore
                                                             onClick={() =>
-                                                                onClickRestore(
+                                                                openModal(
                                                                     request
                                                                         .items[0]
                                                                         .horecaRequestId
@@ -164,6 +178,22 @@ export function HiddenApplicationsViews() {
                     </Table>
                 )}
             </Flex>
+            <Modal
+                opened={opened}
+                onClose={close}
+                title='Подтверждение'
+                centered
+            >
+                <Text mb='md'>Восстановить заявку?</Text>
+                <Flex justify='end' gap='sm'>
+                    <Button color='gray' variant='light' onClick={close}>
+                        Отменить
+                    </Button>
+                    <Button color='red' onClick={confirmRequest}>
+                        Восстановить
+                    </Button>
+                </Flex>
+            </Modal>
         </Flex>
     )
 }
