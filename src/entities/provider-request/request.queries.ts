@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { api } from '@/shared/lib/horekaApi'
 import {
@@ -10,9 +10,9 @@ import {
 import { useCustomInfiniteQuery } from '@/shared/lib/reactQuery/useCustomInfiniteQuery'
 import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
 
-interface GetProviderRequestIncomeQuery {  
+interface GetProviderRequestIncomeQuery {
     hiddenAndViewed?: boolean
-    search?: ProviderHorecaRequestSearchDto 
+    search?: ProviderHorecaRequestSearchDto
     sort?: string
 }
 
@@ -23,10 +23,13 @@ interface GetRequestQueryParams {
     sort?: string
 }
 
-export function useProviderRequestIncomeQuery(params: GetProviderRequestIncomeQuery) {
+export function useProviderRequestIncomeQuery(
+    params: GetProviderRequestIncomeQuery
+) {
     return useCustomQuery({
         queryKey: ['provider', 'request', params],
-        queryFn: () => api.providerRequestsControllerIncomeHorecaRequests(params),
+        queryFn: () =>
+            api.providerRequestsControllerIncomeHorecaRequests(params),
     })
 }
 
@@ -38,16 +41,42 @@ export function useProviderRequestGetIncomeByID(id: number) {
 }
 
 export function useProviderRequestGetStatusMutation() {
+    const queryClient = useQueryClient()
+
     return useMutation({
         mutationFn: (data: HorecaRequestProviderStatusDto) =>
             api.providerRequestsControllerSetStatusForIncomeHorecaRequest(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['provider', 'request'],
+                exact: false,
+            })
+
+            queryClient.invalidateQueries({
+                queryKey: ['request'],
+                exact: false,
+            })
+        },
     })
 }
 
 export function useProviderRequestMutation() {
+    const queryClient = useQueryClient()
+
     return useMutation({
         mutationFn: (data: ProviderRequestCreateDto) =>
             api.providerRequestsControllerCreate(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['provider', 'request'],
+                exact: false,
+            })
+
+            queryClient.invalidateQueries({
+                queryKey: ['request'],
+                exact: false,
+            })
+        },
     })
 }
 

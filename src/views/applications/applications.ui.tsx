@@ -50,6 +50,9 @@ export function ApplicationsViews() {
         const application = applications.find(
             app => app.status.toLowerCase() === status.toLowerCase()
         )
+        if (status === 'CompletedSuccessfully') {
+            return 'Завершённые'
+        }
         return application ? application.label : 'Неизвестный статус'
     }
 
@@ -125,12 +128,28 @@ export function ApplicationsViews() {
                                     padding='lg'
                                     radius='lg'
                                     withBorder
-                                    style={{
-                                        cursor: 'pointer',
-                                    }}
+                                    style={
+                                        order.status === 'Pending'
+                                            ? {
+                                                  cursor: 'pointer',
+                                              }
+                                            : {}
+                                    }
                                 >
                                     <Link
-                                        href={`/user/${user && role({ user })}/applications/${order.id}/comparison`}
+                                        href={
+                                            order.status.toLowerCase() ===
+                                            'pending'
+                                                ? `/user/${user && role({ user })}/applications/${order.id}/comparison`
+                                                : ''
+                                        }
+                                        style={{
+                                            cursor:
+                                                order.status.toLowerCase() ===
+                                                'pending'
+                                                    ? 'pointer'
+                                                    : 'default',
+                                        }}
                                     >
                                         <Text fw={500}>
                                             Заявка № {order.id}
@@ -174,17 +193,33 @@ export function ApplicationsViews() {
                                             </Flex>
 
                                             <Box>
-                                                <Link href={`/user/horeca/providerChatRequest/${order?.providerRequests[0]?.chatId}`}>
-                                                    <IconMessage
-                                                        size={30}
-                                                        color={
-                                                            order.status.toLowerCase() ===
-                                                            'pending'
-                                                                ? 'gray'
-                                                                : 'black'
-                                                        }
-                                                    />
-                                                </Link>
+                                                {order.status !== 'Active' ? (
+                                                    <Box
+                                                        style={{
+                                                            opacity: 0.5,
+                                                            cursor: 'not-allowed',
+                                                        }}
+                                                    >
+                                                        <IconMessage
+                                                            size={30}
+                                                            color='black'
+                                                        />
+                                                    </Box>
+                                                ) : (
+                                                    <Link
+                                                        href={`/user/horeca/providerChatRequest/${order?.providerRequests[0]?.chatId}`}
+                                                    >
+                                                        <IconMessage
+                                                            size={30}
+                                                            color={
+                                                                order.status.toLowerCase() ===
+                                                                'pending'
+                                                                    ? 'gray'
+                                                                    : 'black'
+                                                            }
+                                                        />
+                                                    </Link>
+                                                )}
                                             </Box>
                                         </Flex>
                                         <Divider

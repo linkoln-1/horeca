@@ -26,8 +26,6 @@ import {
     Tooltip,
 } from '@mantine/core'
 import { DateTimePicker, DateInput } from '@mantine/dates'
-import { DatesProvider } from '@mantine/dates'
-import { FileWithPath } from '@mantine/dropzone'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { IconPlus, IconX } from '@tabler/icons-react'
@@ -254,6 +252,7 @@ export function CreateRequestView() {
                     PaymentMethod.Prepayment,
                 name: content.name || '',
                 phone: content.phone || '',
+                comment: content.comment || ''
             })
         }
     }

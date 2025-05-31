@@ -7,6 +7,7 @@ import { FinishApplicationModal } from '@/features/application/detail/finishAppl
 import { OpenOfferModal } from '@/features/application/detail/openOfferModal'
 import { handleApplicationsDetailsModals } from '@/views/applications/ui/applicationsDetailsModal'
 import {
+    Avatar,
     Box,
     Button,
     Card,
@@ -167,7 +168,7 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                         shadow='sm'
                         className='overflow-hidden transition-all duration-200'
                     >
-                        <Flex className='cursor-pointer' mih='435px'>
+                        <Flex className='cursor-pointer'>
                             <Box miw={200}>
                                 <Flex
                                     c={
@@ -226,11 +227,14 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                     pos='absolute'
                                     right={40}
                                 >
-                                    <MantineImage
+                                    <Avatar
                                         w={100}
                                         h={100}
                                         radius='md'
-                                        src='/assets/images/bg-5.png'
+                                        src={getImageUrl(
+                                            data.providerRequests[0]?.user
+                                                ?.avatar?.path
+                                        )}
                                     />
                                     <Text size='lg'>
                                         {data.providerRequests[0].user.rating} /
