@@ -75,7 +75,6 @@ export function DeliveryViews() {
             categories: value =>
                 value.length > 0 ? null : 'Выберите хотя бы одну категорию',
             minOrderAmount: value => {
-                
                 if (
                     value === null ||
                     value === undefined ||
@@ -85,8 +84,8 @@ export function DeliveryViews() {
                 ) {
                     return 'Укажите минимальную сумму заказа'
                 }
-                if (Number(value) < 0) {
-                    return 'Сумма не может быть отрицательной'
+                if (Number(value) <= 0) {
+                    return 'Некорректная сумма заказа'
                 }
                 return null
             },
@@ -141,12 +140,20 @@ export function DeliveryViews() {
                 deliveryMethods.push(DeliveryMethods.SameDayDelivery)
             if (values.weekends) deliveryMethods.push(DeliveryMethods.Weekends)
 
+            const {
+                selfPickup,
+                deliveryBySupplier,
+                sameDayDelivery,
+                weekends,
+                ...profileValues
+            } = values
+
             const updateUserDto: UpdateUserDto = {
                 profile: {
-                    ...values,
+                    ...profileValues,
                     profileType: data?.profile
                         .profileType as ProfileType.Provider,
-                    categories: values.categories.map(
+                    categories: profileValues.categories.map(
                         x => x.value as Categories
                     ),
                     deliveryMethods,
@@ -161,7 +168,6 @@ export function DeliveryViews() {
                 errorKey in errors
                     ? errors[errorKey as keyof typeof errors]
                     : 'Неизвестная ошибка. Попробуйте ещё раз.'
-
             toast.error(errorMessage)
         }
     }
@@ -175,7 +181,6 @@ export function DeliveryViews() {
                 overlayProps={{ blur: 2 }}
                 visible={isPending}
             />
-
             <form
                 className='flex flex-col gap-7'
                 onSubmit={form.onSubmit(handleSubmit)}
@@ -196,7 +201,6 @@ export function DeliveryViews() {
                     searchable
                     required
                 />
-
                 <NumberInput
                     label='Минимальная сумма заказа'
                     {...form.getInputProps('minOrderAmount')}
@@ -204,7 +208,6 @@ export function DeliveryViews() {
                     allowNegative={false}
                     required
                 />
-
                 <Flex direction='column' gap='md'>
                     <Text size='md' fw={600}>
                         Возможный способ доставки
@@ -243,7 +246,6 @@ export function DeliveryViews() {
                         error={hasDeliveryError}
                     />
                 </Flex>
-
                 <Flex justify='center'>
                     <Button
                         type='submit'

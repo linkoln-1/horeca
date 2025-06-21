@@ -76,7 +76,9 @@ export function TemplateApplicationViews() {
                                         key={x.id}
                                     >
                                         <Text size='md' fw={500}>
-                                            {x.name}
+                                            {x.name.length > 60
+                                                ? `${x.name.slice(0, 60)}...`
+                                                : x.name}
                                         </Text>
                                     </List.Item>
                                 ))}
@@ -131,7 +133,9 @@ export function TemplateApplicationViews() {
                                         py='lg'
                                     >
                                         <Text size='lg' fw={600}>
-                                            {template.name}
+                                            {template.name.length > 70
+                                                ? `${template.name.slice(0, 70)}...`
+                                                : template.name}
                                         </Text>
                                         <Text>Создан:</Text>
                                         <Text>
@@ -171,7 +175,12 @@ export function TemplateApplicationViews() {
                                                         <Text c='gray.5'>
                                                             Наименование:
                                                         </Text>
-                                                        <Text>{item.name}</Text>
+                                                        <Text>
+                                                            {item.name.length >
+                                                            200
+                                                                ? `${item.name.slice(0, 200)}...`
+                                                                : item.name}
+                                                        </Text>
                                                     </Flex>
                                                     <Divider orientation='horizontal' />
                                                 </Flex>

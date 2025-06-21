@@ -359,6 +359,7 @@ export function EditTemplateViews({ id }: { id: string }) {
                                         display='none'
                                         openRef={dropzone}
                                         onDrop={handleAddMainImage}
+                                        accept={['image/*']}
                                     />
 
                                     <LoadingOverlay
@@ -583,7 +584,7 @@ export function EditTemplateViews({ id }: { id: string }) {
                                     <TextInput
                                         flex={1}
                                         label='Телефон для связи'
-                                        placeholder='+7 (986) 860 90 56'
+                                        placeholder='+8 (953) 089 05 53'
                                         value={form.values.content.phone}
                                         onChange={e =>
                                             form.setFieldValue(

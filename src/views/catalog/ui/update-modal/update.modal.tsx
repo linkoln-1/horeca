@@ -38,7 +38,6 @@ import { CustomDropzone } from '@/shared/ui/CustomDropzone'
 
 export function UpdateModal({ id }: { id: number }) {
     const user = useUserStore(state => state.user)
-
     const categories = (user?.profile as ProviderProfileDto)?.categories.map(
         x => x as Categories
     )
@@ -46,11 +45,11 @@ export function UpdateModal({ id }: { id: number }) {
     const form = useForm<ProductDto>({
         initialValues: {
             isEditable: false,
-            updatedAt: dayjs(new Date()).format('YYYY-MM-DD'),
+            updatedAt: dayjs().format('YYYY-MM-DD'),
             id: 0,
             userId: 0,
-            createdAt: dayjs(new Date()).format('YYYY-MM-DD'),
-            category: categories as unknown as Categories,
+            createdAt: dayjs().format('YYYY-MM-DD'),
+            category: (categories[0] ?? '') as Categories,
             name: '',
             description: '',
             producer: '',
@@ -71,74 +70,90 @@ export function UpdateModal({ id }: { id: number }) {
             },
         }
     )
-    
+
     const { mutateAsync: uploadImage, isPending: isImagePending } =
         imageQueries.useImageUploadMutation()
 
     const dropzone = useRef<() => void>(null)
+    const [images, setImages] = useState<UploadDto[]>([])
+
+    const checkDimensions = (file: File): Promise<boolean> =>
+        new Promise(resolve => {
+            const img = new Image()
+            img.onload = () => {
+                URL.revokeObjectURL(img.src)
+                resolve(img.width <= 200 && img.height <= 200)
+            }
+            img.onerror = () => resolve(false)
+            img.src = URL.createObjectURL(file)
+        })
 
     const handleAddMainImage = async (files: File[] | null) => {
-        if (files && files.length > 0) {
-            try {
-                const uploadedImageDtos: UploadDto[] = await Promise.all(
-                    files.map(async file => {
-                        const response = await uploadImage({ file })
-                        return response
-                    })
-                )
-
-                form.setValues(prevState => ({
-                    ...prevState,
-                    images: [...(prevState.images || []), ...uploadedImageDtos],
-                }))
-
-                toast.success('Картинка успешно загружена!')
-            } catch (e) {
-                console.error('Error uploading images:', e)
-                toast.error(
-                    'Ошибка при загрузке изображений. Попробуйте ещё раз.'
-                )
-            }
-        } else {
+        if (!files || files.length === 0) {
             toast.error('Не выбрано ни одного файла для загрузки.')
+            return
+        }
+
+        if (images.length + files.length > 5) {
+            toast.error('Нельзя загрузить более 5 изображений.')
+            return
+        }
+
+        const validTypeFiles = files.filter(file =>
+            file.type.startsWith('image/')
+        )
+        if (validTypeFiles.length !== files.length) {
+            toast.error('Можно загружать только изображения.')
+            if (validTypeFiles.length === 0) return
+        }
+
+        const dims = await Promise.all(
+            validTypeFiles.map(f => checkDimensions(f))
+        )
+        const validFiles = validTypeFiles.filter((_, i) => dims[i])
+        if (validFiles.length !== validTypeFiles.length) {
+            toast.error('Изображение должно быть не более 200×200 пикселей.')
+            if (validFiles.length === 0) return
+        }
+
+        try {
+            const uploadedDtos = await Promise.all(
+                validFiles.map(file => uploadImage({ file }))
+            )
+            setImages(prev => {
+                const next = [...prev, ...uploadedDtos]
+                form.setFieldValue('images', next)
+                return next
+            })
+            toast.success('Картинка успешно загружена!')
+        } catch (e) {
+            console.error(e)
+            toast.error('Ошибка при загрузке изображений. Попробуйте ещё раз.')
         }
     }
 
-    const handleDeleteImage = (imageId: number) => {
-        form.setValues(prevState => ({
-            ...prevState,
-            images: prevState.images?.filter(image => image.id !== imageId),
-        }))
-
+    const handleDeleteImage = (id: number) => {
+        setImages(prev => {
+            const next = prev.filter(img => img.id !== id)
+            form.setFieldValue('images', next)
+            return next
+        })
         toast.success('Изображение удалено')
     }
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-
-        try {
-            const updateDto = {
-                category: form.values.category as Categories,
-                name: form.values.name,
-                description: form.values.description,
-                producer: form.values.producer,
-                cost: form.values.cost,
-                count: form.values.count,
-                packagingType: form.values.packagingType ?? '',
-                imageIds: form.values.images?.map(image => image.id) || [],
-            }
-
-            productsUpdate({ data: updateDto })
-        } catch (e: any) {
-            const errorKey = e?.error?.error
-
-            const errorMessage =
-                errorKey in errors
-                    ? errors[errorKey as keyof typeof errors]
-                    : 'Неизвестная ошибка. Попробуйте ещё раз.'
-
-            toast.error(errorMessage)
+        const updateDto = {
+            category: form.values.category,
+            name: form.values.name,
+            description: form.values.description,
+            producer: form.values.producer,
+            cost: form.values.cost,
+            count: form.values.count,
+            packagingType: form.values.packagingType || '',
+            imageIds: form.values.images?.map(img => img.id) || [],
         }
+        productsUpdate({ data: updateDto })
     }
 
     useEffect(() => {
@@ -158,6 +173,7 @@ export function UpdateModal({ id }: { id: number }) {
                 packagingType: products.packagingType,
                 images: products.images,
             })
+            setImages(products.images)
         }
     }, [products])
 
@@ -168,12 +184,7 @@ export function UpdateModal({ id }: { id: number }) {
             </Text>
             <form className='flex flex-col gap-8' onSubmit={handleSubmit}>
                 <Grid>
-                    <Grid.Col
-                        span={{
-                            base: 12,
-                            md: 6,
-                        }}
-                    >
+                    <Grid.Col span={{ base: 12, md: 6 }}>
                         <TextInput
                             label='Наименование'
                             placeholder='Введите наименование'
@@ -181,12 +192,7 @@ export function UpdateModal({ id }: { id: number }) {
                             {...form.getInputProps('name')}
                         />
                     </Grid.Col>
-                    <Grid.Col
-                        span={{
-                            base: 12,
-                            md: 6,
-                        }}
-                    >
+                    <Grid.Col span={{ base: 12, md: 6 }}>
                         <TextInput
                             label='Производитель'
                             placeholder='Введите производителя'
@@ -195,6 +201,7 @@ export function UpdateModal({ id }: { id: number }) {
                         />
                     </Grid.Col>
                 </Grid>
+
                 <Textarea
                     label='Характеристики товара'
                     placeholder='Максимум 500 символов (с пробелами)'
@@ -214,20 +221,19 @@ export function UpdateModal({ id }: { id: number }) {
                     label='Категория товара'
                     placeholder='Выберите категорию'
                     value={form.values.category}
-                    onChange={value => {
-                        form.setFieldValue('category', value as Categories)
-                    }}
+                    onChange={v =>
+                        form.setFieldValue('category', v as Categories)
+                    }
                     required
                 />
 
                 <Group grow>
                     <TextInput
                         label='Фасовка'
-                        required
                         placeholder='Введите фасовку'
+                        required
                         {...form.getInputProps('packagingType')}
                     />
-
                     <NumberInput
                         label='Цена (за ед.)'
                         placeholder='Введите цену'
@@ -243,15 +249,12 @@ export function UpdateModal({ id }: { id: number }) {
                 </Group>
 
                 <Grid>
-                    <Grid.Col
-                        span={{
-                            base: 12,
-                        }}
-                    >
+                    <Grid.Col span={{ base: 12 }}>
                         <Box mb='sm'>
                             <CustomDropzone
                                 display='none'
                                 openRef={dropzone}
+                                accept={['image/*']}
                                 onDrop={handleAddMainImage}
                             />
 
@@ -269,61 +272,55 @@ export function UpdateModal({ id }: { id: number }) {
                                 py='md'
                                 px='md'
                             >
-                                {form.values.images &&
-                                    form.values.images.length < 5 && (
-                                        <Button
-                                            mx='auto'
-                                            w='fit-content'
-                                            size='md'
-                                            fw='500'
-                                            c='indigo.6'
-                                            variant='transparent'
-                                            leftSection={<IconPlus />}
-                                            onClick={() => dropzone.current?.()}
-                                        >
-                                            Добавить фотографии
-                                        </Button>
-                                    )}
-                                (
-                                <Flex mt='md' gap='sm'>
-                                    {form.values.images &&
-                                        form.values.images.map((x, index) => {
-                                            return (
-                                                <Box pos='relative' key={index}>
-                                                    <Tooltip label='Удалить картинку'>
-                                                        <ActionIcon
-                                                            onClick={() =>
-                                                                handleDeleteImage(
-                                                                    index
-                                                                )
-                                                            }
-                                                            color='gray'
-                                                            pos='absolute'
-                                                            right={rem(8 + 10)}
-                                                            top={rem(8 + 10)}
-                                                        >
-                                                            <IconTrash
-                                                                size={20}
-                                                            />
-                                                        </ActionIcon>
-                                                    </Tooltip>
-                                                    <MantineImage
-                                                        radius='md'
-                                                        src={getImageUrl(
-                                                            x.path
-                                                        )}
-                                                        alt='portfolio'
-                                                        className='aspect-square'
-                                                    />
-                                                </Box>
-                                            )
-                                        })}
-                                </Flex>
-                                )
+                                {images.length < 5 && (
+                                    <Button
+                                        mx='auto'
+                                        w='fit-content'
+                                        size='md'
+                                        fw='500'
+                                        c='indigo.6'
+                                        variant='transparent'
+                                        leftSection={<IconPlus />}
+                                        onClick={() => dropzone.current?.()}
+                                    >
+                                        Добавить фотографии
+                                    </Button>
+                                )}
+
+                                {images.length > 0 && (
+                                    <Flex mt='md' gap='sm'>
+                                        {images.map(img => (
+                                            <Box pos='relative' key={img.id}>
+                                                <Tooltip label='Удалить картинку'>
+                                                    <ActionIcon
+                                                        onClick={() =>
+                                                            handleDeleteImage(
+                                                                img.id
+                                                            )
+                                                        }
+                                                        color='gray'
+                                                        pos='absolute'
+                                                        right={rem(18)}
+                                                        top={rem(18)}
+                                                    >
+                                                        <IconTrash size={20} />
+                                                    </ActionIcon>
+                                                </Tooltip>
+                                                <MantineImage
+                                                    radius='md'
+                                                    src={getImageUrl(img.path)}
+                                                    alt='portfolio'
+                                                    className='aspect-square'
+                                                />
+                                            </Box>
+                                        ))}
+                                    </Flex>
+                                )}
                             </Flex>
 
                             <Text size='sm' mt='xs' c='gray.6'>
-                                Можно добавить не более 5 фотографий
+                                Можно добавить не более 5 фотографий (только
+                                изображения до 200×200)
                             </Text>
                         </Box>
                     </Grid.Col>
@@ -331,14 +328,11 @@ export function UpdateModal({ id }: { id: number }) {
 
                 <Flex justify='center' gap='md'>
                     <Button
-                        onClick={() => {
-                            modals.close('product-update-modal')
-                        }}
-                        bg='pink.5'
+                        onClick={() => modals.close('product-update-modal')}
                     >
                         Отмена
                     </Button>
-                    <Button type='submit' bg='indigo.4' c='white'>
+                    <Button type='submit' color='indigo.4'>
                         Обновить товар
                     </Button>
                 </Flex>

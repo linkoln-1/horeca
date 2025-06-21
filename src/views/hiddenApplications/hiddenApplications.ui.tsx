@@ -87,6 +87,7 @@ export function HiddenApplicationsViews() {
                                     'Адрес и дата доставки',
                                     'Комментарий',
                                     'Отсрочка',
+                                    'Восстановить заявку',
                                 ].map((tab, index) => (
                                     <Table.Th key={index} c='#FFF' p='md'>
                                         <Flex justify='center'>{tab}</Flex>
@@ -154,10 +155,7 @@ export function HiddenApplicationsViews() {
                                                             request.acceptUntill
                                                         ).toLocaleDateString()}
                                                     </Table.Td>
-                                                    <Table.Td
-                                                        align='center'
-                                                        p='md'
-                                                    >
+                                                    <Table.Td align='center'>
                                                         <IconRestore
                                                             onClick={() =>
                                                                 openModal(

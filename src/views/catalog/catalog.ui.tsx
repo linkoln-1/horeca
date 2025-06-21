@@ -114,7 +114,11 @@ export function Catalog() {
                                             </Table.Td>
 
                                             <Table.Td align='center' p='md'>
-                                                {product.packagingType}
+                                                {product.packagingType &&
+                                                product.packagingType?.length >
+                                                    50
+                                                    ? `${product.packagingType?.slice(0, 50)}...`
+                                                    : product.packagingType}
                                             </Table.Td>
 
                                             <Table.Td align='center' p='md'>
