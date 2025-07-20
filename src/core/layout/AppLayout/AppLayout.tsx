@@ -82,7 +82,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     return (
         <Container className='min-h-screen flex flex-col justify-between' fluid>
             <Grid>
-                <Grid.Col span={12}>
+        <Grid.Col span={12} className="flex items-center justify-between">
                     <Header />
                 </Grid.Col>
 
