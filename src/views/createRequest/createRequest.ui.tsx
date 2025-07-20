@@ -137,7 +137,7 @@ export function CreateRequestView() {
             return
         }
 
-        const remainingSlots = 5 - images.length
+        const remainingSlots = 3 - images.length
         if (remainingSlots <= 0) {
             toast.error('Можно загрузить не более 5 фотографий.')
             return
@@ -252,7 +252,7 @@ export function CreateRequestView() {
                     PaymentMethod.Prepayment,
                 name: content.name || '',
                 phone: content.phone || '',
-                comment: content.comment || ''
+                comment: content.comment || '',
             })
         }
     }
@@ -398,6 +398,7 @@ export function CreateRequestView() {
                             display='none'
                             openRef={dropzone}
                             onDrop={handleAddMainImage}
+                            accept={['image/*']}
                         />
 
                         <LoadingOverlay
@@ -468,7 +469,7 @@ export function CreateRequestView() {
                         </Flex>
 
                         <Text c='#868e96' className='text-[14px]'>
-                            Можно добавить не более 5 фотографий
+                            Можно добавить не более 3 фотографий
                         </Text>
                     </Flex>
 

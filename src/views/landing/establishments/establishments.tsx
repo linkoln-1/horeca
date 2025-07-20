@@ -11,13 +11,14 @@ export function Establishments() {
                     <div className='uppercase font-extrabold text-[14px] xl:text-2xl 2xl:text-3xl text-center md:text-left'>
                         Все предложения в одном месте
                     </div>
-                    <div className='w-full max-w-[360px] mx-auto md:mx-0'>
+                    <div className='w-full max-w-[360px] max-h-[240px] mx-auto md:mx-0'>
                         <Image
-                            src='/assets/images/image 3.png'
-                            height={360}
+                            src='/assets/images/5.jpg'
+                            height={240}
                             width={360}
                             alt='Norway'
                             fit='contain'
+                            className='max-h-[240px]'
                         />
                     </div>
                     <div className='text-[12px] xl:text-sm 2xl:text-base text-[#495057] text-center md:text-left'>

@@ -61,13 +61,14 @@ export function SignUpStepOne({ form }: StepOneProps) {
                 label={
                     <span>
                         Поставив галочку, вы принимаете{' '}
-                        <Link
+                        <a
+                            href='/Пользовательское соглашение Сфера HoReCa.pdf'
                             target='_blank'
-                            href=''
-                            className='text-blue-600 underline'
+                            rel='noopener noreferrer'
+                            className='cursor-pointer hover:underline'
                         >
                             Пользовательское соглашение
-                        </Link>
+                        </a>
                     </span>
                 }
             />

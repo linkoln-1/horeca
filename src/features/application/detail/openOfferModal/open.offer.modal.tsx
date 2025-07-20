@@ -1,3 +1,5 @@
+'use client'
+
 import { useChatCreateMutation } from '@/entities/chats/chats.queries'
 import { useApproveRequestMutation } from '@/entities/horeca-request/request.queries'
 import {
@@ -14,44 +16,41 @@ import { IconPhotoOff } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/navigation'
 
-import { CategoryLabels } from '@/shared/constants'
 import { getImageUrl } from '@/shared/helpers'
 import {
-    Categories,
-    HorecaRequestWithProviderRequestsDto,
+    HorecaRequestItemDto,
+    IncomeProviderRequestDto,
 } from '@/shared/lib/horekaApi/Api'
 
 interface OpenOfferModalProps {
-    requestData: HorecaRequestWithProviderRequestsDto
+    requestData: IncomeProviderRequestDto
+    products: HorecaRequestItemDto[]
+    horecaRequestId: number
+    providerRequestId: number
     onClose: () => void
 }
 
-export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
-    const totalCost = requestData.providerRequests.reduce(
-        (sum, providerRequest) => {
-            return (
-                sum +
-                providerRequest.items.reduce(
-                    (itemSum, item) => itemSum + item.cost,
-                    0
-                )
-            )
-        },
+export function OpenOfferModal({
+    requestData,
+    products,
+    onClose,
+    horecaRequestId,
+    providerRequestId,
+}: OpenOfferModalProps) {
+    const totalCost =
+        requestData.items?.reduce((sum, item) => sum + (item?.cost ?? 0), 0) ??
         0
-    )
 
-    const availableItemIds = requestData.providerRequests.flatMap(
-        providerRequest =>
-            providerRequest.items.map(item => item.horecaRequestItemId)
-    )
+    const availableItemIds =
+        requestData.items?.map(item => item.horecaRequestItemId) ?? []
 
-    const availableItems = requestData.items.filter(item =>
-        availableItemIds.includes(item.id)
-    )
+    const availableItems =
+        requestData.items?.filter(item =>
+            availableItemIds.includes(item.horecaRequestItemId)
+        ) ?? []
 
-    const unavailableItems = requestData.items.filter(
-        item => !availableItemIds.includes(item.id)
-    )
+    const unavailableItems =
+        products?.filter(p => !availableItemIds.includes(p.id)) ?? []
 
     const approveMutation = useApproveRequestMutation()
     const chatCreateMutation = useChatCreateMutation()
@@ -60,20 +59,19 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
     const handleApprove = async () => {
         try {
             await approveMutation.mutateAsync({
-                horecaRequestId: requestData.id,
-                providerRequestId: requestData.providerRequests[0]?.id,
+                horecaRequestId: horecaRequestId,
+                providerRequestId: providerRequestId,
             })
 
             const createdChat = await chatCreateMutation.mutateAsync({
                 data: {
                     // @ts-ignore
-                    opponentId: requestData.providerRequests[0].user.profile.id,
-                    horecaRequestId: requestData.id,
-                    providerRequestId: requestData.providerRequests[0].id,
+                    opponentId: requestData.user.profile.id,
+                    horecaRequestId: horecaRequestId,
+                    providerRequestId: providerRequestId,
                     type: 'Order',
                 },
             })
-
             onClose()
             if (createdChat?.data.id) {
                 router.push(
@@ -84,7 +82,20 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
             console.error('Ошибка при подтверждении запроса', error)
         }
     }
-
+    const renderUnavailableRows = (items: HorecaRequestItemDto[]) => {
+        return items.map((item, index) => (
+            <Table.Tr key={item.id} bg='red.0'>
+                <Table.Td>{index + 1}</Table.Td>
+                <Table.Td>{item.name}</Table.Td>
+                <Table.Td>
+                    {item.amount} {item.unit}
+                </Table.Td>
+                <Table.Td colSpan={3} style={{ color: '#f03e3e' }}>
+                    Нет предложения от поставщика
+                </Table.Td>
+            </Table.Tr>
+        ))
+    }
     const renderTableRows = (
         items: typeof requestData.items,
         isAvailable: boolean
@@ -94,10 +105,6 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
         const textColor = isAvailable ? 'green.9' : 'red.9'
 
         return items.map((item, index) => {
-            const providerItem = requestData.providerRequests
-                .flatMap(pr => pr.items)
-                .find(pi => pi.horecaRequestItemId === item.id)
-
             return (
                 <Table.Tr
                     key={item.id}
@@ -112,29 +119,25 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
                         </Text>
                     </Table.Td>
                     <Table.Td>
-                        <Text c={textColor}>{item.name}</Text>
+                        <Text c={textColor}>{products[index].name}</Text>
                     </Table.Td>
                     <Table.Td>
                         <Text c={textColor}>
-                            {item.amount} {item.unit}
+                            {products[index].amount} {products[index].unit}
                         </Text>
+                    </Table.Td>
+                    <Table.Td>
+                        <Text c={textColor}>{item?.manufacturer || '—'}</Text>
                     </Table.Td>
                     <Table.Td>
                         <Text c={textColor}>
-                            {providerItem?.manufacturer || '—'}
+                            {item?.cost ? `${item.cost} ₽` : '—'}
                         </Text>
                     </Table.Td>
                     <Table.Td>
-                        <Text c={textColor}>
-                            {providerItem?.cost
-                                ? `${providerItem.cost} ₽`
-                                : '—'}
-                        </Text>
-                    </Table.Td>
-                    <Table.Td>
-                        {providerItem?.images?.length ? (
+                        {item?.images?.length ? (
                             <Flex wrap='wrap' gap={6}>
-                                {providerItem.images.map((img, i) => (
+                                {item?.images.map((img, i) => (
                                     <MantineImage
                                         key={i}
                                         src={getImageUrl(img.path)}
@@ -142,7 +145,7 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
                                         h={50}
                                         radius='md'
                                         fit='cover'
-                                        alt={`Фото ${item.name}`}
+                                        alt={`Фото ${item.id}`}
                                         style={{ border: '1px solid #e0e0e0' }}
                                     />
                                 ))}
@@ -171,22 +174,12 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
                     w='120px'
                     h='120px'
                     radius='lg'
-                    src={getImageUrl(
-                        requestData.providerRequests[0].user.avatar?.path
-                    )}
+                    src={getImageUrl(requestData.user.avatar?.path)}
                 />
                 <Flex direction='column' gap='md'>
-                    <Text>
-                        Поставщик: {requestData.providerRequests[0].user.name}
-                    </Text>
-                    <Text>
-                        Рейтинг: {requestData.providerRequests[0].user.rating} /
-                        5.0
-                    </Text>
-                    <Text>
-                        Совпадение по заявке:{' '}
-                        {requestData.providerRequests[0].cover}%
-                    </Text>
+                    <Text>Поставщик: {requestData.user.name}</Text>
+                    <Text>Рейтинг: {requestData.user.rating} / 5</Text>
+                    <Text>Совпадение по заявке: {requestData.cover}%</Text>
                 </Flex>
             </Flex>
 
@@ -202,21 +195,19 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
             </Flex>
             <Divider mb='lg' w='100%' />
             <Box w='100%'>
-                <Text fw='600'>Категория товаров:</Text>
+                {/* <Text fw='600'>Категория товаров:</Text> */}
                 <Box>
                     {Array.from(
                         new Set(requestData.items.map(item => item.category))
                     ).map(category => (
                         <Box key={category}>
-                            <Text mt='lg'>
+                            {/* <Text mt='lg'>
                                 {category in CategoryLabels
                                     ? CategoryLabels[category as Categories]
                                     : category}
-                            </Text>
+                            </Text> */}
 
-                            {unavailableItems.filter(
-                                item => item.category === category
-                            ).length > 0 && (
+                            {unavailableItems.length >= 1 ? (
                                 <>
                                     <Text my='lg' c='pink.7'>
                                         Нет в наличии
@@ -229,17 +220,14 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
                                         mb='sm'
                                     >
                                         <Table.Tbody className='text-base'>
-                                            {renderTableRows(
-                                                unavailableItems.filter(
-                                                    item =>
-                                                        item.category ===
-                                                        category
-                                                ),
-                                                false
+                                            {renderUnavailableRows(
+                                                unavailableItems
                                             )}
                                         </Table.Tbody>
                                     </Table>
                                 </>
+                            ) : (
+                                ''
                             )}
 
                             {availableItems.filter(
@@ -257,11 +245,7 @@ export function OpenOfferModal({ requestData, onClose }: OpenOfferModalProps) {
                                     >
                                         <Table.Tbody className='text-base'>
                                             {renderTableRows(
-                                                availableItems.filter(
-                                                    item =>
-                                                        item.category ===
-                                                        category
-                                                ),
+                                                availableItems,
                                                 true
                                             )}
                                         </Table.Tbody>

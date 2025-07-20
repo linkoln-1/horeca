@@ -5,7 +5,7 @@ import { userQueries } from '@/entities/user'
 import { jwtDecode } from 'jwt-decode'
 import { usePathname, useRouter } from 'next/navigation'
 
-import { outSidePages, roles } from '@/shared/constants'
+import { outSidePages } from '@/shared/constants'
 import { FullPageLoader } from '@/shared/ui/FullPageLoader'
 
 type AuthProviderProps = {
@@ -36,7 +36,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     useEffect(() => {
         const checkAuth = async () => {
             if (!accessToken) {
-                if (!outSidePages.includes(path)) {
+                if (
+                    !outSidePages.includes(path) &&
+                    !path.startsWith('/account/password_recovery')
+                ) {
+                    console.log('sign-in')
                     router.replace('/sign-in')
                 }
                 setIsLoading(false)
@@ -46,7 +50,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
             if (outSidePages.includes(path)) {
                 router.replace('/user')
             }
-
             try {
                 const response = await refetchUser()
 
@@ -63,7 +66,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
 
         checkAuth()
-    }, [accessToken])
+    }, [accessToken, path])
 
     if (isLoading) {
         return <FullPageLoader className='w-screen h-screen' />

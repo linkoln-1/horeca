@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
+import { toast } from 'react-toastify'
 
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { chatQueries } from '@/entities/chats'
@@ -118,7 +119,21 @@ export function ChatView() {
             size: 'xl',
             radius: 'lg',
             modalId: 'support-request',
-            children: <CreateSupportRequestModal />,
+            withCloseButton: false,
+            children: (
+                <CreateSupportRequestModal
+                    onSuccess={() => {
+                        modals.close('support-request')
+                        toast.success(
+                            'Запрос на чат с поддержкой успешно создан!'
+                        )
+                    }}
+                    onError={(message: string) => {
+                        modals.close('support-request')
+                        toast.error(message)
+                    }}
+                />
+            ),
         })
     }
 

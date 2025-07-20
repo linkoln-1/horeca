@@ -27,7 +27,8 @@ import { CategoryLabels } from '@/shared/constants'
 import { getImageUrl } from '@/shared/helpers'
 import {
     Categories,
-    HorecaRequestWithProviderRequestsDto,
+    HorecaRequestItemDto,
+    IncomeProviderRequestDto,
 } from '@/shared/lib/horekaApi/Api'
 
 export function ApplicationsDetailViews({ id }: { id: string }) {
@@ -160,7 +161,7 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                     заявку:
                 </Title>
 
-                {data?.providerRequests.map(response => (
+                {data?.providerRequests.map((response, index) => (
                     <Paper
                         key={response.id}
                         mb='lg'
@@ -231,14 +232,17 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                         w={100}
                                         h={100}
                                         radius='md'
-                                        src={getImageUrl(
-                                            data.providerRequests[0]?.user
-                                                ?.avatar?.path
-                                        )}
+                                        src={
+                                            response.user.avatar?.path
+                                                ? getImageUrl(
+                                                      response.user.avatar.path
+                                                  )
+                                                : undefined
+                                        }
+                                        alt={response.user.name}
                                     />
                                     <Text size='lg'>
-                                        {data.providerRequests[0].user.rating} /
-                                        5.0
+                                        {response.user.rating ?? 0} / 5
                                     </Text>
                                 </Flex>
 
@@ -265,7 +269,12 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                                         handleOpenOfferModal(
                                                             e,
                                                             response.id,
+                                                            response,
+                                                            data.items,
                                                             data
+                                                                .providerRequests[
+                                                                index
+                                                            ].id
                                                         )
                                                     }
                                                 >
@@ -409,25 +418,10 @@ export function ApplicationsDetailViews({ id }: { id: string }) {
                                                         </Text>
                                                     </Box>
                                                 )}
-                                                <Divider my='md' />
                                             </React.Fragment>
                                         )
                                     }
                                 )}
-
-                                <Flex
-                                    top='376px'
-                                    right='20px'
-                                    justify='flex-end'
-                                >
-                                    <Button
-                                        size='md'
-                                        fw='500'
-                                        variant='transparent'
-                                    >
-                                        Перейти в чат
-                                    </Button>
-                                </Flex>
                             </Box>
                         </Flex>
                     </Paper>
@@ -459,7 +453,9 @@ function handleFinishApplicationModal(requestId: number) {
 function handleOpenOfferModal(
     e: React.MouseEvent<HTMLDivElement>,
     title: number,
-    data: HorecaRequestWithProviderRequestsDto
+    data: IncomeProviderRequestDto,
+    products: HorecaRequestItemDto[],
+    providerRequestId: number
 ) {
     e.stopPropagation()
     modals.open({
@@ -472,6 +468,9 @@ function handleOpenOfferModal(
         children: (
             <OpenOfferModal
                 requestData={data}
+                products={products}
+                horecaRequestId={products[0].horecaRequestId}
+                providerRequestId={providerRequestId}
                 onClose={() => modals.close('openOfferModal')}
             />
         ),

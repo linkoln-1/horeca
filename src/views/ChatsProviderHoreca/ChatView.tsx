@@ -1,15 +1,23 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { toast } from 'react-toastify'
 
 import { useChatHorecaStore } from '@/entities/chats/chat.users.model'
 import {
+    useCreateReviewMutation,
     useGetChatsByIdQuery,
     useInfiniteGetAllMessagesQuery,
 } from '@/entities/chats/chats.queries'
+import { useFavoriteProviderMutation } from '@/entities/favorites/favorites.queries'
 import { userQueries } from '@/entities/user'
-import { Loader } from '@mantine/core'
-import { IconSend2, IconArrowDown } from '@tabler/icons-react'
+import { Button, Loader, Group, Paper, Text, ActionIcon } from '@mantine/core'
+import {
+    IconSend2,
+    IconArrowDown,
+    IconHeart,
+    IconHeartFilled,
+} from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import { useParams } from 'next/navigation'
 
@@ -18,117 +26,144 @@ import { useWebSocketChat } from '@/shared/hooks/useWebsocketChat'
 export function ChatView() {
     const { id } = useParams() as { id: string }
     const chatId = Number(id)
-    const scrollContainerRef = useRef<HTMLDivElement>(null)
-    const bottomRef = useRef<HTMLDivElement>(null)
-    const [message, setMessage] = useState<string>('')
-    const [isAtBottom, setIsAtBottom] = useState(true)
-    const { data: userData } = userQueries.useGetMeQuery()
+
     const { data, isLoading } = useGetChatsByIdQuery({
         id: chatId,
         enabled: chatId > 0,
     })
-    
     const {
         data: allChatMessages,
         fetchNextPage,
         hasNextPage,
-        isFetchingNextPage,
-        refetch,
     } = useInfiniteGetAllMessagesQuery({ chatId })
     const { chats, addMessage, setChatMessagesWithInitial } =
         useChatHorecaStore()
-    const messages = chats[chatId] || []
-
+    const { data: userData } = userQueries.useGetMeQuery()
     const { sendMessage, socketTicket } = useWebSocketChat({
-        chatId: chatId,
+        chatId,
         booleanValue: chatId > 0,
     })
 
-    const scrollToBottom = useCallback(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [])
+    const scrollContainerRef = useRef<HTMLDivElement>(null)
+    const bottomRef = useRef<HTMLDivElement>(null)
+    const [message, setMessage] = useState('')
+    const [isAtBottom, setIsAtBottom] = useState(true)
+    const [isDelivered, setIsDelivered] = useState<number | null>(null)
+    const [isSuccessfully, setIsSuccessfully] = useState<number | null>(null)
 
-    const handleScroll = () => {
-        if (!scrollContainerRef.current) return
-
-        const { scrollTop, scrollHeight, clientHeight } =
-            scrollContainerRef.current
-        const isBottom = scrollHeight - scrollTop - clientHeight < 100
-        setIsAtBottom(isBottom)
-
-        if (scrollTop === 0) {
-            console.log('Подгружаем старые сообщения...')
-        }
-    }
+    const createReview = useCreateReviewMutation()
+    const favoriteMutation = useFavoriteProviderMutation()
 
     useEffect(() => {
         if (!data) return
-        // @ts-ignore
-        const chatMessages = allChatMessages?.pages[0]?.data || []
-        setChatMessagesWithInitial(chatId, undefined, chatMessages)
-    }, [data])
-
-    useEffect(() => {
-        if (isAtBottom) {
-            scrollToBottom()
-        }
-    }, [messages, isAtBottom, scrollToBottom])
+        const initial = allChatMessages?.pages[0]?.data || []
+        setChatMessagesWithInitial(chatId, undefined, initial)
+    }, [data, allChatMessages, setChatMessagesWithInitial, chatId])
 
     useEffect(() => {
         if (!socketTicket) return
-        const handleNewMessage = (newMessage: any) => {
-            addMessage(chatId, newMessage)
-        }
-        socketTicket.on('message', handleNewMessage)
-        return () => {
-            socketTicket.off('message', handleNewMessage)
-        }
-    }, [socketTicket])
+        const onMsg = (m: any) => addMessage(chatId, m)
+        socketTicket.on('message', onMsg)
+        return () => void socketTicket.off('message', onMsg)
+    }, [socketTicket, addMessage, chatId])
 
-    const handleSendMessage = () => {
-        if (!message.trim()) return
+    const scrollToBottom = useCallback(
+        () => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }),
+        []
+    )
+    useEffect(() => {
+        if (isAtBottom) scrollToBottom()
+    }, [chats[chatId], isAtBottom, scrollToBottom])
 
-        if (socketTicket) {
-            sendMessage({
-                newMessage: {
-                    chatId: chatId,
-                    message: message,
-                    authorId: userData!.id,
-                },
+    const handleScroll = () => {
+        const el = scrollContainerRef.current
+        if (!el) return
+        const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100
+        setIsAtBottom(atBottom)
+        if (el.scrollTop === 0 && hasNextPage) fetchNextPage()
+    }
+
+    if (isLoading || !userData) return <Loader />
+
+    const created = new Date(
+        data?.data?.providerRequest?.horecaRequest.deliveryTime
+    ).getTime()
+    const now = Date.now()
+    const showDeliveryQ = isDelivered === null && now - created >= 50
+    const showQualityQ = isDelivered === 1 && isSuccessfully === null
+
+    const providerReq = data?.data?.providerRequest
+    const providerUserId = providerReq?.userId
+
+    const handleDelivery = (delivered: boolean) => {
+        setIsDelivered(delivered ? 1 : 0)
+        if (!delivered) {
+            setIsSuccessfully(0)
+            createReview.mutate({
+                providerRequestId: providerReq,
+                isDelivered: 0,
+                isSuccessfully: 0,
             })
         }
+    }
 
+    const handleQuality = (ok: boolean) => {
+        setIsSuccessfully(ok ? 1 : 0)
+        createReview.mutate(
+            {
+                providerRequestId: providerReq,
+                isDelivered: 1,
+                isSuccessfully: ok ? 1 : 0,
+            },
+            {
+                onSuccess: () => {
+                    toast.success(
+                        ok
+                            ? 'Спасибо за оценку: товар был качественным'
+                            : 'Жаль, что товар не подошёл. Мы это учтём.'
+                    )
+                },
+                onError: () => {
+                    toast.error('Не удалось отправить оценку качества товара')
+                },
+            }
+        )
+    }
+
+    const handleFavorite = () => {
+        if (!providerUserId) return
+        favoriteMutation.mutate(
+            { data: { providerId: providerUserId } },
+            {
+                onSuccess: () => {
+                    toast.success('Поставщик добавлен в избранное')
+                },
+                onError: () => {
+                    toast.error('Не удалось добавить в избранное')
+                },
+            }
+        )
+    }
+
+    const handleSend = () => {
+        if (!message.trim()) return
+        sendMessage?.({
+            newMessage: { chatId, message, authorId: userData.id },
+        })
         addMessage(chatId, {
             id: Date.now(),
             chatId,
             message,
-            authorId: userData!.id,
+            authorId: userData.id,
             isServer: false,
             opponentViewed: false,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         })
-
         setMessage('')
-        setTimeout(() => {
-            scrollToBottom()
-        }, 0)
     }
 
-    if (isLoading || !userData) return <Loader />
-
-    const getSenderName = (authorId: number | null) => {
-        if (authorId === userData.id) return 'Вы'
-        if (userData.role === 'Horeca') return 'Поставщик'
-        if (userData.role === 'Provider') return 'Покупатель'
-        return 'Собеседник'
-    }
-
-    const isMyMessage = (authorId: number | null) =>
-        (authorId ?? 0) === userData?.id
-
-    const myBubbleStyles = 'bg-blue-500 text-white'
-    const opponentBubbleStyles = 'bg-gray-200 text-black'
+    const messages = chats[chatId] || []
 
     return (
         <div className='relative flex flex-col p-4 h-[800px]'>
@@ -138,42 +173,46 @@ export function ChatView() {
                 className='flex-1 overflow-y-auto bg-white p-6 rounded-xl shadow-inner space-y-4 custom-scrollbar'
             >
                 {messages.map(msg => {
-                    const messageDate = dayjs(msg.createdAt).format(
-                        'DD.MM.YYYY HH:mm'
-                    )
+                    const isMe = msg.authorId === userData.id
                     return (
                         <div key={msg.id} className='flex flex-col'>
                             <div
                                 className={`flex ${
-                                    isMyMessage(msg.authorId)
-                                        ? 'justify-end'
-                                        : 'justify-start'
+                                    isMe ? 'justify-end' : 'justify-start'
                                 }`}
                             >
-                                <div
-                                    className={`rounded-2xl p-3 max-w-[75%] min-w-[100px] shadow-md ${
-                                        isMyMessage(msg.authorId)
-                                            ? myBubbleStyles
-                                            : opponentBubbleStyles
+                                <Paper
+                                    className={`rounded-2xl p-3 max-w-[75%] shadow-md ${
+                                        isMe
+                                            ? 'bg-blue-500 text-white'
+                                            : 'bg-gray-200 text-black'
                                     }`}
+                                    withBorder={!isMe}
+                                    radius='xl'
+                                    px='md'
+                                    py='sm'
                                 >
-                                    <div className='font-semibold text-xs mb-1'>
-                                        {getSenderName(msg.authorId)}
-                                    </div>
-                                    <div className='text-sm break-words'>
-                                        {msg.message}
-                                    </div>
-                                </div>
+                                    <Text size='xs' className='mb-1'>
+                                        {isMe
+                                            ? 'Вы'
+                                            : userData.role === 'Horeca'
+                                              ? 'Поставщик'
+                                              : 'Покупатель'}
+                                    </Text>
+                                    <Text size='sm'>{msg.message}</Text>
+                                </Paper>
                             </div>
-                            <div
-                                className={`text-[10px] text-gray-400 mt-1 ${
-                                    isMyMessage(msg.authorId)
-                                        ? 'text-right'
-                                        : 'text-left'
-                                }`}
+                            <Text
+                                size='xs'
+                                color='gray'
+                                className={`${
+                                    isMe ? 'text-right' : 'text-left'
+                                } mt-1`}
                             >
-                                {messageDate}
-                            </div>
+                                {dayjs(msg.createdAt).format(
+                                    'DD.MM.YYYY HH:mm'
+                                )}
+                            </Text>
                         </div>
                     )
                 })}
@@ -181,30 +220,88 @@ export function ChatView() {
             </div>
 
             {!isAtBottom && (
-                <button
+                <Button
                     onClick={scrollToBottom}
-                    className='absolute bottom-24 right-8 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full shadow-lg transition-all'
+                    className='absolute bottom-24 right-8 rounded-full p-2 shadow-lg'
                 >
                     <IconArrowDown size={20} />
-                </button>
+                </Button>
             )}
+
+            {showDeliveryQ &&
+                data?.data?.providerRequest?.providerRequestReview === null && (
+                    <Paper
+                        withBorder
+                        radius='md'
+                        p='md'
+                        className='mt-4 bg-yellow-50'
+                    >
+                        <Text size='sm' className='mb-2'>
+                            Товар был доставлен?
+                        </Text>
+                        <Group>
+                            <Button onClick={() => handleDelivery(true)}>
+                                Да, доставлен
+                            </Button>
+                            <Button
+                                variant='outline'
+                                onClick={() => handleDelivery(false)}
+                            >
+                                Нет, не доставлен
+                            </Button>
+                        </Group>
+                    </Paper>
+                )}
+
+            {showQualityQ &&
+                data?.data?.providerRequest?.providerRequestReview === null && (
+                    <Paper
+                        withBorder
+                        radius='md'
+                        p='md'
+                        className='mt-4 bg-green-50'
+                    >
+                        <Group align='center'>
+                            <Text size='sm'>Товар пришёл качественный?</Text>
+                            <ActionIcon
+                                onClick={handleFavorite}
+                                loading={favoriteMutation.isLoading}
+                                size='lg'
+                                radius='md'
+                                variant='light'
+                            >
+                                {favoriteMutation.isSuccess ? (
+                                    <IconHeartFilled size={20} />
+                                ) : (
+                                    <IconHeart size={20} />
+                                )}
+                            </ActionIcon>
+                        </Group>
+                        <Group mt='sm'>
+                            <Button onClick={() => handleQuality(true)}>
+                                Удовлетворительно
+                            </Button>
+                            <Button
+                                variant='outline'
+                                onClick={() => handleQuality(false)}
+                            >
+                                Нет, возврат
+                            </Button>
+                        </Group>
+                    </Paper>
+                )}
 
             <div className='mt-4 flex'>
                 <input
                     value={message}
                     onChange={e => setMessage(e.target.value)}
-                    onKeyDown={e => {
-                        if (e.key === 'Enter') handleSendMessage()
-                    }}
+                    onKeyDown={e => e.key === 'Enter' && handleSend()}
                     className='flex-1 border rounded-l-2xl px-4 py-2 outline-none shadow-sm focus:ring-2 focus:ring-blue-300'
                     placeholder='Введите сообщение...'
                 />
-                <button
-                    onClick={handleSendMessage}
-                    className='bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-r-2xl transition-all'
-                >
+                <Button onClick={handleSend} className='rounded-r-2xl px-6'>
                     <IconSend2 width={24} height={24} />
-                </button>
+                </Button>
             </div>
         </div>
     )

@@ -132,7 +132,7 @@ export function ProviderRequests() {
                                         withBorder
                                     >
                                         <Text fw={500}>
-                                            № {order.id} от{' '}
+                                            № {order.horecaRequest?.id} от{' '}
                                             {dayjs(order.createdAt).format(
                                                 'YYYY-MM-DD'
                                             )}
@@ -180,9 +180,8 @@ export function ProviderRequests() {
                                             </Flex>
 
                                             <Box>
-                                                {(
-                                                    order.status as unknown as ProviderRequestStatus
-                                                ) !== 'Active' ? (
+                                                {(order.status as unknown as ProviderRequestStatus) !==
+                                                'Active' ? (
                                                     <Box
                                                         style={{
                                                             opacity: 0.5,
@@ -201,7 +200,7 @@ export function ProviderRequests() {
                                                         <IconMessage
                                                             size={30}
                                                             color={
-                                                                order.status as unknown as ProviderRequestStatus ===
+                                                                (order.status as unknown as ProviderRequestStatus) ===
                                                                 'Pending'
                                                                     ? 'gray'
                                                                     : 'black'

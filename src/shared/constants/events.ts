@@ -8,5 +8,6 @@ export const EVENTS = {
     sessionRegistered: 'session-registered',
     joinRoom: 'join-room',
     userJoinRoom: 'user-join-room',
+    REVIEW: 'review',
     MESSAGES,
 }

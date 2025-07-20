@@ -1,12 +1,15 @@
 'use client'
 
 import React from 'react'
+import { toast } from 'react-toastify'
 
+import { CreateSupportRequestModal } from '../chat/ui'
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { providerRequest } from '@/entities/provider-request'
 import { useProviderRequestGetStatusMutation } from '@/entities/provider-request/request.queries'
 import { Button, Flex, Select, Text, Table, Modal } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
+import { modals } from '@mantine/modals'
 import Link from 'next/link'
 
 import {
@@ -41,7 +44,7 @@ export function ProductApplicationViews() {
             search: { status: ProviderHorecaRequestStatus.Actual },
             sort: getSortParam(sortValue),
         })
-    
+
     const groupedRequests =
         incomingRequests && groupRequestsByDate(incomingRequests.data || [])
     const { mutate: setStatus } = useProviderRequestGetStatusMutation()
@@ -62,6 +65,38 @@ export function ProductApplicationViews() {
     const openHideModal = (id: number) => {
         setSelectedRequestId(id)
         open()
+    }
+
+    const createRequestToSupport = (
+        horecaRequestId: number,
+        opponentId: number
+    ) => {
+        console.log(horecaRequestId)
+        console.log(opponentId)
+        modals.open({
+            centered: true,
+            size: 'xl',
+            radius: 'lg',
+            modalId: 'support-request',
+            withCloseButton: false,
+            children: (
+                <CreateSupportRequestModal
+                    type='product-application'
+                    horecaRequestId={horecaRequestId}
+                    opponentId={opponentId}
+                    onSuccess={() => {
+                        modals.close('support-request')
+                        toast.success(
+                            'Запрос на чат с поддержкой успешно создан!'
+                        )
+                    }}
+                    onError={(message: string) => {
+                        modals.close('support-request')
+                        toast.error(message)
+                    }}
+                />
+            ),
+        })
     }
 
     return (
@@ -191,7 +226,7 @@ export function ProductApplicationViews() {
                                                         align='center'
                                                         p='md'
                                                     >
-                                                        способ доставки
+                                                        {request.comment}
                                                     </Table.Td>
                                                     <Table.Td
                                                         align='center'
@@ -245,6 +280,14 @@ export function ProductApplicationViews() {
                                                                 variant='transparent'
                                                                 c='#CC2C79'
                                                                 fw={400}
+                                                                onClick={() =>
+                                                                    createRequestToSupport(
+                                                                        request.userId,
+                                                                        request
+                                                                            .items[0]
+                                                                            .horecaRequestId
+                                                                    )
+                                                                }
                                                             >
                                                                 Пожаловаться
                                                             </Button>

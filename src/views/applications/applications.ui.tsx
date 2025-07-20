@@ -34,10 +34,10 @@ import {
 const limit = 10
 
 const statusMap: Record<string, HorecaRequestStatus> = {
-    'В работе': HorecaRequestStatus.Active,
     'Ожидают откликов': HorecaRequestStatus.Pending,
+    'В работе': HorecaRequestStatus.Active,
     Завершённые: HorecaRequestStatus.CompletedSuccessfully,
-    'Завершённые неуспешно': HorecaRequestStatus.CompletedUnsuccessfully
+    'Завершённые неуспешно': HorecaRequestStatus.CompletedUnsuccessfully,
 }
 
 export function ApplicationsViews() {
@@ -76,7 +76,7 @@ export function ApplicationsViews() {
         setActiveTab(tab)
         setActiveStatus(statusMap[tab])
     }
-
+    
     return (
         <Flex direction='column' gap='md'>
             <Flex gap='md' align='center'>

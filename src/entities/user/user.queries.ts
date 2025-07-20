@@ -4,6 +4,7 @@ import { userStore } from '@/entities/user/user.model'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { api } from '@/shared/lib/horekaApi'
+import { ChangePasswordDto } from '@/shared/lib/horekaApi/Api'
 import { UsersPaginatedQuery } from '@/shared/lib/horekaApi/types'
 import { useCustomInfiniteQuery } from '@/shared/lib/reactQuery/useCustomInfiniteQuery'
 import { useCustomQuery } from '@/shared/lib/reactQuery/useCustomQuery'
@@ -75,6 +76,38 @@ export function useUpdateUserMutation() {
         mutationFn: api.usersControllerUpdate,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ['user', 'me'] })
+        },
+    })
+}
+
+export function usePasswordRecoveryMutation() {
+    return useMutation({
+        mutationFn: (email: string) =>
+            api.authorizationControllerPasswordRecovery({ email }),
+        onSuccess: () => {
+            toast.success(
+                'Инструкции по восстановлению отправлены на ваш email'
+            )
+        },
+        onError: (error: any) => {
+            const message = error?.response?.data?.message || 'Произошла ошибка'
+            toast.error(message)
+        },
+    })
+}
+
+export function useChangePasswordMutation(uuid: string) {
+    return useMutation({
+        mutationFn: (data: ChangePasswordDto) =>
+            api.authorizationControllerPasswordChange(uuid, data),
+        onSuccess: () => {
+            toast.success('Пароль успешно изменён')
+        },
+        onError: (error: any) => {
+            const message =
+                error?.response?.data?.message ||
+                'Произошла ошибка при изменении пароля'
+            toast.error(message)
         },
     })
 }
