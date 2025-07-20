@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { toast } from 'react-toastify'
 
 import { useChatHorecaStore } from '@/entities/chats/chat.users.model'
 import {
@@ -8,9 +9,15 @@ import {
     useGetChatsByIdQuery,
     useInfiniteGetAllMessagesQuery,
 } from '@/entities/chats/chats.queries'
+import { useFavoriteProviderMutation } from '@/entities/favorites/favorites.queries'
 import { userQueries } from '@/entities/user'
-import { Button, Loader, Group, Paper, Text } from '@mantine/core'
-import { IconSend2, IconArrowDown } from '@tabler/icons-react'
+import { Button, Loader, Group, Paper, Text, ActionIcon } from '@mantine/core'
+import {
+    IconSend2,
+    IconArrowDown,
+    IconHeart,
+    IconHeartFilled,
+} from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import { useParams } from 'next/navigation'
 
@@ -41,24 +48,24 @@ export function ChatView() {
     const bottomRef = useRef<HTMLDivElement>(null)
     const [message, setMessage] = useState('')
     const [isAtBottom, setIsAtBottom] = useState(true)
-
     const [isDelivered, setIsDelivered] = useState<number | null>(null)
     const [isSuccessfully, setIsSuccessfully] = useState<number | null>(null)
 
     const createReview = useCreateReviewMutation()
+    const favoriteMutation = useFavoriteProviderMutation()
 
     useEffect(() => {
         if (!data) return
         const initial = allChatMessages?.pages[0]?.data || []
         setChatMessagesWithInitial(chatId, undefined, initial)
-    }, [data])
+    }, [data, allChatMessages, setChatMessagesWithInitial, chatId])
 
     useEffect(() => {
         if (!socketTicket) return
         const onMsg = (m: any) => addMessage(chatId, m)
         socketTicket.on('message', onMsg)
         return () => void socketTicket.off('message', onMsg)
-    }, [socketTicket])
+    }, [socketTicket, addMessage, chatId])
 
     const scrollToBottom = useCallback(
         () => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }),
@@ -78,19 +85,22 @@ export function ChatView() {
 
     if (isLoading || !userData) return <Loader />
 
-    const created = new Date(data.data.createdAt).getTime()
+    const created = new Date(
+        data?.data?.providerRequest?.horecaRequest.deliveryTime
+    ).getTime()
     const now = Date.now()
-    const showDeliveryQ = isDelivered === null && now - created >= 60000
+    const showDeliveryQ = isDelivered === null && now - created >= 50
     const showQualityQ = isDelivered === 1 && isSuccessfully === null
 
-    const providerRequestId = data.data.providerRequest?.id
+    const providerReq = data?.data?.providerRequest
+    const providerUserId = providerReq?.userId
 
     const handleDelivery = (delivered: boolean) => {
         setIsDelivered(delivered ? 1 : 0)
         if (!delivered) {
             setIsSuccessfully(0)
             createReview.mutate({
-                providerRequestId: providerRequestId,
+                providerRequestId: providerReq,
                 isDelivered: 0,
                 isSuccessfully: 0,
             })
@@ -99,11 +109,40 @@ export function ChatView() {
 
     const handleQuality = (ok: boolean) => {
         setIsSuccessfully(ok ? 1 : 0)
-        createReview.mutate({
-            providerRequestId: providerRequestId,
-            isDelivered: 1,
-            isSuccessfully: ok ? 1 : 0,
-        })
+        createReview.mutate(
+            {
+                providerRequestId: providerReq,
+                isDelivered: 1,
+                isSuccessfully: ok ? 1 : 0,
+            },
+            {
+                onSuccess: () => {
+                    toast.success(
+                        ok
+                            ? 'Спасибо за оценку: товар был качественным'
+                            : 'Жаль, что товар не подошёл. Мы это учтём.'
+                    )
+                },
+                onError: () => {
+                    toast.error('Не удалось отправить оценку качества товара')
+                },
+            }
+        )
+    }
+
+    const handleFavorite = () => {
+        if (!providerUserId) return
+        favoriteMutation.mutate(
+            { data: { providerId: providerUserId } },
+            {
+                onSuccess: () => {
+                    toast.success('Поставщик добавлен в избранное')
+                },
+                onError: () => {
+                    toast.error('Не удалось добавить в избранное')
+                },
+            }
+        )
     }
 
     const handleSend = () => {
@@ -138,20 +177,22 @@ export function ChatView() {
                     return (
                         <div key={msg.id} className='flex flex-col'>
                             <div
-                                className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+                                className={`flex ${
+                                    isMe ? 'justify-end' : 'justify-start'
+                                }`}
                             >
                                 <Paper
-                                    className={`rounded-2xl p-3 max-w-[75%] shadow-md ${isMe ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
+                                    className={`rounded-2xl p-3 max-w-[75%] shadow-md ${
+                                        isMe
+                                            ? 'bg-blue-500 text-white'
+                                            : 'bg-gray-200 text-black'
+                                    }`}
                                     withBorder={!isMe}
                                     radius='xl'
                                     px='md'
                                     py='sm'
                                 >
-                                    <Text
-                                        size='xs'
-                                        weight={600}
-                                        className='mb-1'
-                                    >
+                                    <Text size='xs' className='mb-1'>
                                         {isMe
                                             ? 'Вы'
                                             : userData.role === 'Horeca'
@@ -164,7 +205,9 @@ export function ChatView() {
                             <Text
                                 size='xs'
                                 color='gray'
-                                className={`${isMe ? 'text-right' : 'text-left'} mt-1`}
+                                className={`${
+                                    isMe ? 'text-right' : 'text-left'
+                                } mt-1`}
                             >
                                 {dayjs(msg.createdAt).format(
                                     'DD.MM.YYYY HH:mm'
@@ -180,59 +223,73 @@ export function ChatView() {
                 <Button
                     onClick={scrollToBottom}
                     className='absolute bottom-24 right-8 rounded-full p-2 shadow-lg'
-                    compact
                 >
                     <IconArrowDown size={20} />
                 </Button>
             )}
 
-            {showDeliveryQ && (
-                <Paper
-                    withBorder
-                    radius='md'
-                    p='md'
-                    className='mt-4 bg-yellow-50'
-                >
-                    <Text size='sm' weight={600} className='mb-2'>
-                        Товар был доставлен?
-                    </Text>
-                    <Group spacing='sm'>
-                        <Button onClick={() => handleDelivery(true)}>
-                            Да, доставлен
-                        </Button>
-                        <Button
-                            variant='outline'
-                            onClick={() => handleDelivery(false)}
-                        >
-                            Нет, не доставлен
-                        </Button>
-                    </Group>
-                </Paper>
-            )}
+            {showDeliveryQ &&
+                data?.data?.providerRequest?.providerRequestReview === null && (
+                    <Paper
+                        withBorder
+                        radius='md'
+                        p='md'
+                        className='mt-4 bg-yellow-50'
+                    >
+                        <Text size='sm' className='mb-2'>
+                            Товар был доставлен?
+                        </Text>
+                        <Group>
+                            <Button onClick={() => handleDelivery(true)}>
+                                Да, доставлен
+                            </Button>
+                            <Button
+                                variant='outline'
+                                onClick={() => handleDelivery(false)}
+                            >
+                                Нет, не доставлен
+                            </Button>
+                        </Group>
+                    </Paper>
+                )}
 
-            {showQualityQ && (
-                <Paper
-                    withBorder
-                    radius='md'
-                    p='md'
-                    className='mt-4 bg-green-50'
-                >
-                    <Text size='sm' weight={600} className='mb-2'>
-                        Товар пришёл качественный?
-                    </Text>
-                    <Group spacing='sm'>
-                        <Button onClick={() => handleQuality(true)}>
-                            Удовлетворительно
-                        </Button>
-                        <Button
-                            variant='outline'
-                            onClick={() => handleQuality(false)}
-                        >
-                            Нет, возврат
-                        </Button>
-                    </Group>
-                </Paper>
-            )}
+            {showQualityQ &&
+                data?.data?.providerRequest?.providerRequestReview === null && (
+                    <Paper
+                        withBorder
+                        radius='md'
+                        p='md'
+                        className='mt-4 bg-green-50'
+                    >
+                        <Group align='center'>
+                            <Text size='sm'>Товар пришёл качественный?</Text>
+                            <ActionIcon
+                                onClick={handleFavorite}
+                                loading={favoriteMutation.isLoading}
+                                size='lg'
+                                radius='md'
+                                variant='light'
+                            >
+                                {favoriteMutation.isSuccess ? (
+                                    <IconHeartFilled size={20} />
+                                ) : (
+                                    <IconHeart size={20} />
+                                )}
+                            </ActionIcon>
+                        </Group>
+                        <Group mt='sm'>
+                            <Button onClick={() => handleQuality(true)}>
+                                Удовлетворительно
+                            </Button>
+                            <Button
+                                variant='outline'
+                                onClick={() => handleQuality(false)}
+                            >
+                                Нет, возврат
+                            </Button>
+                        </Group>
+                    </Paper>
+                )}
 
             <div className='mt-4 flex'>
                 <input

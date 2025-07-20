@@ -111,7 +111,11 @@ export function EditViews() {
                     withAsterisk
                 />
                 <TextInput
-                    label='Контактный номер для связи с покупателем:'
+                    label={
+                        data?.role === 'Provider'
+                            ? 'Контактный номер для связи с покупателем:'
+                            : 'Контактный номер для связи с поставщиком:'
+                    }
                     placeholder='+7 (965) 999-99-99'
                     {...form.getInputProps('phone')}
                     withAsterisk

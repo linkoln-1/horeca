@@ -7,14 +7,18 @@ enum SocketTransport {
     POLLING = 'polling',
 }
 
-const socketConnections = new Map()
+const socketConnections = new Map<string, Socket | null>()
 socketConnections.set(DEFAULT_CONNECTION, null)
 
-const getSocketHost = (): string => process.env.NEXT_PUBLIC_APP_WS_API as string
+const getSocketHost = (): string => {
+    if (!process.env.NEXT_PUBLIC_APP_WS_API) {
+        throw new Error('NEXT_PUBLIC_APP_WS_API is not defined')
+    }
+    return process.env.NEXT_PUBLIC_APP_WS_API
+}
 
 export const removeSocketConnection = (namespace: string) => {
     const socket = socketConnections.get(namespace)
-
     if (socket) {
         socket.disconnect()
         socketConnections.delete(namespace)
@@ -22,15 +26,14 @@ export const removeSocketConnection = (namespace: string) => {
 }
 
 export const getSocket = (namespace?: string, token?: string): Socket => {
-    const hasNamespaceSocket = socketConnections.has(namespace)
-
-    if (hasNamespaceSocket) {
-        return socketConnections.get(namespace) as Socket
+    const key = namespace || DEFAULT_CONNECTION
+    const existing = socketConnections.get(key)
+    if (existing) {
+        return existing
     }
 
     const HOST = getSocketHost()
-
-    const socketOptions = {
+    const opts = {
         transports: [SocketTransport.WS],
         auth: {
             authorization: `Bearer ${token || ''}`,
@@ -40,25 +43,19 @@ export const getSocket = (namespace?: string, token?: string): Socket => {
         reconnectionDelay: 5000,
     }
 
-    const connection = io(`${HOST}/${namespace || ''}`, socketOptions)
+    const url = namespace ? `${HOST}/${namespace}` : HOST
+    const socket = io(url, opts)
 
-    connection.on('connect', () => {
-        console.log(`Connected to WebSocket ${namespace || 'default'}`)
+    socket.on('connect', () => {
+        console.log(`Connected to WebSocket [${key}]`)
+    })
+    socket.on('disconnect', reason => {
+        console.log(`Disconnected from WebSocket [${key}]:`, reason)
+    })
+    socket.on('error', err => {
+        console.error(`WebSocket [${key}] Error:`, err)
     })
 
-    connection.on('disconnect', () => {
-        console.log(`Disconnected from WebSocket ${namespace || 'default'}`)
-    })
-
-    connection.on('error', error => {
-        console.error('WebSocket Error:', error)
-    })
-
-    if (namespace && !hasNamespaceSocket) {
-        socketConnections.set(namespace, connection)
-    } else {
-        socketConnections.set(DEFAULT_CONNECTION, connection)
-    }
-
-    return connection
+    socketConnections.set(key, socket)
+    return socket
 }

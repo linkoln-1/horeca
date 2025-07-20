@@ -2,6 +2,7 @@ import { ReactNode } from 'react'
 
 import { Footer } from './Footer'
 import { Header } from './Header'
+import CookieConsent from '@/views/landing/cookies/Cookies'
 import { Container, Flex, Grid } from '@mantine/core'
 
 type LandingLayoutProps = {
@@ -23,6 +24,7 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
                 <Header />
                 {children}
             </Flex>
+            <CookieConsent />
             <Footer />
         </Container>
     )

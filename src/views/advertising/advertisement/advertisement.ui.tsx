@@ -1,5 +1,6 @@
 'use client'
 
+import { favoritesQueries } from '@/entities/favorites'
 import { FavoriteProvidersModal } from '@/features/favoriteProviders/favoriteProviders.modal'
 import {
     Box,
@@ -10,12 +11,12 @@ import {
     Text,
     Image as MantineImage,
     Stack,
+    Loader,
 } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 
-import { suppliers } from '@/shared/constants/favoriteProvidersData'
+import { getImageUrl } from '@/shared/helpers'
 
 type Info = {
     name: string
@@ -23,23 +24,30 @@ type Info = {
     description?: string
 }
 
-type FakeHistory = {
-    id: number
-    number: number
-    data: string
-    text: string
-    link?: string
-    linkText?: string
-    info: Info
-    infoCategory: Info
-}
-
 export function Advertisement() {
-    const router = usePathname()
+    const { data: favourites } = favoritesQueries.useGetFavoriteProviderQuery()
+    if (!favourites) return <Loader />
 
     return (
         <Flex direction='column' gap='xl' p='md'>
-            {suppliers.map((suplier, index) => {
+            {favourites.data.length === 0 && (
+                <Flex
+                    justify='center'
+                    align='center'
+                    direction='column'
+                    h='70vh'
+                >
+                    <Text size='lg'>
+                        Это список ваших постоянных клиентов. Сейчас тут пусто,
+                        но, надеемся,
+                    </Text>
+
+                    <Text size='lg'>
+                        скоро появятся первые постоянные клиенты ❤️
+                    </Text>
+                </Flex>
+            )}
+            {favourites.data.map((suplier, index) => {
                 return (
                     <Flex w='100%' key={index}>
                         <Paper
@@ -56,7 +64,9 @@ export function Advertisement() {
                                         w={180}
                                         h={180}
                                         radius='md'
-                                        src={suplier.img}
+                                        src={getImageUrl(
+                                            suplier.user?.avatar?.path
+                                        )}
                                     />
 
                                     <Stack py='md' justify='space-between'>
@@ -66,28 +76,7 @@ export function Advertisement() {
                                             </Text>
 
                                             <Text display='inline' size='md'>
-                                                {suplier.name}
-                                            </Text>
-                                        </Flex>
-                                        <Flex gap='md'>
-                                            <Text fw={600} span size='md'>
-                                                Рейтинг:
-                                            </Text>
-
-                                            <Text display='inline' size='md'>
-                                                {suplier.rating} / 5
-                                            </Text>
-                                        </Flex>
-                                        <Flex gap='md'>
-                                            <Text fw={600} size='md'>
-                                                Категории товаров:
-                                            </Text>
-                                            <Text size='md'>
-                                                {suplier.categories.map(
-                                                    category => {
-                                                        return category + '; '
-                                                    }
-                                                )}
+                                                {suplier.user.name}
                                             </Text>
                                         </Flex>
                                     </Stack>

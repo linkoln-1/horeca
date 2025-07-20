@@ -24,10 +24,24 @@ export function Footer() {
                         </div>
                         <Flex
                             direction={'column'}
-                            className='justify-center gap-y-2 lg:gap-y-[4px] lg:text-[14px]'
+                            className='justify-center gap-y-2 lg:gap-y-[4px] lg:text-[14px] w-max'
                         >
-                            <div>Политика конфиденциальности</div>
-                            <div>Пользовательское соглашение</div>
+                            <a
+                                href='/Политика конфиденциальности Сфера HoReCa.pdf'
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='cursor-pointer hover:underline'
+                            >
+                                Политика конфиденциальности
+                            </a>
+                            <a
+                                href='/Пользовательское соглашение Сфера HoReCa.pdf'
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='cursor-pointer hover:underline'
+                            >
+                                Пользовательское соглашение
+                            </a>
                         </Flex>
                     </Flex>
 
@@ -62,7 +76,7 @@ export function Footer() {
                             <Flex direction={'row'}>
                                 <div className='rounded-full bg-[#F8F9FA] p-2'>
                                     <Link
-                                        href={'https://t.me/sphere_horeca_info'}
+                                        href={'https://t.me/sphere_horeca'}
                                         target='_blank'
                                     >
                                         <IconBrandTelegram

@@ -1,20 +1,11 @@
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 
-import { Footer } from '@/core/layout/AppLayout/Footer'
-import { Header } from '@/core/layout/AppLayout/Header'
+import { Footer } from './Footer'
+import { Header } from './Header'
 import { useUserStore } from '@/core/providers/userStoreContext'
 import { imageQueries } from '@/entities/uploads'
 import { userQueries } from '@/entities/user'
-import {
-    Box,
-    Container,
-    Divider,
-    Flex,
-    Grid,
-    Paper,
-    Text,
-} from '@mantine/core'
-import { useForm } from '@mantine/form'
+import { Container, Grid, Paper, Flex, Box, Divider, Text } from '@mantine/core'
 import { jwtDecode } from 'jwt-decode'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -27,11 +18,8 @@ import {
 import { getImageUrl } from '@/shared/helpers'
 import { role } from '@/shared/helpers/getRole'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
-import {
-    ProfileType,
-    UpdateUserDto,
-    UploadDto,
-} from '@/shared/lib/horekaApi/Api'
+import { useWebSocketNotifications } from '@/shared/hooks/useWebSocketNotifications'
+import { ProfileType } from '@/shared/lib/horekaApi/Api'
 import { CustomAvatarUpload } from '@/shared/ui/CustomAvatarUpload'
 
 type AppLayoutProps = {
@@ -39,17 +27,22 @@ type AppLayoutProps = {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-    const form = useForm<UpdateUserDto | UploadDto>({
-        initialValues: {
-            avatar: 0,
-        },
-    })
-
+    useWebSocketNotifications()
     const isMobile = useBreakpoint('xl')
     const path = usePathname()
+    const isRecovery = path?.startsWith('/account/password_recovery')
 
+    if (isRecovery) {
+        return (
+            <>
+                <Header />
+                {children}
+            </>
+        )
+    }
     const { user, accessToken, updateUser } = useUserStore(state => state)
-
+    // TODO:баг с ролью выхода и захода
+    // useEffect(() => {})
     const { mutateAsync: uploadImage } = imageQueries.useImageUploadMutation()
     const { mutateAsync: updateUserAvatar, isPending } =
         userQueries.useUpdateUserMutation()
@@ -78,21 +71,19 @@ export function AppLayout({ children }: AppLayoutProps) {
             }
         }
     }
-    
+
     return (
         <Container className='min-h-screen flex flex-col justify-between' fluid>
             <Grid>
-        <Grid.Col span={12} className="flex items-center justify-between">
+                <Grid.Col
+                    span={12}
+                    className='flex items-center justify-between'
+                >
                     <Header />
                 </Grid.Col>
 
                 <Grid.Col
-                    span={{
-                        base: 0,
-                        xs: 0,
-                        sm: 2,
-                        md: 2,
-                    }}
+                    span={{ base: 0, xs: 0, sm: 2, md: 2 }}
                     h='calc(100vh - 235px)'
                     pos='sticky'
                     top={20}
@@ -103,10 +94,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                         p='md'
                         radius='md'
                         h='100%'
-                        w='100%'
                     >
                         <Flex direction='column' gap={24}>
-                            <Flex gap='md' align='center' direction='column'>
+                            <Flex direction='column' align='center' gap='md'>
                                 <Box w={150} h={150}>
                                     <CustomAvatarUpload
                                         editable={decode?.role != 'Admin'}
@@ -119,27 +109,16 @@ export function AppLayout({ children }: AppLayoutProps) {
                                         className='aspect-square cursor-pointer'
                                     />
                                 </Box>
-                                <Box>
-                                    <Flex direction='column' gap='lg'>
-                                        {[user].map(item => (
-                                            <Flex
-                                                key={item && item.id}
-                                                direction='column'
-                                                gap='md'
-                                                justify='center'
-                                                align='center'
-                                            >
-                                                <Text size='xl' fw={700}>
-                                                    {item && item.name}
-                                                </Text>
-
-                                                <Text>
-                                                    email: {item && item.email}
-                                                </Text>
-                                            </Flex>
-                                        ))}
-                                    </Flex>
-                                </Box>
+                                <Flex
+                                    direction='column'
+                                    gap='lg'
+                                    align='center'
+                                >
+                                    <Text size='xl' fw={700}>
+                                        {user?.name}
+                                    </Text>
+                                    <Text>email: {user?.email}</Text>
+                                </Flex>
                             </Flex>
 
                             <Divider color='#A0AAC8' />
@@ -201,6 +180,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                     {children}
                 </Grid.Col>
             </Grid>
+
             <Footer my='md' />
         </Container>
     )

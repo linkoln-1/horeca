@@ -9,7 +9,6 @@ import {
     Drawer,
     Flex,
     Image as MantineImage,
-    NavLink,
     Paper,
     useCombobox,
 } from '@mantine/core'
@@ -23,10 +22,10 @@ import {
 } from '@/shared/constants'
 import { role } from '@/shared/helpers/getRole'
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint'
+import { UserRole } from '@/shared/lib/horekaApi/Api'
 
 export function Header() {
     const [opened, setOpened] = useState(false)
-
     const toggleMenu = () => {
         setOpened(prev => !prev)
     }
@@ -45,7 +44,7 @@ export function Header() {
         user?.profile?.profileType === roles[0].role
             ? providerSidebarData
             : horecaSidebarData
-    
+    const isRecovery = path?.startsWith('/account/password_recovery')
     return (
         <Paper w='100%' bg='var(--mantine-color-indigo-0)' p='sm'>
             <Container fluid>
@@ -111,21 +110,25 @@ export function Header() {
                                             </Link>
                                         )
                                     })}
-                                <Flex gap='sm' align='center'>
-                                    <Button
-                                        color='#385191'
-                                        size='compact-sm'
-                                        variant='transparent'
-                                        onClick={logOut}
-                                    >
-                                        Выйти
-                                    </Button>
-                                </Flex>
+                                {isRecovery ? (
+                                    ''
+                                ) : (
+                                    <Flex gap='sm' align='center'>
+                                        <Button
+                                            color='#385191'
+                                            size='compact-sm'
+                                            variant='transparent'
+                                            onClick={logOut}
+                                        >
+                                            Выйти
+                                        </Button>
+                                    </Flex>
+                                )}
                             </Flex>
                         </Drawer>
 
                         <Link
-                            href={`/user${user && role({ user })}/`}
+                            href={`/user/${user?.role === ('Provider' as UserRole) ? 'provider/products/applications' : 'horeca/applications'}`}
                         >
                             <MantineImage
                                 src='/assets/icons/logo.svg'
@@ -134,7 +137,7 @@ export function Header() {
                         </Link>
                     </Flex>
 
-                    {!isMobile && (
+                    {!isMobile && !isRecovery && (
                         <Flex gap='sm' align='center'>
                             <Button
                                 color='#385191'

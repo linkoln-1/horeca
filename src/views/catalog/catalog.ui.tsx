@@ -46,31 +46,30 @@ export function Catalog() {
 
     return (
         <Flex direction='column' gap='md'>
+            <Flex justify='space-between' align='center'>
+                {/* <Select
+                    data={(user?.profile as ProviderProfileDto)?.categories.map(
+                        x => ({
+                            value: x,
+                            label: CategoryLabels[x as Categories],
+                        })
+                    )}
+                    placeholder='Выберите категорию'
+                /> */}
+
+                <Box>
+                    <Button
+                        variant='filled'
+                        size='md'
+                        color='indigo.4'
+                        onClick={() => handleModal()}
+                    >
+                        Добавить новый товар
+                    </Button>
+                </Box>
+            </Flex>
             {data && data.length > 0 && (
                 <Flex direction='column' gap='lg'>
-                    <Flex justify='space-between' align='center'>
-                        <Select
-                            data={(
-                                user?.profile as ProviderProfileDto
-                            )?.categories.map(x => ({
-                                value: x,
-                                label: CategoryLabels[x as Categories],
-                            }))}
-                            placeholder='Выберите категорию'
-                        />
-
-                        <Box>
-                            <Button
-                                variant='filled'
-                                size='md'
-                                color='indigo.4'
-                                onClick={() => handleModal()}
-                            >
-                                Добавить новый товар
-                            </Button>
-                        </Box>
-                    </Flex>
-
                     <Flex direction='column' gap='md'>
                         <Table withRowBorders withColumnBorders>
                             <Table.Thead bg='indigo.4'>

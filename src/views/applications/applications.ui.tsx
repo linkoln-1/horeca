@@ -76,7 +76,7 @@ export function ApplicationsViews() {
         setActiveTab(tab)
         setActiveStatus(statusMap[tab])
     }
-
+    
     return (
         <Flex direction='column' gap='md'>
             <Flex gap='md' align='center'>

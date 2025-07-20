@@ -36,26 +36,22 @@ export function Footer(props: FooterProps) {
                     {!isMobile && (
                         <Flex className='flex-row' gap='md' align='center'>
                             <Flex gap='md'>
-                                <Button
-                                    component={Link}
-                                    href={''}
-                                    color='#385191'
-                                    size='compact-sm'
-                                    variant='transparent'
-                                    fw={400}
+                                <a
+                                    href='/Пользовательское соглашение Сфера HoReCa.pdf'
+                                    target='_blank'
+                                    rel='noopener noreferrer'
+                                    className='cursor-pointer hover:underline'
                                 >
                                     Пользовательское соглашение
-                                </Button>
-                                <Button
-                                    component={Link}
-                                    href={''}
-                                    color='#385191'
-                                    size='compact-sm'
-                                    variant='transparent'
-                                    fw={400}
+                                </a>
+                                <a
+                                    href='/Политика конфиденциальности Сфера HoReCa.pdf'
+                                    target='_blank'
+                                    rel='noopener noreferrer'
+                                    className='cursor-pointer hover:underline'
                                 >
                                     Политика конфиденциальности
-                                </Button>
+                                </a>
                             </Flex>
                         </Flex>
                     )}
