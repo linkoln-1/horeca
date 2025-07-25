@@ -319,6 +319,7 @@ export interface HorecaRequestItemDto {
 
 export interface HorecaRequestProviderStatusDto {
     horecaRequestId: number
+    /** @deprecated */
     viewed?: boolean
     hidden?: boolean
 }
@@ -360,10 +361,11 @@ export interface IncomeProviderRequestItemDto {
     images?: UploadDto[]
 }
 
-export interface IncomeProviderUserDto {
+export interface ProviderUserDto {
     avatar?: UploadDto
     name: string
     rating: number
+    categories?: string[]
 }
 
 export interface IncomeProviderRequestDto {
@@ -377,7 +379,7 @@ export interface IncomeProviderRequestDto {
     updatedAt: string
     items: IncomeProviderRequestItemDto[]
     cover: number
-    user: IncomeProviderUserDto
+    user: ProviderUserDto
 }
 
 export interface HorecaRequestWithProviderRequestsDto {
@@ -532,6 +534,12 @@ export interface ChatDto {
     updatedAt: string
 }
 
+export interface ChatSearchDto {
+    type?: ChatType
+    /** Required when type is not defined */
+    chatParticipantId?: number
+}
+
 export enum ProviderRequestStatus {
     Pending = 'Pending',
     Active = 'Active',
@@ -646,6 +654,7 @@ export interface FavouritesCreateDto {
 }
 
 export interface FavouritesUserDto {
+    avatar?: UploadDto
     name: string
 }
 
@@ -659,7 +668,7 @@ export interface FavouritesDto {
     /** @format date-time */
     updatedAt: string
     user: FavouritesUserDto
-    provider: FavouritesUserDto
+    provider: ProviderUserDto
 }
 
 export interface SupportRequestCreateDto {
@@ -769,7 +778,7 @@ export interface ProductCreateDto {
     description: string
     producer: string
     cost: number
-    count: number
+    count: string
     packagingType: string
     imageIds: number[]
 }
@@ -806,7 +815,7 @@ export interface ProductDto {
     description: string
     producer: string
     cost: number
-    count: number
+    count: string
     packagingType: string | null
     /** @format date-time */
     createdAt: string
@@ -848,7 +857,7 @@ export interface ProductUpdateDto {
     description: string
     producer: string
     cost: number
-    count: number
+    count: string
     packagingType: string
     imageIds: number[]
 }
@@ -1692,7 +1701,7 @@ export class Api<
             query?: {
                 offset?: number
                 limit?: number
-                search?: any
+                search?: ChatSearchDto
                 /** fieldName(numeric)|ASC/DESC */
                 sort?: string
             },
