@@ -32,7 +32,7 @@ export function ContactUs() {
 
         try {
             const response = await fetch(
-                'https://sphere-horeca.ru/cms/api/forms',
+                process.env.NEXT_PUBLIC_APP_BASE_API + '/cms/api/forms',
                 {
                     method: 'POST',
                     headers: {
