@@ -6,7 +6,7 @@ on:
 
 jobs:
     deploy:
-        runs-on: self-hosted
+        runs-on: [self-hosted, horeca]
         environment: production
         steps:
             - name: checkout repo
